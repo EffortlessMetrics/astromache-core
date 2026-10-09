@@ -1,0 +1,16 @@
+---
+import Publication from "../layouts/Publication.astro";
+---
+<Publication title="Search — Field Notes" description="Search publication notes.">
+<h1>Search notes</h1><form id="search-form"><label for="query">Search</label><input id="query" name="query" type="search" /><button>Search</button></form><p id="search-status" role="status"></p><ul id="search-results"></ul>
+</Publication>
+<script>
+import {createStaticIndexLoader,createStaticSearchBackend} from "@effortlessmetrics/static-search";
+type Note={title:string;text:string;url:string};
+const index=createStaticIndexLoader<Note[]>({load:async signal=>{const response=await fetch("/search-index.json",{signal});if(!response.ok)throw new Error("Index unavailable");return response.json();}});
+const backend=createStaticSearchBackend({index,createFallback:snapshot=>({search:query=>snapshot.data.filter(note=>(note.title+" "+note.text).toLocaleLowerCase().includes(query.toLocaleLowerCase()))}),getAllDocuments:snapshot=>snapshot.data});
+const form=document.querySelector<HTMLFormElement>("#search-form")!;const input=document.querySelector<HTMLInputElement>("#query")!;const status=document.querySelector<HTMLElement>("#search-status")!;const list=document.querySelector<HTMLUListElement>("#search-results")!;let request=0;let abort:AbortController|undefined;
+form.addEventListener("submit",async event=>{event.preventDefault();abort?.abort();const controller=new AbortController();abort=controller;const query=input.value;const generation=++request;try{await backend.init({signal:controller.signal});if(generation!==request||controller.signal.aborted)return;const results=await backend.search(query,{}, {signal:controller.signal});if(generation!==request)return;list.replaceChildren(...results.map(note=>{const li=document.createElement("li");const link=document.createElement("a");link.href=note.url;link.textContent=note.title;li.append(link);return li;}));status.textContent=results.length+" results";}catch(error){if(generation===request&&!(error instanceof DOMException&&error.name==="AbortError"))status.textContent="Search unavailable";}});
+window.addEventListener("pagehide",event=>{abort?.abort();abort=undefined;++request;if(!event.persisted)backend.dispose();});
+</script>
+

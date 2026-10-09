@@ -1,0 +1,22 @@
+---
+import Document from './Document.astro';
+import type { PublicationMetadata } from './metadata';
+import type { HTMLAttributes } from 'astro/types';
+export type Props=PublicationMetadata & {htmlAttributes?:HTMLAttributes<'html'>;themeStorageKey?:string;themeToggleId?:string;};
+const {themeStorageKey='theme',themeToggleId='theme-toggle',...metadata}=Astro.props;
+---
+<Document {...metadata}>
+<Fragment slot="head"><script is:inline define:vars={{themeStorageKey}}>
+let preference;try{preference=localStorage.getItem(themeStorageKey);}catch{}
+document.documentElement.dataset.theme=preference==='dark'||preference==='light'?preference:window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+</script><slot name="head"/></Fragment>
+<slot name="header" slot="header"/><slot/><slot name="footer" slot="footer"/>
+<Fragment slot="body-end"><slot name="body-end"/><span hidden data-publication-theme data-theme-key={themeStorageKey} data-theme-toggle={themeToggleId}></span></Fragment>
+</Document>
+<script>
+for(const config of document.querySelectorAll<HTMLElement>('[data-publication-theme]')){
+ const toggle=document.getElementById(config.dataset.themeToggle || 'theme-toggle');
+ const update=()=>toggle?.setAttribute('aria-label','Switch to '+(document.documentElement.dataset.theme==='dark'?'light':'dark')+' theme');
+ toggle?.addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;try{localStorage.setItem(config.dataset.themeKey || 'theme',theme);}catch{}update();});update();
+}
+</script>

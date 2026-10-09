@@ -1,0 +1,6 @@
+---
+import PostList from './PostList.astro';
+export interface Props {label:string;href?:string;id?:string;itemHeadingLevel?:2|3;items:ReadonlyArray<{title:string;href:string;description:string}>;}
+const {label,href,items,id,itemHeadingLevel=2}=Astro.props;
+---
+<section class="lens-section" id={id}>{href?<a href={href} class="lens-heading"><h2>{label}</h2></a>:<h2>{label}</h2>}<PostList items={items} headingLevel={itemHeadingLevel}/><slot/></section>

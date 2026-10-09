@@ -1,0 +1,5 @@
+---
+export interface Props {label?:string;}
+const {label='Site footer'}=Astro.props;
+---
+<footer class="publication-footer" aria-label={label}><slot name="social"/><slot/></footer>

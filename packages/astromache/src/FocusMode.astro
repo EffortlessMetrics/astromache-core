@@ -1,0 +1,132 @@
+---
+export interface Props {toggleId?:string;storageKey?:string;bodyClass?:string;}
+const {toggleId="focus-mode-toggle",storageKey="focus-mode",bodyClass="focus-mode"}=Astro.props;
+---
+
+<button
+  id={toggleId}
+  type="button" data-focus-toggle data-storage-key={storageKey} data-focus-class={bodyClass}
+  class="focus-mode-toggle"
+  aria-label="Toggle focus mode"
+  title="Toggle focus mode"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M12 1v6m0 6v6m11-11h-6m-6 0H1"></path>
+  </svg>
+  <span class="sr-only">Toggle focus mode</span>
+</button>
+
+<style>
+  .focus-mode-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--content-bg);
+    border: 1px solid var(--border);
+    color: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .focus-mode-toggle:hover {
+    background: var(--accent);
+    color: white;
+    transform: scale(1.05);
+  }
+
+  .focus-mode-toggle:active {
+    transform: scale(0.95);
+  }
+
+  body.focus-mode .focus-mode-toggle {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* Hide on mobile */
+  @media (max-width: 768px) {
+    .focus-mode-toggle {
+      bottom: 4.5rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  /* Hide on print */
+  @media print {
+    .focus-mode-toggle {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Focus mode functionality
+  function initFocusMode() {
+    const toggle = document.querySelector<HTMLButtonElement>("[data-focus-toggle]");
+    const body = document.body;
+    const storageKey=toggle?.dataset.storageKey||"focus-mode";
+    const bodyClass=toggle?.dataset.focusClass||"focus-mode";
+
+    // Check saved preference
+    let savedMode: string | null = null;
+    try { savedMode = localStorage.getItem(storageKey); } catch {}
+    if (savedMode === "true") {
+      body.classList.add(bodyClass);
+    }
+    toggle?.setAttribute("aria-pressed",String(body.classList.contains(bodyClass)));
+
+    // Toggle on click
+    toggle?.addEventListener("click", () => {
+      const isActive = body.classList.toggle(bodyClass);
+      try { localStorage.setItem(storageKey, isActive.toString()); } catch {}
+      toggle?.setAttribute("aria-pressed",String(isActive));
+
+      // Announce to screen readers
+      const message = isActive ? "Focus mode enabled" : "Focus mode disabled";
+      announceToScreenReader(message);
+    });
+
+    // Keyboard shortcut removed - now available through TypeAnywhereSearch (Cmd+K then type "focus")
+  }
+
+  // Screen reader announcement
+  function announceToScreenReader(message: string) {
+    const announcement = document.createElement("div");
+    announcement.setAttribute("role", "status");
+    announcement.setAttribute("aria-live", "polite");
+    announcement.setAttribute("aria-atomic", "true");
+    announcement.className = "sr-only";
+    announcement.textContent = message;
+
+    document.body.appendChild(announcement);
+    setTimeout(() => announcement.remove(), 1000);
+  }
+
+  // Initialize
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFocusMode);
+  } else {
+    initFocusMode();
+  }
+</script>

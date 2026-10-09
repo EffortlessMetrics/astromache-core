@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "ESNext",
+    "jsx": "preserve",
+    "jsxImportSource": "astro",
+    "types": ["node", "astro/client"]
+  },
+  "contentMappers": [{ "package": "@astrojs/ts-content-mapper", "extensions": [".astro"] }],
+  "include": [
+    "packages/**/*.ts",
+    "packages/**/*.astro",
+    "consumers/**/*.ts",
+    "consumers/**/*.astro"
+  ]
+}

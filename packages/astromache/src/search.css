@@ -1,0 +1,67 @@
+:root {
+  --color-ocean-deep: var(--accent);
+  --color-ocean-top: var(--accent);
+  --color-ocean-light: var(--accent);
+  --color-ocean-dark: var(--accent-hover);
+}
+:root {
+  --tas-surface: var(--content-bg);
+  --tas-surface-muted: var(--background);
+  --tas-surface-raised: var(--muted);
+  --tas-border: var(--border);
+  --tas-border-subtle: var(--border);
+  --tas-border-strong: var(--secondary);
+  --tas-divider: var(--border);
+  --tas-text: var(--foreground);
+  --tas-text-strong: var(--foreground);
+  --tas-text-solid: var(--foreground);
+  --tas-text-muted: var(--secondary);
+  --tas-text-faint: var(--secondary);
+  --color-ocean-deep: var(--accent);
+}
+[data-tas-dialog],
+[data-tas-dialog] * {
+  box-sizing: border-box;
+}
+[data-tas-dialog] input {
+  min-inline-size: 0;
+}
+/* Recover the original Tailwind base treatment locally, without resetting publication content. */
+@layer base {
+  [data-tas-dialog] :is(h1, h2, h3, p, ul, li) {
+    margin: 0;
+    padding: 0;
+  }
+  [data-tas-dialog] :is(h1, h2, h3) {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  [data-tas-dialog] :is(svg, img) {
+    display: block;
+    vertical-align: middle;
+  }
+  [data-tas-dialog] :is(input, button) {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+  [data-tas-dialog] button {
+    background-color: transparent;
+    border: 0 solid;
+    cursor: pointer;
+  }
+  [data-tas-dialog] input {
+    appearance: none;
+    border: 0 solid;
+    background: transparent;
+  }
+}
+[data-tas-dialog] input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+[data-tas-dialog] .search-domain-meta {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--secondary);
+}

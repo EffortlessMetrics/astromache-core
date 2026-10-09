@@ -1,0 +1,26 @@
+diff --git a/components/Picture.astro b/components/Picture.astro
+index 815c2c17db504e8fb7c8ea0dedd1998b25020b70..f7e7f298eb7c272e34fb4b16c83b9c4d51ea10af 100644
+--- a/components/Picture.astro
++++ b/components/Picture.astro
+@@ -75,7 +75,7 @@ const originalSrc = await resolveSrc(props.src);
+ // When inferSize is set for a remote image, resolve dimensions once and thread them through
+ // to all getImage() calls. This avoids multiple redundant HTTP requests to the same URL,
+ // which can trigger rate-limiting (HTTP 429) on servers like Wikimedia.
+-if (props.inferSize && isRemoteImage(originalSrc)) {
++if ('inferSize' in props && props.inferSize && isRemoteImage(originalSrc)) {
+ 	const remoteSize = await inferRemoteSize(originalSrc);
+-	delete props.inferSize;
++	Reflect.deleteProperty(props, 'inferSize');
+ 	props.width ??= remoteSize.width;
+diff --git a/types/fonts.d.ts b/types/fonts.d.ts
+index 5530e68413d608be50577b880bbaed89e18890b7..2414eaa66f94aa3874d462b298e9c0dd69ffcf41 100644
+--- a/types/fonts.d.ts
++++ b/types/fonts.d.ts
+@@ -8,3 +8,7 @@ declare module 'astro:assets' {
+ 	/** @internal */
+ 	export type FontPreloadFilter = import('../dist/assets/fonts/types.js').PreloadFilter;
+ }
++
++declare module 'virtual:astro:assets/fonts/internal' {
++	export const componentDataByCssVariable: import('../dist/assets/fonts/types.js').ComponentDataByCssVariable;
++}

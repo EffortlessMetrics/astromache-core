@@ -1,0 +1,12 @@
+{
+  "name": "astromache-neutral-fixture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "astro build"
+  },
+  "dependencies": {
+    "astro": "7.3.5",
+    "astromache": "workspace:*"
+  }
+}

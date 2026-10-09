@@ -1,0 +1,9 @@
+---
+export interface Props {items:ReadonlyArray<{title:string;href:string;description:string}>;pagination?:{current:number;total:number;previous?:string;next?:string};returnStorageKey?:string;headingLevel?:2|3;}
+const {items,pagination,returnStorageKey,headingLevel=2}=Astro.props;
+const Heading=headingLevel===3?"h3":"h2";
+---
+<ul class="article-cards">{items.map(item=><li><Heading><a href={item.href}>{item.title}</a></Heading><p>{item.description}</p></li>)}</ul>
+{pagination&&pagination.total>1&&<nav aria-label="Pagination" class="pagination">{pagination.previous&&<a href={pagination.previous}>Previous</a>}<span>Page {pagination.current} of {pagination.total}</span>{pagination.next&&<a href={pagination.next}>Next</a>}</nav>}
+{returnStorageKey&&<span hidden data-publication-return-key={returnStorageKey}></span>}
+<script>for(const element of document.querySelectorAll<HTMLElement>('[data-publication-return-key]')){try{sessionStorage.setItem(element.dataset.publicationReturnKey!,location.pathname);}catch{}}</script>

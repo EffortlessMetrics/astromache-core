@@ -1,0 +1,30 @@
+{
+  "name": "astromache-publication-starter",
+  "version": "0.2.0",
+  "private": true,
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "vp lint src",
+    "format:check": "vp fmt . --check",
+    "qualify": "vp run check && vp run lint && vp run format:check && vp run build"
+  },
+  "dependencies": {
+    "astro": "7.3.5",
+    "astromache": "file:vendor/astromache-0.2.0.tgz"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@types/node": "24.10.1",
+    "typescript": "6.0.3",
+    "vite-plus": "1.0.0"
+  },
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
+  "packageManager": "pnpm@10.28.0"
+}

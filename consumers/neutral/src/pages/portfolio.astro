@@ -1,0 +1,13 @@
+---
+import Document from "astromache/document";
+import Portfolio from "astromache/portfolio";
+import "astromache/fonts.css";
+const items = [
+  {title:"Neutral landscape placeholder",medium:"Original SVG fixture",intent:"Exercises a replaceable image without distributing personal photographs.",alt:"Two simple geometric hills under a circle",src:"/portfolio-placeholder.svg"},
+  {title:"Second geometric study",medium:"Original SVG fixture",intent:"Exercises optional tool labels and repeated selection.",alt:"Second geometric study using the same licensed fixture",src:"/portfolio-placeholder.svg",tools:["SVG","Geometry"]},
+];
+---
+<Document title="Photography portfolio fixture" description="Neutral reusable portfolio capability" canonical={new URL("https://neutral.example/portfolio/")} language="en">
+  <Portfolio title="Photography" description="Consumer-owned work and image rights belong here." items={items} />
+</Document>
+<style is:global>body {font-family:"IBM Plex Sans",sans-serif;background:Canvas;color:CanvasText;color-scheme:light dark;}</style>

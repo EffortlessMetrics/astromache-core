@@ -1,0 +1,164 @@
+---
+export interface Props {
+  wordsPerMinute?: number;
+  contentSelector?: string;
+  indicatorId?: string;
+  barId?: string;
+}
+
+const { wordsPerMinute = 200, contentSelector = ".post-content", indicatorId = "reading-time", barId = "myBar" } = Astro.props;
+if(!Number.isFinite(wordsPerMinute)||wordsPerMinute<=0)throw new RangeError("Reading speed must be positive");
+---
+
+<div class="reading-progress-container" data-words-per-minute={wordsPerMinute} data-content-selector={contentSelector} data-indicator-id={indicatorId} data-bar-id={barId}>
+  <div class="progress-track" aria-hidden="true"><div id={barId} class="publication-progress-bar"></div></div>
+  <!-- Reading time indicator -->
+  <div class="reading-time" id={indicatorId}>
+    <span class="time-remaining"></span>
+    <span class="separator">·</span>
+    <span class="progress-percent">0%</span>
+  </div>
+</div>
+
+<style>
+  .progress-track {height:4px;background:var(--background);}
+  .publication-progress-bar {height:4px;width:0;background:var(--accent);}
+  .reading-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .reading-time {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: var(--content-bg);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    color: var(--secondary);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .reading-time.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .separator {
+    margin: 0 0.5rem;
+    opacity: 0.5;
+  }
+
+  @media (max-width: 640px) {
+    .reading-time {
+      top: auto;
+      bottom: 12px;
+      right: 12px;
+    }
+  }
+
+  /* Hide on print */
+  @media print {
+    .reading-progress-container {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Calculate reading time and track progress
+  function initReadingProgress() {
+    const config = document.querySelector<HTMLElement>(".reading-progress-container");
+    const content = document.querySelector(config?.dataset.contentSelector || ".post-content");
+    const timeIndicator = document.getElementById(config?.dataset.indicatorId || "reading-time");
+    const wordsPerMinute = Number(document.querySelector<HTMLElement>(".reading-progress-container")?.dataset.wordsPerMinute ?? 200);
+    const timeRemaining = timeIndicator?.querySelector(".time-remaining");
+    const progressPercent = timeIndicator?.querySelector(".progress-percent");
+
+    if (!content || !timeIndicator) return;
+
+    // Calculate total words
+    const text = content.textContent || "";
+    const words = text.trim().split(/\s+/).length;
+    const totalMinutes = Math.ceil(words / wordsPerMinute);
+
+    // Set initial time
+    if (timeRemaining) {
+      timeRemaining.textContent = `${totalMinutes} min read`;
+    }
+
+    // Update progress on scroll
+    let scrollTimer: number | undefined;
+    function updateProgress() {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const scrollableHeight = documentHeight - windowHeight;
+      const progress =
+        scrollableHeight <= 0
+          ? 1
+          : Math.min(Math.max(scrollTop / scrollableHeight, 0), 1);
+      const bar = document.getElementById(config?.dataset.barId || "myBar");
+      if (bar) bar.style.width = `${progress * 100}%`;
+
+      // Show indicator after scrolling starts
+      if (scrollTop > 100) {
+        timeIndicator?.classList.add("visible");
+      } else {
+        timeIndicator?.classList.remove("visible");
+      }
+
+      // Update percentage
+      if (progressPercent) {
+        progressPercent.textContent = `${Math.round(progress * 100)}%`;
+      }
+
+      // Update time remaining
+      if (timeRemaining) {
+        const wordsRead = Math.floor(words * progress);
+        const wordsLeft = words - wordsRead;
+        const minutesLeft = Math.ceil(wordsLeft / wordsPerMinute);
+
+        if (minutesLeft > 0) {
+          timeRemaining.textContent = `${minutesLeft} min left`;
+        } else {
+          timeRemaining.textContent = "Complete!";
+        }
+      }
+    }
+
+    // Throttled scroll handler
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (scrollTimer) return;
+        scrollTimer = window.setTimeout(() => {
+          updateProgress();
+          scrollTimer = undefined;
+        }, 100);
+      },
+      { passive: true }
+    );
+
+    // Initial update
+    updateProgress();
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initReadingProgress);
+  } else {
+    initReadingProgress();
+  }
+</script>

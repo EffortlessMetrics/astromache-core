@@ -1,0 +1,52 @@
+---
+export interface Props {brand:string;brandHref?:string;links?:ReadonlyArray<{label:string;href:string;current?:boolean}>;navigationLabel?:string;itemsId?:string;overlaySelector?:string;}
+const {brand,brandHref='/',links=[],navigationLabel='Primary navigation',itemsId='navigation-items',overlaySelector='[data-tas-dialog]'}=Astro.props;
+---
+<header class="publication-header" data-overlay-selector={overlaySelector}>
+<div class="header-row"><a class="site-title" href={brandHref}>{brand}</a><nav aria-label={navigationLabel}>
+<button class="icon-button menu-toggle" type="button" aria-label="Open Menu" aria-expanded="false" aria-controls={itemsId}><slot name="menu-icon"><span class="menu-icon" aria-hidden="true">☰</span></slot><slot name="close-icon"><span class="close-icon" aria-hidden="true">×</span></slot></button>
+<div class="nav-items" id={itemsId}>{links.map(link=><a href={link.href} class:list={{'active-nav':link.current}} aria-current={link.current?'page':undefined}>{link.label}</a>)}<slot name="controls"/></div>
+</nav></div></header>
+<script>
+  const header = document.querySelector<HTMLElement>(".publication-header"); const nav = header?.querySelector<HTMLElement>("nav"); const menu = nav?.querySelector<HTMLButtonElement>(".menu-toggle"); const items = document.getElementById(menu?.getAttribute("aria-controls") || "navigation-items");
+  const background = [...document.querySelectorAll<HTMLElement>("main, footer")];
+  const previousInert = new Map<HTMLElement, boolean>();
+  function setOpen(open: boolean) {
+    menu?.setAttribute("aria-expanded", String(open));
+    menu?.setAttribute("aria-label", open ? "Close Menu" : "Open Menu");
+    items?.toggleAttribute("data-open", open);
+    header?.toggleAttribute("data-menu-open", open);
+    for (const element of background) {
+      if (open) {
+        if (!previousInert.has(element)) previousInert.set(element, element.inert);
+        element.inert = true;
+      } else if (previousInert.has(element)) {
+        element.inert = previousInert.get(element)!;
+        previousInert.delete(element);
+      }
+    }
+    if (open) items?.querySelector<HTMLAnchorElement>("a")?.focus();
+  }
+  menu?.addEventListener("click", () => setOpen(menu.getAttribute("aria-expanded") !== "true"));
+  document.addEventListener("keydown", event => {
+    if (menu?.getAttribute("aria-expanded") !== "true") return;
+    if (document.querySelector(header?.dataset.overlaySelector || "[data-tas-dialog]")) return;
+    if (event.key === "Escape" && menu?.getAttribute("aria-expanded") === "true") {
+      event.preventDefault();
+      setOpen(false);
+      menu.focus();
+    }
+    if (event.key === "Tab" && header) {
+      const controls = [...header.querySelectorAll<HTMLElement>("a[href],button:not([disabled])")].filter(element => element.getClientRects().length > 0);
+      const index = controls.indexOf(document.activeElement as HTMLElement);
+      if (index < 0 || (event.shiftKey && index === 0) || (!event.shiftKey && index === controls.length - 1)) {
+        event.preventDefault();
+        controls[event.shiftKey ? controls.length - 1 : 0]?.focus();
+      }
+    }
+  });
+  const desktop = matchMedia("(min-width: 640px)");
+  desktop.addEventListener("change", event => { if (event.matches) setOpen(false); });
+</script>
+
+

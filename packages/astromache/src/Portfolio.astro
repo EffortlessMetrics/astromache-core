@@ -1,0 +1,37 @@
+---
+import PortfolioLightbox, { type PortfolioLightboxItem } from "./PortfolioLightbox.astro";
+interface Props {
+  title: string;
+  description?: string;
+  items: PortfolioLightboxItem[];
+}
+const { title, description, items } = Astro.props;
+---
+<section class="portfolio" aria-label={title}>
+  <div class="hero">
+    <h1>{title}</h1>
+    {description && <p>{description}</p>}
+    <slot name="introduction" />
+  </div>
+  <div class="gallery">
+    {items.map((item, index) => <figure>
+      <button type="button" data-portfolio-trigger={index} aria-label={`Open ${item.title} in the portfolio lightbox`}>
+        <img src={item.src} alt={item.alt} loading="lazy" width="960" height="640" />
+      </button>
+      <figcaption><h2>{item.title}</h2><p>{item.medium}</p><p>{item.intent}</p></figcaption>
+    </figure>)}
+  </div>
+  <PortfolioLightbox items={items} />
+</section>
+<style>
+  .portfolio {max-width:64rem;margin-inline:auto;padding:1rem;overflow-wrap:anywhere;}
+  .hero {padding:clamp(1.5rem,4vw,3.5rem);border:1px solid var(--portfolio-border,currentColor);border-radius:2rem;background:radial-gradient(ellipse at 50% 0,color-mix(in srgb,currentColor 8%,transparent),transparent 65%);}
+  h1 {font-size:clamp(2.25rem,1.75rem + 2.5vw,3.5rem);font-weight:600;letter-spacing:-.025em;line-height:1.5;margin:0;}
+  .gallery {display:grid;gap:2rem;margin-block:3rem;}
+  figure {margin:0;min-width:0;}
+  button {display:block;width:100%;padding:0;border:0;border-radius:1.5rem;overflow:hidden;cursor:pointer;background:transparent;}
+  button:focus-visible {outline:3px solid var(--portfolio-focus,currentColor);outline-offset:4px;}
+  img {display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;}
+  h2 {font-weight:600;line-height:1.5;}
+  @media(min-width:48rem){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));}}
+</style>

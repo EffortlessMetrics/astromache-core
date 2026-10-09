@@ -1,0 +1,5 @@
+---
+export interface Props {items:ReadonlyArray<{label:string;href:string}>;class?:string;}
+const {items,class:className='tag-list'}=Astro.props;
+---
+<ul class={className}>{items.map(item=><li><a href={item.href}>{item.label}</a></li>)}</ul>

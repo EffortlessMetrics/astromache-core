@@ -1,0 +1,25 @@
+{
+  "astromache": {
+    "version": "0.2.0",
+    "sha256": "53bf0fa41d2371c5941fa1422ae83563002744bd684e45c7b048b548d2182874",
+    "packageSourceHead": "0504061d9292252f65336c9b90b1a63a04816d33"
+  },
+  "staticSearch": {
+    "version": "0.1.0",
+    "sha256": "01989cda90ec846dabc7766c258a86742ad062d6bf2efbfd5cd1e5ccb7db7736",
+    "packageSourceHead": "79d0b5525507124f5efe22ab3c2501e4e40c6c58"
+  },
+  "astroOffline": {
+    "version": "0.1.4",
+    "sha256": "55d880bfa3fc9dcd650df94a1354040db899130edfb471d8caf45b6fa96e257e",
+    "packageSourceHead": "ea10e41d5ad78906a9d66ff0972b9241adbadc6f",
+    "repository": "EffortlessMetrics/astro-offline",
+    "rollback": {
+      "version": "0.1.3",
+      "sha256": "7baae24a5e911f8ec8b80c138aa3c51a7776abab8332229ed2b0917f6df44970",
+      "packageSourceHead": "5a9bd121533981d9e5fed8ab2db88012908d6ede",
+      "archive": "vendor/effortlessmetrics-astro-offline-0.1.3.tgz",
+      "availability": "Retained in producer history/vendor; inactive archives excluded from clean exports"
+    }
+  }
+}

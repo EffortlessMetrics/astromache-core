@@ -1,0 +1,6 @@
+---
+import Publication from '../../layouts/Publication.astro';import PostList from 'astromache/post-list';import {notes,card,tagSlug} from '../../publication-content';
+export async function getStaticPaths(){const entries=await notes();return [...new Set(entries.flatMap(note=>note.data.tags))].map(label=>({params:{tag:tagSlug(label)},props:{label,entries:entries.filter(note=>note.data.tags.includes(label))}}));}
+const {label,entries}=Astro.props;
+---
+<Publication title={label+' / Field Notes'} description={'Notes filed under '+label+'.'}><h1>{label}</h1><PostList items={entries.map(card)} returnStorageKey="field-notes-back"/></Publication>

@@ -1,3 +1,4 @@
+import { scopeStarterLicense } from "./scope-starter-license.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { copyFile, lstat, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
@@ -67,6 +68,7 @@ try {
     activeVendor.size,
     "Every active archive must be saved in source",
   );
+  await scopeStarterLicense(destination);
   await writeFile(
     join(destination, "STARTER-DELIVERY.json"),
     JSON.stringify(

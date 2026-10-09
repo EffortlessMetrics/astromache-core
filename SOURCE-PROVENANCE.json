@@ -4,7 +4,7 @@
   "sourceCommit": "061e3fb936362dfa890a0aadf435239b5ed958fd",
   "frozenSourceMapSha256": "8271e3834eed700dd19d4d86db762de1be264f81892cb0b6670ad478cedb6e30",
   "frozenSnapshot": "thin-migration-local",
-  "changes": "Repository metadata, unique candidate version, ownership docs and corresponding contract assertions; Astro includes previously independently qualified canonical offline preset",
+  "changes": "Repository metadata, unique candidate version, ownership docs and corresponding contract assertions; Astro includes previously independently qualified canonical offline preset; scoped query return and closed-overlay keyboard fixes with four red-green browser regressions; generated-site licensing separation; zero-word reading progress correction, search sitemap coverage and complete export documentation",
   "privateSourceImported": false,
   "deniedStillPR4Included": false
 }

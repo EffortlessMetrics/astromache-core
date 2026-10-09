@@ -42,6 +42,10 @@ jobs:
         run: pnpm exec playwright install chromium
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Listing return and overlay keyboard regressions
+        run: pnpm verify:interaction
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
       - name: Independent packed consumers
         # Chromium is scoped to this hosted checkout, not global configuration.
         run: pnpm verify:packed

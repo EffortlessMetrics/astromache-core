@@ -6,6 +6,7 @@ export async function GET({ site }: APIContext) {
     "/",
     "/posts/",
     "/portfolio/",
+    "/search/",
     ...entries.map((note) => noteLink(note.id)),
     ...[...new Set(entries.flatMap((note) => note.data.tags))].map(
       (tag) => "/tags/" + tagSlug(tag) + "/",

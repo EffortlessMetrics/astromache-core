@@ -71,6 +71,15 @@ export async function verifyPublicationBrowser(directory, { recipe }) {
         assert.equal(response.status(), 200, `${path} must be served`);
         assert.match(await response.text(), expected, `${path} must contain publication metadata`);
       }
+      if (recipe) {
+        const sitemap = await page.request.get(`${origin}/sitemap.xml`);
+        assert.equal(sitemap.status(), 200);
+        assert.match(
+          await sitemap.text(),
+          /\/search\/<\/loc>/,
+          "Search route must be discoverable in recipe sitemap",
+        );
+      }
       await page.goto(`${origin}/404.html`);
       assert.equal(await page.getByRole("main").count(), 1);
       await page.locator('a.site-title[href="/"]').first().click();

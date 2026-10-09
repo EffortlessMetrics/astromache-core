@@ -1,3 +1,11 @@
+# 0.2.4 (unpublished)
+
+Count empty/whitespace-only reading content as zero words; preserve normal progress behavior. Correct supported export documentation. Seven compiled interaction/progress browser regressions cover this release.
+
+# 0.2.3 (unpublished)
+
+Preserve listing query parameters in Article return navigation. Let mounted closed overlays release mobile menu Escape/Tab handling; active overlays retain keyboard ownership. Four compiled browser regressions verify these repairs.
+
 # 0.2.2 (unpublished)
 
 Move package ownership metadata to EffortlessMetrics/astromache-core. Preserve npm identity and existing runtime/API contracts.

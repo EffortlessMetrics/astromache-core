@@ -4,7 +4,7 @@ This records the preceding branded producer and its unchanged fixture/archive id
 
 # AstroMache publication system
 
-For a small independent project without copying the producer development tree, see [standalone starter delivery](docs/starter-delivery.md). Run `node scripts/create-starter.mjs publication ../my-publication` or choose `search-offline` for the optional recipe; no producer installation is required.
+For a small independent project without copying the producer development tree, see [standalone starter delivery](starter-delivery.md). Run `node scripts/create-starter.mjs publication ../my-publication` or choose `search-offline` for the optional recipe; no producer installation is required.
 
 The current source expands the genuine reusable publication foundation and complete neutral starter: article/list/taxonomy typography and composition, responsive menu/theme, reading progress/focus/copy controls, and the existing native gallery/navigation machinery. The private personal site and neutral products are sibling consumers of the same exports. Content models, corpus, routes, ranking, metadata policy, fonts, assets, privacy-specific sharing and brand tokens remain adapters.
 

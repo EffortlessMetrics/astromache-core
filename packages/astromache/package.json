@@ -1,6 +1,6 @@
 {
   "name": "astromache",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "private": false,
   "description": "Astro publication components, metadata validation and bounded native navigation helpers",
   "homepage": "https://github.com/EffortlessMetrics/astromache-core#readme",

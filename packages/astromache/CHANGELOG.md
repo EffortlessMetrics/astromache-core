@@ -1,3 +1,7 @@
+# 0.2.7 (unpublished)
+
+Align article actions by their text baselines so direct and nested native buttons retain equal intrinsic heights. Preserve existing control styling, responsive wrapping and adjacent-post navigation. Compiled desktop, mobile and forced-wrap geometry regressions cover actual Article/CopyLink components and keyboard Back-to-top behavior.
+
 # 0.2.6 (unpublished)
 
 Check every matching overlay before the navigation menu handles Escape or Tab. A later active dialog keeps keyboard ownership when an earlier mounted dialog is closed. Ten compiled interaction/theme browser regressions cover the final runtime candidate.

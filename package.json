@@ -21,7 +21,8 @@
     "verify:offline:client": "node scripts/verify-offline-client.mjs",
     "verify:canonical-preset": "node scripts/verify-canonical-preset.mjs",
     "verify:interaction": "node scripts/verify-return-menu.mjs",
-    "verify:taxonomy": "node scripts/verify-taxonomy.mjs"
+    "verify:taxonomy": "node scripts/verify-taxonomy.mjs",
+    "verify:article-actions": "node scripts/verify-article-actions.mjs"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

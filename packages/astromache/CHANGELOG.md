@@ -1,3 +1,11 @@
+# 0.2.6 (unpublished)
+
+Check every matching overlay before the navigation menu handles Escape or Tab. A later active dialog keeps keyboard ownership when an earlier mounted dialog is closed. Ten compiled interaction/theme browser regressions cover the final runtime candidate.
+
+# 0.2.5 (unpublished)
+
+Synchronize native control color schemes with the selected publication theme, including saved theme and toggles. Neutral producer adapters route categories alongside tags and reject empty or colliding URL slugs. Nine compiled interaction/theme browser cases and real taxonomy builds guard these repairs. Generated applications remain UNLICENSED; upstream template code retains MIT OR Apache-2.0 notices.
+
 # 0.2.4 (unpublished)
 
 Count empty/whitespace-only reading content as zero words; preserve normal progress behavior. Correct supported export documentation. Seven compiled interaction/progress browser regressions cover this release.

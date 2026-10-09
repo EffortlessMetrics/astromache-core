@@ -9,6 +9,7 @@ const {themeStorageKey='theme',themeToggleId='theme-toggle',...metadata}=Astro.p
 <Fragment slot="head"><script is:inline define:vars={{themeStorageKey}}>
 let preference;try{preference=localStorage.getItem(themeStorageKey);}catch{}
 document.documentElement.dataset.theme=preference==='dark'||preference==='light'?preference:window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+document.documentElement.style.colorScheme=document.documentElement.dataset.theme;
 </script><slot name="head"/></Fragment>
 <slot name="header" slot="header"/><slot/><slot name="footer" slot="footer"/>
 <Fragment slot="body-end"><slot name="body-end"/><span hidden data-publication-theme data-theme-key={themeStorageKey} data-theme-toggle={themeToggleId}></span></Fragment>
@@ -17,6 +18,6 @@ document.documentElement.dataset.theme=preference==='dark'||preference==='light'
 for(const config of document.querySelectorAll<HTMLElement>('[data-publication-theme]')){
  const toggle=document.getElementById(config.dataset.themeToggle || 'theme-toggle');
  const update=()=>toggle?.setAttribute('aria-label','Switch to '+(document.documentElement.dataset.theme==='dark'?'light':'dark')+' theme');
- toggle?.addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;try{localStorage.setItem(config.dataset.themeKey || 'theme',theme);}catch{}update();});update();
+ toggle?.addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;document.documentElement.style.colorScheme=theme;try{localStorage.setItem(config.dataset.themeKey || 'theme',theme);}catch{}update();});update();
 }
 </script>

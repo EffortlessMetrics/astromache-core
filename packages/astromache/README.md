@@ -1,10 +1,10 @@
 # astromache
 
-Current producer: https://github.com/EffortlessMetrics/astromache-core. Version 0.2.4 is an unpublished uniquely identified relocation candidate. The branded starter is https://github.com/EffortlessMetrics/astromache.
+Current producer: https://github.com/EffortlessMetrics/astromache-core. Version 0.2.6 is an unpublished uniquely identified relocation candidate. The branded starter is https://github.com/EffortlessMetrics/astromache.
 
 # AstroMache publication foundation candidate
 
-This working source is an expanded, **unpublished** 0.2.4 candidate. The existing npm astromache@0.1.0 release remains immutable and does not contain these new publication exports. Consumers of this candidate must use its exact local archive and SHA-256 receipt. The additive publication API uses a new minor-version identity. Publication of 0.2.4 still requires separate authorization; no registry release is performed here.
+This working source is an expanded, **unpublished** 0.2.6 candidate. The existing npm astromache@0.1.0 release remains immutable and does not contain these new publication exports. Consumers of this candidate must use its exact local archive and SHA-256 receipt. The additive publication API uses a new minor-version identity. Publication of 0.2.6 still requires separate authorization; no registry release is performed here.
 
 The foundation supplies real publication typography, responsive navigation, article presentation, cards, taxonomy lists, theme initialization/toggle, reading progress, focus mode, copy-link feedback, and gallery mechanics. The complete neutral starter and optional search/offline recipe consume these same exports. Content collection schemas, routes, dates, related-content selection, metadata policy, branding, font assets, privacy/share behavior, and search ranking remain consumer-owned.
 

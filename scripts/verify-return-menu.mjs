@@ -16,6 +16,11 @@ try {
   await mkdir(join(fixture, "src/pages"), { recursive: true });
   await symlink(join(root, "node_modules"), join(fixture, "node_modules"), "junction");
   await writeFile(join(fixture, "package.json"), JSON.stringify({ type: "module" }));
+  const packageRequire = createRequire(join(root, "packages/astromache/package.json"));
+  await writeFile(
+    join(fixture, "astro.config.mjs"),
+    `export default {vite:{resolve:{alias:{"bcp-47":${JSON.stringify(packageRequire.resolve("bcp-47").replaceAll("\\", "/"))}}}}};`,
+  );
   await cp(join(root, "packages/astromache/src"), join(fixture, "src/components"), {
     recursive: true,
   });
@@ -53,6 +58,14 @@ import ReadingProgress from ${component("ReadingProgress")};
 <html><body><ReadingProgress/><main class="post-content">${text}</main><div style="height:3000px"></div></body></html>`,
     );
   }
+  await writeFile(
+    join(fixture, "src/pages/theme.astro"),
+    `---
+import Publication from ${component("Publication")};
+import ${JSON.stringify(join(root, "packages/astromache/src/publication.css").replaceAll("\\", "/"))};
+---
+<Publication title="Theme fixture" description="Native controls" canonical={new URL('https://example.com/theme/')} language="en"><button id="theme-toggle">Theme</button><input id="native-control" aria-label="Native control"/></Publication>`,
+  );
   execFileSync(
     process.execPath,
     [join(dirname(require.resolve("astro/package.json")), "bin/astro.mjs"), "build"],
@@ -66,7 +79,14 @@ import ReadingProgress from ${component("ReadingProgress")};
         "dist",
         pathname.endsWith("/") ? pathname + "index.html" : pathname,
       );
-      response.setHeader("Content-Type", extname(file) === ".js" ? "text/javascript" : "text/html");
+      response.setHeader(
+        "Content-Type",
+        extname(file) === ".js"
+          ? "text/javascript"
+          : extname(file) === ".css"
+            ? "text/css"
+            : "text/html",
+      );
       response.end(await readFile(file));
     } catch {
       response.writeHead(404).end();
@@ -138,6 +158,23 @@ import ReadingProgress from ${component("ReadingProgress")};
     await page.keyboard.press("Escape");
     assert.equal(await page.locator(".menu-toggle").getAttribute("aria-expanded"), "false");
   });
+  await test("closed first dialog does not mask later active overlay", async () => {
+    await page.goto(origin + "/");
+    await page.locator(".menu-toggle").click();
+    await page.evaluate(() => {
+      const later = document.createElement("dialog");
+      later.dataset.tasDialog = "";
+      later.id = "later-dialog";
+      later.innerHTML = "<button>Later overlay</button>";
+      document.body.append(later);
+      later.showModal();
+    });
+    await page.keyboard.press("Escape");
+    assert.equal(await page.locator(".menu-toggle").getAttribute("aria-expanded"), "true");
+    await page.waitForFunction(() => !document.querySelector("#later-dialog").open);
+    await page.keyboard.press("Escape");
+    assert.equal(await page.locator(".menu-toggle").getAttribute("aria-expanded"), "false");
+  });
   for (const [name, expected] of [
     ["empty", "Complete!"],
     ["whitespace", "Complete!"],
@@ -152,6 +189,46 @@ import ReadingProgress from ${component("ReadingProgress")};
       );
       assert.equal(await page.locator(".time-remaining").textContent(), expected);
       assert.equal(await page.locator(".progress-percent").textContent(), "0%");
+    });
+  }
+  for (const [os, saved] of [
+    ["dark", "light"],
+    ["light", "dark"],
+  ]) {
+    await test(`native controls follow ${saved} preference against ${os} OS and toggle`, async () => {
+      const context = await browser.newContext({ colorScheme: os });
+      try {
+        await context.addInitScript((value) => localStorage.setItem("theme", value), saved);
+        const themed = await context.newPage();
+        await themed.goto(origin + "/theme/");
+        assert.equal(await themed.locator("html").getAttribute("data-theme"), saved);
+        assert.equal(
+          await themed
+            .locator("#native-control")
+            .evaluate((el) => getComputedStyle(el).colorScheme),
+          saved,
+        );
+        const initial = await themed
+          .locator("#native-control")
+          .evaluate((el) => getComputedStyle(el).backgroundColor);
+        await themed.locator("#theme-toggle").click();
+        assert.equal(await themed.locator("html").getAttribute("data-theme"), os);
+        assert.equal(
+          await themed
+            .locator("#native-control")
+            .evaluate((el) => getComputedStyle(el).colorScheme),
+          os,
+        );
+        assert.notEqual(
+          await themed
+            .locator("#native-control")
+            .evaluate((el) => getComputedStyle(el).backgroundColor),
+          initial,
+        );
+        assert.equal(await themed.evaluate(() => localStorage.getItem("theme")), os);
+      } finally {
+        await context.close();
+      }
     });
   }
   console.log(JSON.stringify(results));

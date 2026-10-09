@@ -46,6 +46,8 @@ jobs:
         run: pnpm verify:interaction
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Neutral taxonomy routes and collision diagnostics
+        run: pnpm verify:taxonomy
       - name: Independent packed consumers
         # Chromium is scoped to this hosted checkout, not global configuration.
         run: pnpm verify:packed

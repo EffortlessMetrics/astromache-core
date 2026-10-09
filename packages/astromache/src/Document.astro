@@ -1,0 +1,25 @@
+---
+import { publicationMetadata, type PublicationMetadata } from "./metadata";
+import type { HTMLAttributes } from "astro/types";
+type Props = PublicationMetadata & { htmlAttributes?: HTMLAttributes<"html"> };
+const metadata = publicationMetadata(Astro.props);
+---
+
+<!doctype html>
+<html {...{ ...Astro.props.htmlAttributes, lang: metadata.language }}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{metadata.title}</title>
+    <meta name="description" content={metadata.description} />
+    <link rel="canonical" href={metadata.canonical.href} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a href="#main">Skip to content</a>
+    <slot name="header" />
+    <main id="main" tabindex="-1"><slot /></main>
+    <slot name="footer" />
+    <slot name="body-end" />
+  </body>
+</html>

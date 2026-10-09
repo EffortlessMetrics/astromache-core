@@ -1,0 +1,184 @@
+---
+export interface PortfolioLightboxItem {
+  title: string;
+  medium: string;
+  intent: string;
+  alt: string;
+  src: string;
+  tools?: string[];
+}
+
+export interface Props {
+  items: PortfolioLightboxItem[];
+}
+
+const { items } = Astro.props as Props;
+---
+
+<dialog
+  id="portfolio-lightbox"
+  class="portfolio-lightbox"
+  aria-labelledby="portfolio-lightbox-title"
+>
+  <div class="portfolio-controls">
+    <button
+      id="portfolio-lightbox-close"
+      type="button"
+      class="portfolio-close"
+    >
+      Close
+    </button>
+  </div>
+
+  <div
+    class="portfolio-detail-grid"
+  >
+    <figure>
+      <img
+        id="portfolio-lightbox-image"
+        alt=""
+        loading="eager"
+      />
+    </figure>
+
+    <div>
+      <p
+        id="portfolio-lightbox-medium"
+      >
+      </p>
+      <h2
+        id="portfolio-lightbox-title"
+      >
+      </h2>
+      <p
+        id="portfolio-lightbox-intent"
+      >
+      </p>
+      <ul id="portfolio-lightbox-tools" hidden>
+      </ul>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .portfolio-lightbox {
+    background:var(--portfolio-background,Canvas);
+    color:var(--portfolio-foreground,CanvasText);
+    border:1px solid var(--portfolio-border,currentColor);
+    padding:1rem;
+    inset: 0;
+    max-height: calc(100dvh - 2rem);
+    max-width: calc(100vw - 2rem);
+    margin: auto;
+    width: min(1200px, calc(100vw - 2rem));
+  }
+
+  .portfolio-lightbox::backdrop {
+    background: rgba(7, 10, 18, 0.82);
+    backdrop-filter: blur(10px);
+  }
+  .portfolio-lightbox > div:first-child {display:flex;justify-content:flex-end;}
+  .portfolio-lightbox > div:nth-child(2) {max-height:calc(100dvh - 8rem);overflow:auto;}
+  .portfolio-lightbox figure {margin:1rem 0;}
+  .portfolio-lightbox img {width:100%;height:auto;max-height:65dvh;object-fit:contain;}
+  .portfolio-lightbox ul {list-style:none;display:flex;flex-wrap:wrap;gap:0.5rem;padding:0;}
+  .portfolio-lightbox ul[hidden] {display:none;}
+  .portfolio-close {font:inherit;color:inherit;background:transparent;border:1px solid var(--portfolio-border,currentColor);border-radius:0.5rem;padding:0.35rem 0.75rem;cursor:pointer;}
+  .portfolio-close:focus-visible {outline:2px solid var(--portfolio-focus,Highlight);outline-offset:3px;}
+  .portfolio-detail-grid {display:grid;gap:1rem;}
+  #portfolio-lightbox-title {font-size:clamp(1.25rem,2vw,2rem);line-height:1.3;}
+  .portfolio-lightbox :global(.portfolio-tool) {border:1px solid var(--portfolio-border,currentColor);border-radius:1rem;padding:0.2rem 0.6rem;font-size:0.75rem;}
+  @media(min-width:800px) {.portfolio-detail-grid {grid-template-columns:minmax(0,1.6fr) minmax(16rem,1fr);}}
+</style>
+
+<script define:vars={{ items }}>
+  const lightboxItems = items;
+
+  const initPortfolioLightbox = () => {
+    const dialog = document.getElementById("portfolio-lightbox");
+    if (!(dialog instanceof HTMLDialogElement)) return;
+
+    const image = document.getElementById("portfolio-lightbox-image");
+    const title = document.getElementById("portfolio-lightbox-title");
+    const medium = document.getElementById("portfolio-lightbox-medium");
+    const intent = document.getElementById("portfolio-lightbox-intent");
+    const tools = document.getElementById("portfolio-lightbox-tools");
+    const closeButton = document.getElementById("portfolio-lightbox-close");
+
+    if (
+      !(image instanceof HTMLImageElement) ||
+      !(title instanceof HTMLElement) ||
+      !(medium instanceof HTMLElement) ||
+      !(intent instanceof HTMLElement) ||
+      !(tools instanceof HTMLElement) ||
+      !(closeButton instanceof HTMLButtonElement)
+    ) {
+      return;
+    }
+
+    if (dialog.dataset.lightboxBound !== "true") {
+      closeButton.addEventListener("click", () => dialog.close());
+
+      dialog.addEventListener("click", event => {
+        if (event.target !== dialog) return;
+        const rect = dialog.getBoundingClientRect();
+        const insideBounds =
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom;
+
+        if (!insideBounds) {
+          dialog.close();
+        }
+      });
+
+      dialog.dataset.lightboxBound = "true";
+    }
+
+    const renderItem = index => {
+      const item = lightboxItems[index];
+      if (!item) return;
+
+      image.src = item.src;
+      image.alt = item.alt;
+      title.textContent = item.title;
+      medium.textContent = item.medium;
+      intent.textContent = item.intent;
+
+      tools.replaceChildren();
+
+      if (Array.isArray(item.tools) && item.tools.length > 0) {
+        for (const label of item.tools) {
+          const chip = document.createElement("li");
+          chip.className = "portfolio-tool";
+          chip.textContent = label;
+          tools.append(chip);
+        }
+        tools.hidden = false;
+      } else {
+        tools.hidden = true;
+      }
+    };
+
+    document.querySelectorAll("[data-portfolio-trigger]").forEach(trigger => {
+      if (!(trigger instanceof HTMLElement)) return;
+      if (trigger.dataset.lightboxBound === "true") return;
+
+      trigger.addEventListener("click", () => {
+        const rawIndex = trigger.dataset.portfolioTrigger;
+        const index = Number(rawIndex);
+        if (!Number.isFinite(index)) return;
+        renderItem(index);
+        dialog.showModal();
+      });
+
+      trigger.dataset.lightboxBound = "true";
+    });
+  };
+
+  initPortfolioLightbox();
+  document.addEventListener("astro:page-load", initPortfolioLightbox);
+  document.addEventListener("astro:after-swap", initPortfolioLightbox);
+</script>
+

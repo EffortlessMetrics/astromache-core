@@ -1,0 +1,4 @@
+---
+import Publication from '../../layouts/Publication.astro';import PostList from 'astromache/post-list';import {notes,card} from '../../publication-content';const entries=await notes();
+---
+<Publication title="Posts / Field Notes" description="The complete sample notebook, newest first."><h1>Posts</h1><p>The complete notebook, newest first.</p><PostList items={entries.map(card)} returnStorageKey="field-notes-back"/></Publication>

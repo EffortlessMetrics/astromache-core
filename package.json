@@ -1,0 +1,50 @@
+{
+  "name": "astromache-qualification",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r --filter \"./consumers/*\" run build",
+    "typecheck": "node scripts/check-compiler.mjs compatibility",
+    "typecheck:native": "node scripts/check-compiler.mjs native",
+    "check:astro": "pnpm -r --filter \"./consumers/*\" exec astro check",
+    "lint": "vp lint packages/ consumers/ scripts/",
+    "test": "vp test --run",
+    "verify:output": "node scripts/verify-output.mjs",
+    "verify:packed": "node scripts/verify-packed-consumers.mjs",
+    "qualify:native": "vp run typecheck:native && node scripts/verify-native-diagnostics.mjs",
+    "qualify": "vp run typecheck && pnpm qualify:native && vp run check:astro && vp run lint && vp run format:check && vp run test && vp run build && vp run verify:output && pnpm verify:canonical-preset",
+    "format:check": "vp fmt . --check",
+    "verify:offline": "node scripts/verify-offline-ownership.mjs && node scripts/verify-offline.mjs",
+    "verify:offline:freshness": "node scripts/verify-offline-freshness.mjs",
+    "verify:offline:claim": "node scripts/verify-offline.mjs --claim",
+    "verify:offline:api": "node scripts/verify-offline-api.mjs && node scripts/verify-offline-api.mjs --claim",
+    "verify:offline:client": "node scripts/verify-offline-client.mjs",
+    "verify:canonical-preset": "node scripts/verify-canonical-preset.mjs",
+    "verify:interaction": "node scripts/verify-return-menu.mjs",
+    "verify:taxonomy": "node scripts/verify-taxonomy.mjs"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@astrojs/ts-content-mapper": "0.2.0",
+    "@effortlessmetrics/astro-offline": "file:vendor/effortlessmetrics-astro-offline-0.1.4.tgz",
+    "@playwright/test": "1.58.2",
+    "@types/node": "24.10.1",
+    "astro": "7.3.5",
+    "pnpm": "10.28.0",
+    "typescript": "6.0.3",
+    "typescript-native": "npm:typescript@7.1.0-dev.20261003.1",
+    "vite-plus": "1.0.0"
+  },
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "pnpm": {
+    "overrides": {
+      "vite@*": "npm:@voidzero-dev/vite-plus-core@1.0.0"
+    },
+    "patchedDependencies": {
+      "astro@7.3.5": "patches/astro@7.3.5.patch"
+    }
+  }
+}

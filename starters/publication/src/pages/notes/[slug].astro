@@ -1,0 +1,8 @@
+---
+import {render} from 'astro:content';import Publication from '../../layouts/Publication.astro';import Article from 'astromache/article';import ReadingProgress from 'astromache/reading-progress';import FocusMode from 'astromache/focus-mode';import CopyLink from 'astromache/copy-link';import {readingTime,formatReadingTime} from 'astromache/reading-time';import {notes,noteLink,tagSlug} from '../../publication-content';
+export async function getStaticPaths(){const entries=await notes();return entries.map((note,index)=>({params:{slug:note.id},props:{note,previous:index>0?entries[index-1]:undefined,next:entries[index+1]}}));}
+const {note,previous,next}=Astro.props;const {Content}=await render(note);const canonical=new URL(noteLink(note.id),Astro.site);const published={datetime:note.data.published.toISOString(),label:new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(note.data.published)};
+---
+<Publication title={note.data.title+' / Field Notes'} description={note.data.description} article>
+<Article title={note.data.title} {published} readingTime={formatReadingTime(readingTime(note.body||''))} lens={{label:note.data.category,href:'/tags/'+tagSlug(note.data.category)+'/'}} tags={note.data.tags.map(tag=>({label:tag,href:'/tags/'+tagSlug(tag)+'/'}))} previous={previous&&{label:previous.data.title,href:noteLink(previous.id)}} next={next&&{label:next.data.title,href:noteLink(next.id)}} backHref="/posts/" returnStorageKey="field-notes-back"><p slot="source" class="source-attribution">A note from the Field Notes editors.</p><Content/><CopyLink slot="actions" url={canonical.href}/><Fragment slot="reading-tools"><ReadingProgress/><FocusMode storageKey="field-notes-focus"/></Fragment></Article>
+</Publication>

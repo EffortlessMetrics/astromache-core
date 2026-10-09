@@ -1,0 +1,68 @@
+name: AstroMache publication qualification
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+env:
+  ASTRO_TELEMETRY_DISABLED: "1"
+concurrency:
+  group: astromache-slice-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  publication:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: 10.28.0
+      - name: Source and toolchain
+        run: |
+          git rev-parse HEAD
+          node --version
+          pnpm --version
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vp --version
+      - name: Required native and compatibility compilers, template diagnostics, lint, tests and output
+        run: pnpm qualify
+      - name: Install checkout-scoped Chromium
+        run: pnpm exec playwright install chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Listing return and overlay keyboard regressions
+        run: pnpm verify:interaction
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Neutral taxonomy routes and collision diagnostics
+        run: pnpm verify:taxonomy
+      - name: Independent packed consumers
+        # Chromium is scoped to this hosted checkout, not global configuration.
+        run: pnpm verify:packed
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Offline worker default and opt-in claim contracts
+        run: |
+          pnpm verify:offline
+          pnpm verify:offline:claim
+          pnpm verify:offline:client
+          pnpm verify:offline:api
+          pnpm verify:offline:freshness
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Independent publication starter and search-offline recipe
+        run: node scripts/verify-publication-products.mjs
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers

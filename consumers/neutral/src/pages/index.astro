@@ -1,0 +1,19 @@
+---
+import Document from "astromache/document";
+import "astromache/fonts.css";
+---
+
+<Document
+  title="Neutral publication"
+  description="Independent publication fixture"
+  canonical={new URL("https://neutral.example/")}
+  language="en"
+  htmlAttributes={{ "data-publication": "neutral", lang: "invalid-override" }}
+>
+  <h1>Neutral publication</h1>
+  <p>This fixture supplies its own content and identity.</p>
+</Document>
+<style is:global>
+  body { font-family: "IBM Plex Sans", sans-serif; }
+  code, pre { font-family: "IBM Plex Mono", monospace; }
+</style>

@@ -1,0 +1,196 @@
+---
+export interface Props {
+  url?: string;
+  text?: string;
+  class?: string;
+  resetMs?: number;
+  copiedText?: string;
+  failedText?: string;
+}
+
+const {
+  url = Astro.url.href,
+  text = "Copy link",
+  class: className,
+  resetMs = 2000, copiedText = "Copied link", failedText = "Failed to copy",
+} = Astro.props;
+if(!Number.isFinite(resetMs)||resetMs<0)throw new RangeError("Copy feedback delay must be nonnegative");
+---
+
+<button
+  class={`copy-link-btn ${className || ""}`}
+  type="button" data-url={url} data-reset-ms={resetMs} data-copied-text={copiedText} data-failed-text={failedText}
+  aria-label={text}
+  title={text}
+>
+  <svg
+    class="copy-icon"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+  <svg
+    class="check-icon"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    style="display: none;"
+  >
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+  <span class="copy-text">{text}</span>
+</button>
+
+<style>
+  .copy-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: transparent;
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    color: var(--foreground);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+    position: relative;
+    min-width: 7rem; /* Ensures consistent width for all states */
+  }
+
+  .copy-link-btn:hover {
+    background-color: var(--muted);
+    border-color: var(--accent);
+  }
+
+  .copy-link-btn:active {
+    transform: scale(0.98);
+  }
+
+  .copy-link-btn.copied {
+    border-color: var(--highlight);
+    color: var(--highlight);
+  }
+
+  .copy-link-btn.error {
+    border-color: var(--error, #ef4444);
+    color: var(--error, #ef4444);
+  }
+
+  .copy-icon,
+  .check-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .copy-text {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .copy-text {
+      display: none;
+    }
+
+    .copy-link-btn {
+      padding: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  function initCopyLink() {
+    const buttons =
+      document.querySelectorAll<HTMLButtonElement>(".copy-link-btn");
+
+    buttons.forEach(button => {
+      if (button.dataset.copyLinkReady === "true") return;
+      button.dataset.copyLinkReady = "true";
+      const copiedText=button.dataset.copiedText||"Copied link";
+      const failedText=button.dataset.failedText||"Failed to copy";
+      const resetMs=Number(button.dataset.resetMs||2000);
+      const originalText = button.querySelector(".copy-text")?.textContent || "Copy link";
+      const originalLabel = button.getAttribute("aria-label") || originalText;
+      let resetTimer: ReturnType<typeof setTimeout> | undefined;
+      let generation = 0;
+      button.addEventListener("click", async (e: MouseEvent) => {
+        e.preventDefault();
+        const currentGeneration = ++generation;
+        clearTimeout(resetTimer);
+
+        const btn = e.currentTarget as HTMLButtonElement;
+        const url = btn.dataset.url || window.location.href;
+        const copyIcon = btn.querySelector(".copy-icon") as HTMLElement;
+        const checkIcon = btn.querySelector(".check-icon") as HTMLElement;
+
+        try {
+          // Modern clipboard API
+          await navigator.clipboard.writeText(url);
+          if (currentGeneration !== generation) return;
+
+          // Visual feedback on button
+          btn.classList.add("copied");
+          btn.classList.remove("error");
+          btn.setAttribute("aria-label", copiedText);
+          copyIcon.style.display = "none";
+          checkIcon.style.display = "block";
+
+          // Update button text
+          const copyText = btn.querySelector(".copy-text") as HTMLElement;
+          if (copyText) {
+            copyText.textContent = copiedText;
+          }
+
+          // Reset after 2 seconds
+          resetTimer = setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.setAttribute("aria-label", originalLabel);
+            copyIcon.style.display = "block";
+            checkIcon.style.display = "none";
+            if (copyText) {
+              copyText.textContent = originalText;
+            }
+          }, resetMs);
+        } catch (_err) {
+          if (currentGeneration !== generation) return;
+          // Show error if modern API fails
+          btn.classList.add("error");
+          btn.classList.remove("copied");
+          btn.setAttribute("aria-label", failedText);
+          copyIcon.style.display = "block";
+          checkIcon.style.display = "none";
+          const copyText = btn.querySelector(".copy-text") as HTMLElement;
+          if (copyText) {
+            copyText.textContent = failedText;
+          }
+
+          // Reset after 2 seconds
+          resetTimer = setTimeout(() => {
+            btn.classList.remove("error");
+            btn.setAttribute("aria-label", originalLabel);
+            if (copyText) {
+              copyText.textContent = originalText;
+            }
+          }, resetMs);
+        }
+      });
+    });
+  }
+
+  // Initialize on page load
+  initCopyLink();
+  document.addEventListener("astro:page-load", initCopyLink);
+</script>
+

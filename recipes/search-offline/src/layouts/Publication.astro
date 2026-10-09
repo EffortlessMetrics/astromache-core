@@ -1,0 +1,27 @@
+---
+import Publication from 'astromache/publication';import Header from 'astromache/header';import Footer from 'astromache/footer';
+import 'astromache/fonts.css';import 'astromache/publication.css';import '../styles/publication.css';
+interface Props {title:string;description:string;article?:boolean;}
+const {title,description,article=false}=Astro.props;
+const canonical=new URL(Astro.url.pathname,Astro.site);
+const links=[{label:'Posts',href:'/posts/'},{label:'Gallery',href:'/portfolio/'},{label:'Search',href:'/search/'}].map(link=>({...link,current:Astro.url.pathname===link.href}));
+---
+<Publication title={title} description={description} canonical={canonical} language="en" themeStorageKey="field-notes-theme">
+<Fragment slot="head"><meta property="og:type" content={article?'article':'website'}/><meta property="og:title" content={title}/><meta property="og:description" content={description}/><meta property="og:url" content={canonical.href}/><link rel="alternate" type="application/rss+xml" title="Field Notes" href="/rss.xml"/><link rel="icon" href="/favicon.svg"/></Fragment>
+<Header slot="header" brand="Field Notes" links={links} itemsId="field-notes-navigation"><button slot="controls" type="button" class="icon-button" id="theme-toggle" aria-label="Change theme"><svg aria-hidden="true" class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 16A8 8 0 0 1 8 5a8 8 0 1 0 11 11Z"/></svg><svg aria-hidden="true" class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button></Header>
+<slot/><Footer slot="footer"><nav slot="social" aria-label="Publication resources"><a href="/rss.xml">RSS</a></nav><span>Field Notes / An independent publication</span></Footer>
+</Publication>
+<script>import {prefetch} from 'astro:prefetch';import {installNavigationPrefetch} from 'astromache/navigation';installNavigationPrefetch(prefetch);</script>
+
+<script>
+import {installOfflineRegistration} from "@effortlessmetrics/astro-offline/client";
+installOfflineRegistration({
+  workerURL:"/reading-worker.js",scope:"/",requireVisible:true,idle:true,ownershipGuard:true,reuseExisting:true,
+  onState(state) { document.documentElement.dataset.offlineRegistration = state; },
+  onLifecycle(state, details) {
+    document.documentElement.dataset.offlineLifecycle = state;
+    document.documentElement.dataset.offlineHasActiveWorker = String(details.hasActiveWorker);
+    document.documentElement.dataset.offlineControlsPage = String(details.controlsPage);
+  },
+});
+</script>

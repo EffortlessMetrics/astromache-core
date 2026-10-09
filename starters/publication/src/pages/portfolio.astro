@@ -1,0 +1,6 @@
+---
+import Publication from "../layouts/Publication.astro";
+import Portfolio from "astromache/portfolio";
+const items = [{ title: "Geometric landscape", src: "/study.svg", alt: "Two geometric hills below a circle", medium: "SVG study", intent: "A neutral example for your own work." }, { title: "Second study", src: "/study.svg", alt: "A second geometric landscape study", medium: "SVG study", intent: "Replace the sample with an image you have rights to use.", tools: ["SVG"] }];
+---
+<Publication title="Gallery — Field Notes" description="Selected geometric studies."><Portfolio title="Gallery" description="Selected work and experiments." items={items} /></Publication>

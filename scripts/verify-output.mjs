@@ -1,0 +1,16 @@
+import assert from "node:assert/strict";
+import { readFile, writeFile } from "node:fs/promises";
+const html = await readFile("consumers/neutral/dist/index.html", "utf8");
+assert.match(html, /<title>Neutral publication<\/title>/);
+const openingHtml = html.match(/<html\b[^>]*>/)?.[0];
+assert.ok(openingHtml, "Missing root html element");
+assert.match(openingHtml, /\sdata-publication="neutral"(?=\s|>)/);
+assert.match(openingHtml, /\slang="en"(?=\s|>)/);
+assert.doesNotMatch(html, /invalid-override/);
+assert.match(html, /href="https:\/\/neutral.example\/"/);
+assert.match(html, /href="#main"/);
+assert.match(html, /<main id="main" tabindex="-1">/);
+assert.doesNotMatch(html, /<script\b/);
+const receipt = { neutral: { htmlBytes: Buffer.byteLength(html) } };
+await writeFile(".qualification-output.json", JSON.stringify(receipt, null, 2));
+console.log("Neutral document output", JSON.stringify(receipt));

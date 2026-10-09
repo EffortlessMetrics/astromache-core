@@ -1,0 +1,21 @@
+---
+export interface Link {label:string;href:string;}
+export interface Props {title:string;published:{datetime:string;label:string};readingTime?:string;lens?:Link;tags?:ReadonlyArray<Link>;related?:ReadonlyArray<Link>;previous?:Link;next?:Link;backHref?:string;backLabel?:string;returnStorageKey?:string;backId?:string;topButtonId?:string;}
+const {title,published,readingTime,lens,tags=[],related=[],previous,next,backHref='/',backLabel='Go back',returnStorageKey,backId='article-back',topButtonId='back-to-top'}=Astro.props;
+---
+<a class="back-link" href={backHref} id={backId} data-article-back data-return-key={returnStorageKey}><slot name="back-icon"/><span>{backLabel}</span></a>
+<h1 class="article-title blog-title">{title}</h1>
+<div class="article-meta"><span class="publication-date"><slot name="date-icon"/><span class="sr-only">Published:</span><time datetime={published.datetime}>{published.label}</time></span>{readingTime&&<><span aria-hidden="true">&middot;</span><span class="reading-time">{readingTime}</span></>}{lens&&<><span aria-hidden="true">&middot;</span><a class="article-lens" href={lens.href}>{lens.label}</a></>}</div>
+<slot name="source"/>
+<article data-article-body class="post-content"><slot/></article>
+<ul class="tag-section article-tags">{tags.map(tag=><li><a href={tag.href}>{tag.label}</a></li>)}</ul>
+<div class="article-actions"><slot name="actions"/><button type="button" id={topButtonId} data-article-top>Back to Top</button></div>
+{related.length>0&&<section class="related-posts"><h2 id="related-posts">Related Posts</h2><ul>{related.map(link=><li><a href={link.href}>{link.label}</a></li>)}</ul></section>}
+<nav class="adjacent-posts" aria-label="Adjacent posts">{previous&&<a href={previous.href}>Previous Post: {previous.label}</a>}{next&&<a href={next.href}>Next Post: {next.label}</a>}</nav>
+<slot name="reading-tools"/>
+<script>
+for(const heading of document.querySelectorAll<HTMLElement>('main h2[id],main h3[id],main h4[id],main h5[id],main h6[id]')){if(heading.querySelector('.heading-link'))continue;const link=document.createElement('a');link.className='heading-link';link.href='#'+heading.id;link.setAttribute('aria-label','Link to '+(heading.textContent?.trim()||'section'));const marker=document.createElement('span');marker.textContent='#';marker.setAttribute('aria-hidden','true');link.append(marker);heading.append(link);}
+for(const button of document.querySelectorAll('[data-article-top]'))button.addEventListener('click',()=>window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'}));
+for(const back of document.querySelectorAll<HTMLAnchorElement>('[data-article-back][data-return-key]')){try{const stored=sessionStorage.getItem(back.dataset.returnKey!);if(stored){const target=new URL(stored,location.origin);if(target.origin===location.origin)back.href=target.pathname+target.search;}}catch{}}
+</script>
+<style>:global(.heading-link){margin-left:.5rem;opacity:0;text-decoration:none;}:global(:is(h2,h3,h4,h5,h6):hover .heading-link),:global(.heading-link:focus-visible){opacity:1;}</style>

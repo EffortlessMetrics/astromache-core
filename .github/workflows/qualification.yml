@@ -46,6 +46,10 @@ jobs:
         run: pnpm verify:interaction
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Article action geometry and keyboard behavior
+        run: pnpm verify:article-actions
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
       - name: Neutral taxonomy routes and collision diagnostics
         run: pnpm verify:taxonomy
       - name: Independent packed consumers

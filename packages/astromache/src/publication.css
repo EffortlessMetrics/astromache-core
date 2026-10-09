@@ -362,6 +362,9 @@ sub {
   justify-content: space-between;
   margin-block: 2rem;
 }
+.article-actions {
+  align-items: baseline;
+}
 body.focus-mode {
   --max-width: 680px;
 }

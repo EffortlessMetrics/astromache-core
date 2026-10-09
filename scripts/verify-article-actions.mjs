@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { cp, mkdtemp, mkdir, readFile, writeFile, symlink, rm } from "node:fs/promises";
+import { cp, mkdtemp, mkdir, readFile, writeFile, symlink, rm, realpath } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,7 +14,9 @@ const componentPackage = process.env.ASTROMACHE_GEOMETRY_PACKAGE_ROOT
   ? resolve(process.env.ASTROMACHE_GEOMETRY_PACKAGE_ROOT)
   : join(root, "packages/astromache");
 const require = createRequire(import.meta.url);
-const fixture = await mkdtemp(join(tmpdir(), "astromache-action-geometry-"));
+// Windows hosted tmpdir can use a DOS alias. Astro/Vite CSS identities must
+// use the same canonical path as the files resolved during compilation.
+const fixture = await realpath(await mkdtemp(join(tmpdir(), "astromache-action-geometry-")));
 const evidence = process.env.ASTROMACHE_GEOMETRY_EVIDENCE
   ? resolve(process.env.ASTROMACHE_GEOMETRY_EVIDENCE)
   : undefined;

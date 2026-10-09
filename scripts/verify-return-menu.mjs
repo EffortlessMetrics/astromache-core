@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile, symlink, readFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, symlink, readFile, rm, cp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,8 +16,10 @@ try {
   await mkdir(join(fixture, "src/pages"), { recursive: true });
   await symlink(join(root, "node_modules"), join(fixture, "node_modules"), "junction");
   await writeFile(join(fixture, "package.json"), JSON.stringify({ type: "module" }));
-  const component = (name) =>
-    JSON.stringify(join(root, "packages/astromache/src", name + ".astro").replaceAll("\\", "/"));
+  await cp(join(root, "packages/astromache/src"), join(fixture, "src/components"), {
+    recursive: true,
+  });
+  const component = (name) => JSON.stringify("../components/" + name + ".astro");
   await writeFile(
     join(fixture, "src/pages/index.astro"),
     `---

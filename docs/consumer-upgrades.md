@@ -11,14 +11,14 @@ Use Node `>=24.19.0 <25`; Node 24.19.x and Astro **7.3.5** are qualified. The de
 For a pnpm consumer, copy the accepted archive into its own `vendor/` directory, then run:
 
 ```sh
-pnpm add ./vendor/astromache-0.2.7.tgz astro@7.3.5
+pnpm add ./vendor/astromache-0.2.7.tgz astro@7.3.5 --save-exact
 pnpm install --frozen-lockfile --ignore-scripts
 ```
 
 For an npm consumer, use:
 
 ```sh
-npm install ./vendor/astromache-0.2.7.tgz astro@7.3.5 --ignore-scripts
+npm install ./vendor/astromache-0.2.7.tgz astro@7.3.5 --save-exact --ignore-scripts
 npm ci --ignore-scripts
 ```
 
@@ -32,7 +32,7 @@ Once registry publication is explicitly confirmed, verify the published archive 
 
 The original 0.1.0 document, metadata, navigation, fonts and portfolio subpaths remain available. Expanded 0.2.x adds publication components/styles and the canonical static offline preset. Retain existing import paths; review the changelog for behavior repairs and test your actual adapters. No root export or unexported internal path compatibility is promised. A dependency change may change built bytes even when imports remain compatible.
 
-Use an isolated copy to demonstrate a dependency-and-lock-only upgrade. Check content routes, listing query return, menu/overlay keyboard ownership, themes/native controls and any gallery/reading controls you use. For offline sites, rebuild the whole output and its worker together: output digest and bundled dependency changes identify a new cache generation. Preserve site-owned cache prefixes, exclusions, budgets, scope and query policy unless deliberately changing them.
+Use an isolated copy to demonstrate a dependency-and-lock-only upgrade. Check content routes, listing query return, menu/overlay keyboard ownership, themes/native controls and any gallery/reading controls you use. For offline sites, rebuild the whole output and its worker together: The emitted output digest governs the worker revision; bundled dependency changes affect that revision when they change emitted bytes. A package-version-only or metadata-only change may leave the revision unchanged. Preserve site-owned cache prefixes, exclusions, budgets, scope and query policy unless deliberately changing them.
 
 Test an already controlled browser updating naturally: the old worker may remain active while clients are open. Do not force activation merely to make a test pass. Verify eventual new control, offline navigation/assets, reconnect freshness, rejected-install preservation and unrelated-cache isolation. Selected HTML must retain the exact built bytes and qualified canonical routes on the target host; local builds do not establish hosted readiness.
 

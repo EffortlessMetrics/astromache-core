@@ -11,7 +11,7 @@ Use Node `>=24.19.0 <25`; Node 24.19.x and Astro **7.3.5** are qualified. The de
 For a pnpm consumer, copy the accepted archive into its own `vendor/` directory, then run:
 
 ```sh
-pnpm add ./vendor/astromache-0.2.7.tgz astro@7.3.5 --save-exact
+pnpm add ./vendor/astromache-0.2.7.tgz astro@7.3.5 --save-exact --ignore-scripts
 pnpm install --frozen-lockfile --ignore-scripts
 ```
 
@@ -24,7 +24,7 @@ npm ci --ignore-scripts
 
 The first command updates the dependency pin and lockfile. Review both together; keep active archives with the project so fresh installation resolves the same bytes. Run the consumer's type checks, build and affected browser checks after the frozen reinstall. Review any dependencies that require separately authorized installation scripts.
 
-The optional peer `@effortlessmetrics/astro-offline >=0.1.4 <0.2.0` is required when importing `astromache/static-offline`. Existing document, metadata, navigation, gallery and publication component imports do not require it. For the preset, install the exact qualified archive with `pnpm add ./vendor/effortlessmetrics-astro-offline-0.1.4.tgz` or the equivalent `npm install` command, then repeat the frozen reinstall. Search and contact libraries keep separate versions and upgrade decisions.
+The optional peer `@effortlessmetrics/astro-offline >=0.1.4 <0.2.0` is required when importing `astromache/static-offline`. Existing document, metadata, navigation, gallery and publication component imports do not require it. For the preset, install the exact qualified archive with `pnpm add ./vendor/effortlessmetrics-astro-offline-0.1.4.tgz --ignore-scripts` or the equivalent `npm install` command, then repeat the frozen reinstall. Search and contact libraries keep separate versions and upgrade decisions.
 
 Once registry publication is explicitly confirmed, verify the published archive identity against the accepted receipt before using exact registry pins such as `astromache@0.2.7`. Do not infer publication from a source tag, merged PR or passing CI.
 

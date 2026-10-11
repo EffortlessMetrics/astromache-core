@@ -9,6 +9,7 @@ import {
   readFile,
   readdir,
   realpath,
+  rm,
   writeFile,
   access,
 } from "node:fs/promises";
@@ -425,6 +426,117 @@ await probe("retained receipt worker filename change requires clean output", asy
   assert.notEqual(result.status, 0);
   assert.match(result.stdout + result.stderr, /receiptFile.*collision/i);
   assert.deepEqual(after, before);
+});
+for (const [name, prepare, overrides] of [
+  ["retained-receipt-rename", async () => {}, { receiptFile: "next-receipt.json" }],
+  [
+    "retained-pair-rename",
+    async () => {},
+    { receiptFile: "next-receipt.json", workerFile: "next-worker.js" },
+  ],
+  [
+    "retained-orphan-worker",
+    async (dir) => rm(join(dir, "offline-receipt.json")),
+    { receiptFile: "next-receipt.json", workerFile: "next-worker.js" },
+  ],
+  [
+    "retained-corrupt-receipt",
+    async (dir) => writeFile(join(dir, "offline-receipt.json"), "{invalid"),
+    { receiptFile: "next-receipt.json", workerFile: "next-worker.js" },
+  ],
+  [
+    "retained-extra-pair",
+    async (dir) => {
+      await cp(join(dir, "reading-worker.js"), join(dir, "other-worker.js"));
+      await cp(join(dir, "offline-receipt.json"), join(dir, "other-receipt.json"));
+    },
+    {},
+  ],
+  [
+    "retained-corrupt-other-worker",
+    async (dir) => {
+      await writeFile(
+        join(dir, "other-worker.js"),
+        (await readFile(join(dir, "reading-worker.js"), "utf8")).replace(
+          /const REVISION="[0-9a-f]{20}"/,
+          'const REVISION="corrupt"',
+        ),
+      );
+    },
+    {},
+  ],
+  [
+    "retained-duplicate-receipt",
+    async (dir) => cp(join(dir, "offline-receipt.json"), join(dir, "other-receipt.json")),
+    {},
+  ],
+]) {
+  await probe(`${name} rejects without partial output mutation`, async () => {
+    const directory = join(consumer, name);
+    await cp(join(consumer, "dist-default"), directory, { recursive: true });
+    await writeFile(join(directory, "extra.json"), '{"fixture":"seventh asset"}');
+    const initial = await hook(name, policy);
+    assert.equal(initial.status, 0, initial.stdout + initial.stderr);
+    const previous = JSON.parse(await readFile(join(directory, "offline-receipt.json"), "utf8"));
+    assert.equal(previous.resources, 7);
+    await prepare(directory);
+    await rm(join(directory, "404"), { recursive: true });
+    const before = await snapshot(directory);
+    const result = await hook(name, { ...policy, ...overrides });
+    const after = await snapshot(directory);
+    await writeFile(
+      join(root, `${name}-snapshot.json`),
+      JSON.stringify({ status: result.status, previous, before, after }, null, 2),
+    );
+    assert.notEqual(result.status, 0);
+    assert.match(result.stdout + result.stderr, /receiptFile.*collision.*clean output/i);
+    assert.deepEqual(after, before);
+  });
+}
+await probe(
+  "unrelated receipt-shaped JSON and worker-like JavaScript remain corpus assets",
+  async () => {
+    const name = "unrelated-retained-assets";
+    const directory = join(consumer, name);
+    await cp(join(consumer, "dist-default"), directory, { recursive: true });
+    const receipt = JSON.parse(await readFile(join(directory, "offline-receipt.json"), "utf8"));
+    const unrelated = JSON.stringify({ ...receipt, revision: "unrelated consumer data" });
+    const javascript =
+      "/*! @effortlessmetrics/astro-offline owner code - MIT alternative\n*/\nconsole.log('consumer asset');";
+    await writeFile(join(directory, "unrelated.json"), unrelated);
+    await writeFile(join(directory, "unrelated.js"), javascript);
+    const result = await hook(name, policy);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    const updated = JSON.parse(await readFile(join(directory, "offline-receipt.json"), "utf8"));
+    assert.equal(updated.resources, 8);
+    assert.ok(updated.urls.includes("/unrelated.json"));
+    assert.ok(updated.urls.includes("/unrelated.js"));
+    assert.equal(await readFile(join(directory, "unrelated.json"), "utf8"), unrelated);
+    assert.equal(await readFile(join(directory, "unrelated.js"), "utf8"), javascript);
+  },
+);
+await probe("changing both filenames succeeds after old generated files are removed", async () => {
+  const name = "clean-retained-pair-rename";
+  const directory = join(consumer, name);
+  await cp(join(consumer, "dist-default"), directory, { recursive: true });
+  await rm(join(directory, "reading-worker.js"));
+  await rm(join(directory, "offline-receipt.json"));
+  const result = await hook(name, {
+    ...policy,
+    receiptFile: "next-receipt.json",
+    workerFile: "next-worker.js",
+  });
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const updated = JSON.parse(await readFile(join(directory, "next-receipt.json"), "utf8"));
+  assert.equal(updated.resources, 6);
+  assert.deepEqual(updated.urls, [
+    "/",
+    "/404/",
+    "/article/",
+    "/asset.json",
+    "/keep.css",
+    "/offline/",
+  ]);
 });
 const receipt = {
   packageVersion: manifest.version,

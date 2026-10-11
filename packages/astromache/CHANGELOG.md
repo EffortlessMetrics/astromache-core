@@ -1,4 +1,8 @@
-# 0.2.9 (unpublished)
+# 0.2.10 (unpublished)
+
+Detect retained generated workers independently of the newly configured filenames before any preset writes. Renaming workerFile, receiptFile or both requires removing prior generated files or using clean output; orphaned workers and extra matching receipts cannot silently enter the corpus. Same-pair retained rebuilds still allow content, cache-prefix and policy changes, and unrelated receipt-shaped JSON and JavaScript assets remain eligible. Preserve the prior 0.2.9 archive as superseded evidence of the rename bypass.
+
+# 0.2.9 (unpublished, superseded)
 
 Reject receipt filenames longer than 255 ASCII bytes during configuration. Detect public asset collisions before output and preflight existing receipt destinations before any preset writes. Retained receipts must match their regular, unlinked generated worker's revision and ordered corpus; unrelated assets, case aliases and linked files are refused without changing output. Legitimate retained receipts still support changed content and worker policy. Existing worker destinations are checked even for new receipts; changing workerFile on retained output requires a clean output directory. The prior 0.2.8 archive remains historical evidence and is superseded by this repair.
 

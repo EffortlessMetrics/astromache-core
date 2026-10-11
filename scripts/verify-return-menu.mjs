@@ -241,3 +241,5 @@ import ${JSON.stringify(join(root, "packages/astromache/src/publication.css").re
   if (server) await new Promise((resolve) => server.close(resolve));
   await rm(fixture, { recursive: true, force: true });
 }
+
+await import("./verify-header-interaction.mjs");

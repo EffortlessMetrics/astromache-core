@@ -1,3 +1,7 @@
+# 0.2.8 (unpublished)
+
+Honor the public static-offline receiptFile override while keeping offline-receipt.json as the default. Require portable root JSON receipt names so receipts cannot overwrite workers or HTML pages or act as ignore globs. Reject non-root Astro base paths and non-directory build formats during configuration, before rendering or writing a worker. The canonical directory preset and its pinned specialist backend support root-mounted directory URLs; unsupported output must not silently yield an unusable offline corpus. Independent packed Astro consumers cover all three configuration contracts, rejected receipt names, retained-output rebuilds and unchanged default policy.
+
 # 0.2.7 (unpublished)
 
 Align article actions by their text baselines so direct and nested native buttons retain equal intrinsic heights. Preserve existing control styling, responsive wrapping and adjacent-post navigation. Compiled desktop, mobile and forced-wrap geometry regressions cover actual Article/CopyLink components and keyboard Back-to-top behavior.

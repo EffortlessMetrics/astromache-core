@@ -4,29 +4,29 @@ Keep your application's routes, content, configuration and license decisions. Up
 
 ## Choose verified bytes
 
-As checked on 2026-10-10, npm exposes only `astromache@0.1.0`; the current `0.2.8` candidate is unpublished, and `@effortlessmetrics/astro-offline` is unavailable from the public registry. Obtain the exact accepted archives and receipts from the maintainer, verify their SHA-256 values, and retain the previous archives, manifest and lockfile. Never replace different bytes under an existing archive filename/version. A source checkout alone is not an accepted package receipt.
+As checked on 2026-10-10, npm exposes only `astromache@0.1.0`; the current `0.2.9` candidate is unpublished, and `@effortlessmetrics/astro-offline` is unavailable from the public registry. Obtain the exact accepted archives and receipts from the maintainer, verify their SHA-256 values, and retain the previous archives, manifest and lockfile. Never replace different bytes under an existing archive filename/version. A source checkout alone is not an accepted package receipt.
 
 Use Node `>=24.19.0 <25`; Node 24.19.x and Astro **7.3.5** are qualified. The declared Astro `^7.3.5` peer range does not mean every version has been tested. Use your existing package manager; pnpm 10.28.0 is qualified for the supplied publication starter. Consumer builds do not require the producer's compiler patches or tooling overrides.
 
 For a pnpm consumer, copy the accepted archive into its own `vendor/` directory, then run:
 
 ```sh
-pnpm add ./vendor/astromache-0.2.8.tgz astro@7.3.5 --save-exact --ignore-scripts
+pnpm add ./vendor/astromache-0.2.9.tgz astro@7.3.5 --save-exact --ignore-scripts
 pnpm install --frozen-lockfile --ignore-scripts
 ```
 
 For an npm consumer, use:
 
 ```sh
-npm install ./vendor/astromache-0.2.8.tgz astro@7.3.5 --save-exact --ignore-scripts
+npm install ./vendor/astromache-0.2.9.tgz astro@7.3.5 --save-exact --ignore-scripts
 npm ci --ignore-scripts
 ```
 
 The first command updates the dependency pin and lockfile. Review both together; keep active archives with the project so fresh installation resolves the same bytes. Run the consumer's type checks, build and affected browser checks after the frozen reinstall. Review any dependencies that require separately authorized installation scripts.
 
-The optional peer `@effortlessmetrics/astro-offline >=0.1.4 <0.2.0` is required when importing `astromache/static-offline`. Existing document, metadata, navigation, gallery and publication component imports do not require it. The canonical preset requires root-mounted Astro base: "/" and build.format: "directory"; incompatible settings now fail during configuration instead of emitting a broken worker. Preserve existing hosting and output decisions when selecting this optional preset. Its public receiptFile option is honored, with offline-receipt.json remaining the default. Use a root .json filename starting with an ASCII letter or digit and containing only letters, digits, dots, underscores or hyphens; paths, glob characters and Windows device names are rejected during configuration. For the preset, install the exact qualified archive with `pnpm add ./vendor/effortlessmetrics-astro-offline-0.1.4.tgz --ignore-scripts` or the equivalent `npm install` command, then repeat the frozen reinstall. Search and contact libraries keep separate versions and upgrade decisions.
+The optional peer `@effortlessmetrics/astro-offline >=0.1.4 <0.2.0` is required when importing `astromache/static-offline`. Existing document, metadata, navigation, gallery and publication component imports do not require it. The canonical preset requires root-mounted Astro base: "/" and build.format: "directory"; incompatible settings now fail during configuration instead of emitting a broken worker. Preserve existing hosting and output decisions when selecting this optional preset. Its public receiptFile option is honored, with offline-receipt.json remaining the default. Use a root .json filename of at most 255 ASCII bytes starting with a letter or digit and containing only letters, digits, dots, underscores or hyphens; paths, glob characters and Windows device names are rejected during configuration. A public asset using that filename or a case alias is rejected before output; an existing output destination is reusable only when its receipt matches the paired generated worker. A rejected collision leaves the preset output untouched. Changing workerFile on retained output requires a clean output directory; same-filename workers can rebuild after content, cache-prefix or policy changes. Candidate 0.2.9 supersedes the preserved 0.2.8 archive, which could overwrite a JSON asset. For the preset, install the exact qualified archive with `pnpm add ./vendor/effortlessmetrics-astro-offline-0.1.4.tgz --ignore-scripts` or the equivalent `npm install` command, then repeat the frozen reinstall. Search and contact libraries keep separate versions and upgrade decisions.
 
-Once registry publication is explicitly confirmed, verify the published archive identity against the accepted receipt before using exact registry pins such as `astromache@0.2.8`. Do not infer publication from a source tag, merged PR or passing CI.
+Once registry publication is explicitly confirmed, verify the published archive identity against the accepted receipt before using exact registry pins such as `astromache@0.2.9`. Do not infer publication from a source tag, merged PR or passing CI.
 
 ## Compatibility and acceptance
 

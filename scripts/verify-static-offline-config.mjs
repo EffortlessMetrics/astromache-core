@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, realpath, writeFile, access } from "node:fs/promises";
+import {
+  cp,
+  link,
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  realpath,
+  writeFile,
+  access,
+} from "node:fs/promises";
 import { isAbsolute, join, relative, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -53,6 +63,9 @@ await writeFile(
   ),
 );
 await writeFile(join(consumer, "pnpm-workspace.yaml"), "packages:\n  - .\n");
+// Optional preserved stock dependency graph for offline qualification; CI resolves afresh.
+const lockfileSeed = process.env.ASTROMACHE_CONFIG_LOCKFILE;
+if (lockfileSeed) await cp(lockfileSeed, join(consumer, "pnpm-lock.yaml"));
 const run = (args) =>
   execFileSync(process.execPath, [manager, ...args], {
     cwd: consumer,
@@ -87,6 +100,7 @@ for (const page of ["index", "article", "offline", "contact", "404"])
   );
 await mkdir(join(consumer, "public"), { recursive: true });
 await writeFile(join(consumer, "public/asset.json"), JSON.stringify({ fixture: true }));
+await writeFile(join(consumer, "public/keep.css"), "body { color: inherit; }");
 const policy = {
   cachePrefix: "config-core-proof-",
   workerFile: "reading-worker.js",
@@ -164,6 +178,7 @@ for (const [index, receiptFile] of [
   "custom[1].json",
   "../custom.json",
   "NUL.json",
+  "a".repeat(256) + ".json",
 ].entries()) {
   await probe(`unsupported receipt filename ${receiptFile} fails before output`, async () => {
     const name = `invalid-receipt-${index}`;
@@ -174,12 +189,119 @@ for (const [index, receiptFile] of [
     assert.equal(await exists(join(consumer, `dist-${name}/index.html`)), false);
   });
 }
+await probe("public JSON asset collision fails before output", async () => {
+  const original = await readFile(join(consumer, "public/asset.json"));
+  const result = await build("public-collision", {}, { ...policy, receiptFile: "asset.json" });
+  const destination = join(consumer, "dist-public-collision/asset.json");
+  await writeFile(
+    join(root, "public-collision-observation.json"),
+    JSON.stringify(
+      {
+        status: result.status,
+        original: original.toString(),
+        emitted: (await exists(destination)) ? await readFile(destination, "utf8") : null,
+      },
+      null,
+      2,
+    ),
+  );
+  assert.notEqual(result.status, 0, "A receipt must not overwrite a public JSON asset");
+  assert.match(
+    result.stdout + result.stderr,
+    /astromache\/static-offline.*receiptFile.*collision/i,
+  );
+  assert.equal(await exists(join(consumer, "dist-public-collision/index.html")), false);
+  assert.equal(await exists(join(consumer, "dist-public-collision/reading-worker.js")), false);
+  assert.deepEqual(await readFile(join(consumer, "public/asset.json")), original);
+});
+async function snapshot(directory) {
+  const entries = await readdir(directory, { recursive: true, withFileTypes: true });
+  const result = {};
+  for (const entry of entries) {
+    const path = join(entry.parentPath, entry.name);
+    result[relative(directory, path).replaceAll(String.fromCharCode(92), "/")] = entry.isDirectory()
+      ? "directory"
+      : createHash("sha256")
+          .update(await readFile(path))
+          .digest("hex");
+  }
+  return result;
+}
+async function hook(name, options) {
+  const file = `${name}.mjs`;
+  await writeFile(
+    join(consumer, file),
+    `import staticOffline from 'astromache/static-offline';\nawait staticOffline(${JSON.stringify(options)}).hooks['astro:build:done']({dir:new URL('./${name}/',import.meta.url)});\n`,
+  );
+  const result = spawnSync(process.execPath, [file], {
+    cwd: consumer,
+    encoding: "utf8",
+    timeout: 60000,
+  });
+  await writeFile(join(root, `${name}.log`), result.stdout + result.stderr);
+  return result;
+}
+for (const [name, assetName, contents] of [
+  ["hook-collision", "asset.json", JSON.stringify({ fixture: "keep this asset" })],
+  ["hook-case-collision", "ASSET.json", JSON.stringify({ fixture: "keep this alias" })],
+  [
+    "hook-receipt-shaped-asset",
+    "asset.json",
+    JSON.stringify(
+      {
+        revision: "a".repeat(20),
+        resources: 1,
+        files: 1,
+        bytes: 1,
+        urls: ["/"],
+        largestHtmlBytes: 1,
+        workbox: "7.4.1",
+      },
+      null,
+      2,
+    ),
+  ],
+]) {
+  await probe(`${name} rejects without partial output mutation`, async () => {
+    const directory = join(consumer, name);
+    await mkdir(directory);
+    await writeFile(join(directory, "index.html"), "<h1>Keep the home page</h1>");
+    await writeFile(join(directory, "404.html"), "<h1>Keep the root 404</h1>");
+    await writeFile(join(directory, "reading-worker.js"), "/* keep the previous worker */");
+    await writeFile(join(directory, "keep.css"), "body { color: inherit; }");
+    await writeFile(join(directory, assetName), contents);
+    const before = await snapshot(directory);
+    const result = await hook(name, { ...policy, receiptFile: "asset.json" });
+    const after = await snapshot(directory);
+    await writeFile(
+      join(root, `${name}-snapshot.json`),
+      JSON.stringify({ status: result.status, before, after }, null, 2),
+    );
+    assert.notEqual(result.status, 0, "An existing asset is not an owned retained receipt");
+    assert.match(
+      result.stdout + result.stderr,
+      /astromache\/static-offline.*receiptFile.*collision/i,
+    );
+    assert.deepEqual(
+      after,
+      before,
+      "Collision rejection must preserve all output bytes and entries",
+    );
+  });
+}
 await probe("default root directory policy remains supported", async () => {
   const result = await build("default");
   assert.equal(result.status, 0, result.stdout + result.stderr);
   const dir = join(consumer, "dist-default");
   const receipt = JSON.parse(await readFile(join(dir, "offline-receipt.json"), "utf8"));
-  assert.deepEqual(receipt.urls, ["/", "/404/", "/article/", "/asset.json", "/offline/"]);
+  assert.deepEqual(receipt.urls, [
+    "/",
+    "/404/",
+    "/article/",
+    "/asset.json",
+    "/keep.css",
+    "/offline/",
+  ]);
   assert.deepEqual(
     await readFile(join(dir, "404/index.html")),
     await readFile(join(dir, "404.html")),
@@ -189,13 +311,38 @@ await probe("default root directory policy remains supported", async () => {
   assert.ok(worker.includes('"stripQuery":false'));
   assert.ok(worker.includes('"navigationFallback":"/offline/"'));
 });
+await probe("custom public directory case alias is rejected before output", async () => {
+  const directory = join(consumer, "custom-public");
+  await mkdir(directory);
+  const original = await readFile(join(consumer, "dist-default/offline-receipt.json"));
+  await writeFile(join(directory, "ASSET.json"), original);
+  const result = await build(
+    "custom-public-collision",
+    { publicDir: "./custom-public" },
+    { ...policy, receiptFile: "asset.json" },
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(
+    result.stdout + result.stderr,
+    /astromache\/static-offline.*receiptFile.*collision/i,
+  );
+  assert.equal(await exists(join(consumer, "dist-custom-public-collision/index.html")), false);
+  assert.deepEqual(await readFile(join(directory, "ASSET.json")), original);
+});
 await probe("custom receipt filename is honored", async () => {
   const options = { ...policy, receiptFile: "custom-receipt.json" };
   const result = await build("custom", {}, options);
   assert.equal(result.status, 0, result.stdout + result.stderr);
   const dir = join(consumer, "dist-custom");
   const receipt = JSON.parse(await readFile(join(dir, "custom-receipt.json"), "utf8"));
-  assert.deepEqual(receipt.urls, ["/", "/404/", "/article/", "/asset.json", "/offline/"]);
+  assert.deepEqual(receipt.urls, [
+    "/",
+    "/404/",
+    "/article/",
+    "/asset.json",
+    "/keep.css",
+    "/offline/",
+  ]);
   assert.equal(await exists(join(dir, "offline-receipt.json")), false);
   await writeFile(
     join(consumer, "rebuild-custom.mjs"),
@@ -210,6 +357,74 @@ await probe("custom receipt filename is honored", async () => {
     JSON.parse(await readFile(join(dir, "custom-receipt.json"), "utf8")).revision,
     receipt.revision,
   );
+  await writeFile(
+    join(dir, "article/index.html"),
+    (await readFile(join(dir, "article/index.html"), "utf8")) + "\n<p>Retained output changed</p>",
+  );
+  execFileSync(process.execPath, ["rebuild-custom.mjs"], {
+    cwd: consumer,
+    stdio: "inherit",
+    timeout: 60000,
+  });
+  const changed = JSON.parse(await readFile(join(dir, "custom-receipt.json"), "utf8"));
+  assert.notEqual(changed.revision, receipt.revision);
+  assert.deepEqual(changed.urls, receipt.urls);
+  const updatedPolicy = {
+    ...options,
+    cachePrefix: "changed-config-core-proof-",
+    worker: { ...options.worker, stripQuery: true },
+  };
+  await writeFile(
+    join(consumer, "rebuild-custom.mjs"),
+    `import staticOffline from 'astromache/static-offline';\nawait staticOffline(${JSON.stringify(updatedPolicy)}).hooks['astro:build:done']({dir:new URL('./dist-custom/',import.meta.url)});\n`,
+  );
+  execFileSync(process.execPath, ["rebuild-custom.mjs"], {
+    cwd: consumer,
+    stdio: "inherit",
+    timeout: 60000,
+  });
+  const updated = JSON.parse(await readFile(join(dir, "custom-receipt.json"), "utf8"));
+  assert.notEqual(updated.revision, changed.revision);
+  assert.deepEqual(updated.urls, receipt.urls);
+});
+for (const [name, linked, receiptFile] of [
+  ["receipt-hardlink", "custom-receipt.json", "custom-receipt.json"],
+  ["worker-hardlink", "reading-worker.js", "custom-receipt.json"],
+  ["new-receipt-worker-hardlink", "reading-worker.js", "new-receipt.json"],
+]) {
+  await probe(`${name} rejects without partial output mutation`, async () => {
+    const directory = join(consumer, name);
+    await cp(join(consumer, "dist-custom"), directory, { recursive: true });
+    await link(join(directory, linked), join(directory, `linked-${linked}`));
+    const before = await snapshot(directory);
+    const result = await hook(name, { ...policy, receiptFile });
+    const after = await snapshot(directory);
+    await writeFile(
+      join(root, `${name}-snapshot.json`),
+      JSON.stringify({ status: result.status, before, after }, null, 2),
+    );
+    assert.notEqual(result.status, 0);
+    assert.match(
+      result.stdout + result.stderr,
+      /astromache\/static-offline.*receiptFile.*collision/i,
+    );
+    assert.deepEqual(after, before);
+  });
+}
+await probe("retained receipt worker filename change requires clean output", async () => {
+  const name = "retained-worker-rename";
+  const directory = join(consumer, name);
+  await cp(join(consumer, "dist-custom"), directory, { recursive: true });
+  const before = await snapshot(directory);
+  const result = await hook(name, {
+    ...policy,
+    receiptFile: "custom-receipt.json",
+    workerFile: "new-worker.js",
+  });
+  const after = await snapshot(directory);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout + result.stderr, /receiptFile.*collision/i);
+  assert.deepEqual(after, before);
 });
 const receipt = {
   packageVersion: manifest.version,
@@ -222,6 +437,11 @@ const receipt = {
   }).trim(),
   consumer,
   installed,
+  lockfileSeedSha256: lockfileSeed
+    ? createHash("sha256")
+        .update(await readFile(lockfileSeed))
+        .digest("hex")
+    : null,
   probes,
 };
 await writeFile(join(root, "receipt.json"), JSON.stringify(receipt, null, 2) + "\n");

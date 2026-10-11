@@ -327,7 +327,10 @@ export async function verifyPublicationUpgradeNegatives(directory, candidate, ru
   };
   await pinDelivery(broken, bad);
   await verifyPublicationDelivery(broken, bad);
-  run(["install", "--ignore-scripts"], broken);
+  // CI freezes installs by default. Resolve the deliberately broken pin first,
+  // then require a frozen install so only its public-export build can fail.
+  run(["install", "--lockfile-only", "--ignore-scripts"], broken);
+  run(["install", "--frozen-lockfile", "--ignore-scripts"], broken);
   const result = spawnSync(
     process.execPath,
     [join(broken, "node_modules/astro/bin/astro.mjs"), "build"],

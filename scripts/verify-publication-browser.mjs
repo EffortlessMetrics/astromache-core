@@ -15,7 +15,7 @@ async function poll(page, predicate, description) {
   throw new Error(`Timed out: ${description}`);
 }
 
-export async function verifyPublicationBrowser(directory, { recipe }) {
+export async function verifyPublicationBrowser(directory, { recipe, current = false }) {
   const server = createServer(async (request, response) => {
     try {
       const path = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
@@ -45,7 +45,10 @@ export async function verifyPublicationBrowser(directory, { recipe }) {
   const browser = await chromium.launch();
   try {
     for (const width of [320, 1440]) {
-      const context = await browser.newContext({ viewport: { width, height: 900 } });
+      const context = await browser.newContext({
+        viewport: { width, height: current ? 600 : 900 },
+        reducedMotion: "reduce",
+      });
       if (recipe)
         await context.addInitScript(() => {
           Object.defineProperty(navigator, "connection", {
@@ -134,6 +137,46 @@ export async function verifyPublicationBrowser(directory, { recipe }) {
         false,
       );
       assert.ok(await page.locator("#reading-time").textContent());
+      if (current) {
+        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        await poll(
+          page,
+          () => document.querySelector("#reading-time .progress-percent")?.textContent === "100%",
+          "reading progress reaches completion",
+        );
+        assert.equal(
+          await page.locator("#myBar").evaluate((element) => element.style.width),
+          "100%",
+        );
+        assert.equal(
+          await page.locator("#reading-time .time-remaining").textContent(),
+          "Complete!",
+        );
+        const top = page.getByRole("button", { name: "Back to Top", exact: true });
+        await top.focus();
+        await page.keyboard.press("Enter");
+        await poll(page, () => window.scrollY < 2, "article keyboard back-to-top");
+        const focus = page.getByRole("button", { name: "Toggle focus mode", exact: true });
+        await focus.focus();
+        await page.keyboard.press("Enter");
+        assert.equal(await focus.getAttribute("aria-pressed"), "true");
+        assert.equal(await page.evaluate(() => localStorage.getItem("field-notes-focus")), "true");
+        await page.reload();
+        assert.equal(
+          await page
+            .locator("body")
+            .evaluate((element) => element.classList.contains("focus-mode")),
+          true,
+        );
+        await page.getByRole("button", { name: "Toggle focus mode", exact: true }).click();
+        await page.locator(".post-content h2 .heading-link").first().focus();
+        await page.keyboard.press("Enter");
+        assert.ok(
+          new URL(page.url()).hash,
+          "Heading permalink keyboard navigation retains a section hash",
+        );
+      }
+
       await page.evaluate(() => {
         Object.defineProperty(navigator, "clipboard", {
           configurable: true,
@@ -153,6 +196,27 @@ export async function verifyPublicationBrowser(directory, { recipe }) {
       await page.goto(`${origin}/posts/`);
       await page.locator('a[href="/notes/making-room-for-change/"]').first().click();
       await page.getByRole("heading", { name: "Making room for change", exact: true }).waitFor();
+      if (current) {
+        await page.goto(`${origin}/posts/?return-check=1`);
+        await page.locator('a[href="/notes/a-quiet-system/"]').first().click();
+        await poll(
+          page,
+          () =>
+            document.querySelector("[data-article-back]")?.getAttribute("href") ===
+            "/posts/?return-check=1",
+          "article return controller retains listing query",
+        );
+        await page.locator("[data-article-back]").focus();
+        await page.keyboard.press("Enter");
+        await page.waitForURL(`${origin}/posts/?return-check=1`);
+        for (const tag of ["practice", "observation"]) {
+          await page.goto(`${origin}/tags/${tag}/`);
+          assert.ok(
+            await page.locator('a[href^="/notes/"]').count(),
+            `Taxonomy ${tag} exposes public article routes`,
+          );
+        }
+      }
       await page.goto(`${origin}/portfolio/`);
       const trigger = page.getByRole("button", {
         name: "Open Geometric landscape in the portfolio lightbox",

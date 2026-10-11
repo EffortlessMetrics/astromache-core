@@ -92,6 +92,19 @@ export async function verifyRecipeCanonical(directory) {
   try {
     browser = await chromium.launch();
     const context = await browser.newContext();
+    // Registration deliberately defers constrained connections. This lifecycle
+    // test qualifies an eligible connection, independently of host estimates.
+    await context.addInitScript(() => {
+      Object.defineProperty(navigator, "connection", {
+        configurable: true,
+        value: Object.assign(new EventTarget(), {
+          effectiveType: "4g",
+          downlink: 10,
+          rtt: 10,
+          saveData: false,
+        }),
+      });
+    });
     try {
       const page = await context.newPage();
       await page.goto(origin);

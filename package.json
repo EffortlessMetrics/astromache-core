@@ -10,6 +10,7 @@
     "lint": "vp lint packages/ consumers/ scripts/",
     "test": "vp test --run",
     "verify:output": "node scripts/verify-output.mjs",
+    "verify:publication:current": "node scripts/verify-publication-products.mjs --current-packed",
     "verify:packed": "node scripts/verify-packed-consumers.mjs",
     "qualify:native": "vp run typecheck:native && node scripts/verify-native-diagnostics.mjs",
     "qualify": "vp run typecheck && pnpm qualify:native && vp run check:astro && vp run lint && vp run format:check && vp run test && vp run build && vp run verify:output && pnpm verify:canonical-preset",

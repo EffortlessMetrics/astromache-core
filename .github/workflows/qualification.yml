@@ -70,3 +70,7 @@ jobs:
         run: node scripts/verify-publication-products.mjs
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Freshly packed current full-consumer upgrades and negative deliveries
+        run: pnpm verify:publication:current
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers

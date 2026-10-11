@@ -21,3 +21,5 @@ Starter exporters set the generated application package to `UNLICENSED` and move
 ## Consumer upgrades
 
 For exact archive installation, compatibility checks and browser-worker rollback limits, see [upgrade an existing consumer](docs/consumer-upgrades.md).
+
+Run `pnpm verify:publication:current` to freshly pack the current package and qualify disposable full publication and search-offline consumers outside this checkout. The upgrade changes only the dependency pin, matching delivery metadata and lock entries; application files and frozen specialist archives must retain identical bytes. It verifies a clean frozen reinstall, installed archive/export identity, full browser flows and natural historical-to-current worker adoption, including rejected deliveries and a broken public export. JSON receipts identify the packed bytes and saved lockfiles. `node scripts/verify-publication-products.mjs` separately retains the historical 0.2.0 qualification; neither command publishes a package.

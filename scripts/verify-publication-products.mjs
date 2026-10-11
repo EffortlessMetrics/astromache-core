@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtemp, readFile, realpath } from "node:fs/promises";
+import { mkdtemp, readFile, realpath, writeFile } from "node:fs/promises";
 import { delimiter, dirname, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -9,6 +9,12 @@ import { verifyRecipeBFCache } from "./verify-recipe-bfcache.mjs";
 import { verifyRecipeFreshness } from "./verify-recipe-freshness.mjs";
 import { verifyRecipeLifecycle } from "./verify-recipe-lifecycle.mjs";
 import { verifyRecipeCanonical } from "./verify-recipe-canonical.mjs";
+import {
+  packCurrentPublication,
+  upgradePublication,
+  verifyPublicationUpgradeNegatives,
+} from "./verify-publication-upgrade.mjs";
+import { verifyPublicationWorkerUpgrade } from "./verify-publication-worker-upgrade.mjs";
 
 await import("./verify-recipe-request-contracts.mjs");
 
@@ -26,6 +32,8 @@ assert.ok(
   !relative(producer, root).startsWith(`.${sep}`) && !root.startsWith(producer + sep),
   "Products must be copied outside producer",
 );
+const current = process.argv.includes("--current-packed");
+const candidate = current ? await packCurrentPublication(producer, root, manager) : undefined;
 const products = [
   ["starters/publication", false],
   ["recipes/search-offline", true],
@@ -57,9 +65,9 @@ for (const [source, recipe] of products.filter(
     undefined,
     "Ordinary Astro product must not patch compiler",
   );
-  const run = (args) =>
+  const run = (args, cwd = directory) =>
     execFileSync(process.execPath, [manager, ...args], {
-      cwd: directory,
+      cwd,
       stdio: "inherit",
       timeout: 300000,
       env: {
@@ -67,16 +75,38 @@ for (const [source, recipe] of products.filter(
         PATH: `${dirname(process.execPath)}${delimiter}${process.env.PATH ?? process.env.Path ?? ""}`,
       },
     });
-  run(["install", "--frozen-lockfile", "--ignore-scripts"]);
+  const upgrade = current
+    ? await upgradePublication(directory, candidate, run, { recipe })
+    : undefined;
+  if (!current) run(["install", "--frozen-lockfile", "--ignore-scripts"]);
   run(["qualify"]);
-  await verifyPublicationBrowser(directory, { recipe });
+  await verifyPublicationBrowser(directory, { recipe, current });
   if (recipe) {
     await verifyRecipeBFCache(directory);
     await verifyRecipeFreshness(directory);
     await verifyRecipeLifecycle(directory);
     await verifyRecipeCanonical(directory);
+    if (current) {
+      upgrade.receipt.naturalWorkerUpgrade = await verifyPublicationWorkerUpgrade(
+        upgrade.baseline,
+        directory,
+      );
+      upgrade.receipt.negatives = await verifyPublicationUpgradeNegatives(
+        directory,
+        candidate,
+        run,
+      );
+    }
+  }
+  if (current) {
+    await upgrade.verifyUnchanged();
+    await writeFile(
+      join(directory, "CURRENT-PACKED-QUALIFICATION.json"),
+      JSON.stringify({ pass: true, ...upgrade.receipt }, null, 2) + "\n",
+    );
+    console.log("Current full-consumer receipt", JSON.stringify(upgrade.receipt));
   }
   console.log(
-    `Independent ${source}: frozen installation, ordinary Astro qualification and browser flows passed (${directory})`,
+    `Independent ${source}${current ? ` upgraded to freshly packed ${candidate.manifest.version}` : " historical 0.2.0"}: frozen installation, ordinary Astro qualification and browser flows passed (${directory})`,
   );
 }

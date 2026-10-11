@@ -11,6 +11,19 @@ const {brand,brandHref='/',links=[],navigationLabel='Primary navigation',itemsId
   const header = document.querySelector<HTMLElement>(".publication-header"); const nav = header?.querySelector<HTMLElement>("nav"); const menu = nav?.querySelector<HTMLButtonElement>(".menu-toggle"); const items = document.getElementById(menu?.getAttribute("aria-controls") || "navigation-items");
   const background = [...document.querySelectorAll<HTMLElement>("main, footer")];
   const previousInert = new Map<HTMLElement, boolean>();
+  function tabbableControls(container: ParentNode) {
+    const candidates = [...container.querySelectorAll<HTMLElement>(
+      "a[href],area[href],button,input,select,textarea,iframe,object,embed,summary,[tabindex],[contenteditable]"
+    )].filter(element => {
+      const editableHost = element.isContentEditable && !element.parentElement?.isContentEditable && !element.hasAttribute("tabindex");
+      return (element.tabIndex >= 0 || editableHost) && !element.matches(":disabled") && !element.closest("[inert]") && element.getClientRects().length > 0 && !["hidden", "collapse"].includes(getComputedStyle(element).visibility);
+    });
+    return candidates.filter(element => {
+      if (!(element instanceof HTMLInputElement) || element.type !== "radio" || !element.name) return true;
+      const group = candidates.filter(candidate => candidate instanceof HTMLInputElement && candidate.type === "radio" && candidate.name === element.name && candidate.form === element.form) as HTMLInputElement[];
+      return element === (group.find(radio => radio.checked) || group[0]);
+    }).sort((left, right) => (left.tabIndex > 0 ? left.tabIndex : Number.MAX_SAFE_INTEGER) - (right.tabIndex > 0 ? right.tabIndex : Number.MAX_SAFE_INTEGER));
+  }
   function setOpen(open: boolean) {
     menu?.setAttribute("aria-expanded", String(open));
     menu?.setAttribute("aria-label", open ? "Close Menu" : "Open Menu");
@@ -28,6 +41,12 @@ const {brand,brandHref='/',links=[],navigationLabel='Primary navigation',itemsId
     if (open) items?.querySelector<HTMLAnchorElement>("a")?.focus();
   }
   menu?.addEventListener("click", () => setOpen(menu.getAttribute("aria-expanded") !== "true"));
+  header?.addEventListener("click", event => {
+    const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.hasAttribute("download") || (link.target && link.target.toLowerCase() !== "_self")) return;
+    const target = new URL(link.href);
+    if (target.origin === location.origin && target.pathname === location.pathname && target.search === location.search && target.href.includes("#")) setOpen(false);
+  });
   document.addEventListener("keydown", event => {
     if (menu?.getAttribute("aria-expanded") !== "true") return;
     const overlays = document.querySelectorAll<HTMLElement>(header?.dataset.overlaySelector || "[data-tas-dialog]");
@@ -38,7 +57,7 @@ const {brand,brandHref='/',links=[],navigationLabel='Primary navigation',itemsId
       menu.focus();
     }
     if (event.key === "Tab" && header) {
-      const controls = [...header.querySelectorAll<HTMLElement>("a[href],button:not([disabled])")].filter(element => element.getClientRects().length > 0);
+      const controls = tabbableControls(header);
       const index = controls.indexOf(document.activeElement as HTMLElement);
       if (index < 0 || (event.shiftKey && index === 0) || (!event.shiftKey && index === controls.length - 1)) {
         event.preventDefault();

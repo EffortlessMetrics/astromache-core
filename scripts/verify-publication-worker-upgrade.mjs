@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, resolve, sep } from "node:path";
 import { chromium } from "@playwright/test";
+import { snapshotOfflineCache, assertOfflineCacheUnchanged } from "./offline-cache-snapshot.mjs";
 
 async function poll(page, predicate, label) {
   const end = Date.now() + 30000;
@@ -126,15 +127,10 @@ export async function verifyPublicationWorkerUpgrade(baseline, directory) {
         const cache = await caches.open("unrelated-consumer-cache");
         await cache.put("/sentinel", new Response("retain"));
       });
-      const oldCorpus = await page.evaluate(async (revision) => {
-        const cache = await caches.open(`astromache-recipe-reading-${revision}`);
-        return Promise.all(
-          (await cache.keys()).map(async (request) => [
-            request.url,
-            Array.from(new Uint8Array(await (await cache.match(request)).arrayBuffer())),
-          ]),
-        );
-      }, oldRevision);
+      const oldCorpus = await page.evaluate(
+        snapshotOfflineCache,
+        `astromache-recipe-reading-${oldRevision}`,
+      );
       assert.ok(oldCorpus.length > 0, "Historical verified corpus must contain entries");
       serving = current;
       const attemptUpgrade = () =>
@@ -183,16 +179,8 @@ export async function verifyPublicationWorkerUpgrade(baseline, directory) {
         ),
         "Interrupted upgrade removes its partial cache",
       );
-      assert.deepEqual(
-        await page.evaluate(async (revision) => {
-          const cache = await caches.open(`astromache-recipe-reading-${revision}`);
-          return Promise.all(
-            (await cache.keys()).map(async (request) => [
-              request.url,
-              Array.from(new Uint8Array(await (await cache.match(request)).arrayBuffer())),
-            ]),
-          );
-        }, oldRevision),
+      assertOfflineCacheUnchanged(
+        await page.evaluate(snapshotOfflineCache, `astromache-recipe-reading-${oldRevision}`),
         oldCorpus,
         "Interrupted upgrade preserves every historical cache entry and byte",
       );

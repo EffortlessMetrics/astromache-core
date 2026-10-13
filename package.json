@@ -13,7 +13,7 @@
     "verify:publication:current": "node scripts/verify-publication-products.mjs --current-packed",
     "verify:packed": "node scripts/verify-packed-consumers.mjs",
     "qualify:native": "vp run typecheck:native && node scripts/verify-native-diagnostics.mjs",
-    "qualify": "vp run typecheck && pnpm qualify:native && vp run check:astro && vp run lint && vp run format:check && vp run test && vp run build && vp run verify:output && pnpm verify:canonical-preset",
+    "qualify": "vp run typecheck && pnpm qualify:native && vp run check:astro && vp run lint && vp run format:check && vp run test && vp run build && vp run verify:output && pnpm verify:canonical-preset && pnpm verify:offline:snapshots",
     "format:check": "vp fmt . --check",
     "verify:offline": "node scripts/verify-offline-ownership.mjs && node scripts/verify-offline.mjs",
     "verify:offline:freshness": "node scripts/verify-offline-freshness.mjs",
@@ -23,7 +23,8 @@
     "verify:canonical-preset": "node scripts/verify-canonical-preset.mjs",
     "verify:interaction": "node scripts/verify-return-menu.mjs",
     "verify:taxonomy": "node scripts/verify-taxonomy.mjs",
-    "verify:article-actions": "node scripts/verify-article-actions.mjs"
+    "verify:article-actions": "node scripts/verify-article-actions.mjs",
+    "verify:offline:snapshots": "node --test scripts/offline-cache-snapshot.test.mjs"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import {
   access,
   cp,
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   realpath,
   rename,
@@ -31,12 +32,77 @@ assert(
 const outsideAlias = join(fixture, "into-producer");
 const insideAlias = join(producer, "node_modules", basename(fixture));
 const leaf = `rejected-${basename(fixture)}`;
-const run = (destination) =>
+const projects = {
+  publication: "starters/publication",
+  "search-offline": "recipes/search-offline",
+};
+const run = (destination, project = "publication") =>
   spawnSync(
     process.execPath,
-    [join(producer, "scripts/create-starter.mjs"), "publication", destination],
+    [join(producer, "scripts/create-starter.mjs"), project, destination],
     { cwd: producer, encoding: "utf8" },
   );
+
+async function verifyDelivery(destination, project) {
+  const source = projects[project];
+  const upstream = JSON.parse(await readFile(join(producer, source, "package.json"), "utf8"));
+  const app = JSON.parse(await readFile(join(destination, "package.json"), "utf8"));
+  assert.equal(app.private, true);
+  assert.equal(
+    app.license,
+    "UNLICENSED",
+    "Generated application must not inherit the template license",
+  );
+  assert.equal(app.pnpm, undefined, "Generated application must not inherit producer tooling");
+  assert.deepEqual(
+    app,
+    { ...upstream, license: "UNLICENSED" },
+    "Only application license metadata changes during export",
+  );
+  const activeVendor = Object.values(upstream.dependencies)
+    .filter((pin) => pin.startsWith("file:vendor/"))
+    .map((pin) => pin.slice(5));
+  const expected = execFileSync("git", ["ls-files", "-z", "--", source], {
+    cwd: producer,
+    encoding: "utf8",
+  })
+    .split("\0")
+    .filter(Boolean)
+    .map((file) => file.slice(source.length + 1))
+    .filter((file) => !file.startsWith("vendor/") || activeVendor.includes(file));
+  for (const notice of ["LICENSE", "LICENSE-MIT", "LICENSE-APACHE"]) {
+    const index = expected.indexOf(notice);
+    assert(index >= 0, `Tracked product notice required: ${notice}`);
+    expected.splice(index, 1);
+    expected.push(`licenses/template/${notice}`);
+    await assert.rejects(access(join(destination, notice)), { code: "ENOENT" });
+    assert.deepEqual(
+      await readFile(join(destination, "licenses/template", notice)),
+      await readFile(join(producer, source, notice)),
+      "Preserve exact upstream notice: " + notice,
+    );
+  }
+  expected.push("licenses/template/README.md", "STARTER-DELIVERY.json");
+  const actual = [];
+  async function visit(path = "") {
+    for (const entry of await readdir(join(destination, path), { withFileTypes: true })) {
+      const file = path ? `${path}/${entry.name}` : entry.name;
+      assert(!entry.isSymbolicLink(), `Export must contain ordinary files: ${file}`);
+      if (entry.isDirectory()) await visit(file);
+      else actual.push(file);
+    }
+  }
+  await visit();
+  assert.deepEqual(
+    actual.sort(),
+    expected.sort(),
+    `${project} export must contain only tracked product files, scoped notices and active archives`,
+  );
+  assert.match(
+    await readFile(join(destination, "licenses/template/README.md"), "utf8"),
+    /does not license.*replacement content/,
+  );
+}
 await symlink(producer, outsideAlias, "junction");
 try {
   const rejected = run(join(outsideAlias, leaf));
@@ -50,28 +116,11 @@ try {
     assert.equal(accepted.status, 0, accepted.stderr);
     const destination = join(fixture, "outside", "consumer");
     assert.equal(await realpath(join(insideAlias, "consumer")), await realpath(destination));
-    assert.equal(
-      JSON.parse(await readFile(join(destination, "package.json"), "utf8")).private,
-      true,
-    );
-    const app = JSON.parse(await readFile(join(destination, "package.json"), "utf8"));
-    assert.equal(
-      app.license,
-      "UNLICENSED",
-      "Generated application must not inherit the template license",
-    );
-    for (const notice of ["LICENSE", "LICENSE-MIT", "LICENSE-APACHE"]) {
-      await assert.rejects(access(join(destination, notice)), { code: "ENOENT" });
-      assert.deepEqual(
-        await readFile(join(destination, "licenses/template", notice)),
-        await readFile(join(producer, notice)),
-        "Preserve exact upstream notice: " + notice,
-      );
-    }
-    assert.match(
-      await readFile(join(destination, "licenses/template/README.md"), "utf8"),
-      /does not license.*replacement content/,
-    );
+    await verifyDelivery(destination, "publication");
+    const recipe = join(fixture, "outside", "recipe");
+    const exportedRecipe = run(recipe, "search-offline");
+    assert.equal(exportedRecipe.status, 0, exportedRecipe.stderr);
+    await verifyDelivery(recipe, "search-offline");
     const refused = run(join(insideAlias, "consumer"));
     assert.notEqual(refused.status, 0, "Existing consumer must not be replaced");
     assert.match(refused.stderr, /EEXIST/);

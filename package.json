@@ -29,7 +29,7 @@
   "devDependencies": {
     "@astrojs/check": "0.9.10",
     "@astrojs/ts-content-mapper": "0.2.0",
-    "@effortlessmetrics/astro-offline": "file:vendor/effortlessmetrics-astro-offline-0.1.4.tgz",
+    "@effortlessmetrics/astro-offline": "file:vendor/effortlessmetrics-astro-offline-0.1.5.tgz",
     "@playwright/test": "1.58.2",
     "@types/node": "24.10.1",
     "astro": "7.3.5",

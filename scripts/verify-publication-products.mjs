@@ -9,6 +9,7 @@ import { verifyRecipeBFCache } from "./verify-recipe-bfcache.mjs";
 import { verifyRecipeFreshness } from "./verify-recipe-freshness.mjs";
 import { verifyRecipeLifecycle } from "./verify-recipe-lifecycle.mjs";
 import { verifyRecipeCanonical } from "./verify-recipe-canonical.mjs";
+import { verifyPublicationOfflineAliases } from "./verify-publication-offline-aliases.mjs";
 import {
   packCurrentPublication,
   upgradePublication,
@@ -86,6 +87,7 @@ for (const [source, recipe] of products.filter(
     await verifyRecipeFreshness(directory);
     await verifyRecipeLifecycle(directory);
     await verifyRecipeCanonical(directory);
+    await verifyPublicationOfflineAliases(directory);
     if (current) {
       upgrade.receipt.naturalWorkerUpgrade = await verifyPublicationWorkerUpgrade(
         upgrade.baseline,

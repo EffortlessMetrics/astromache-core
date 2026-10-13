@@ -49,7 +49,10 @@ export async function verifyPublicationWorkerUpgrade(baseline, directory) {
             .toString()
             .replace("</head>", '<meta name="qualification-transform" content="rejected"></head>'),
         );
-      if (interrupted && path === "/notes/a-quiet-system/index.html") {
+      if (
+        interrupted &&
+        ["/notes/a-quiet-system/", "/notes/a-quiet-system/index.html"].includes(path)
+      ) {
         interruptedResponses++;
         response.writeHead(200, {
           "Content-Type": "text/html",

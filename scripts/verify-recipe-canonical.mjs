@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { cp, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, sep, extname } from "node:path";
@@ -18,19 +19,21 @@ export async function verifyRecipeCanonical(directory) {
   for (const version of ["a", "b"]) {
     const dir = join(root, version);
     await cp(join(directory, "dist"), dir, { recursive: true });
-    const file = join(dir, "posts/index.html");
-    const html = (await readFile(file, "utf8")).replace(
-      "<body",
-      `<body data-canonical-build="${version}"`,
-    );
-    await writeFile(file, html);
+    for (const route of ["index.html", "posts/index.html"]) {
+      const file = join(dir, route);
+      const html = (await readFile(file, "utf8")).replace(
+        "<body",
+        `<body data-canonical-build="${version}"`,
+      );
+      await writeFile(file, html);
+    }
   }
   const receipt = await generateOfflineWorker(join(root, "a"), {
     cachePrefix: "astromache-recipe-reading-",
     workerFile: "reading-worker.js",
-    pages: ["/posts/"],
+    pages: ["/", "/posts/"],
     globPatterns: ["**/*.{html,js,css,json,svg,woff2}"],
-    globIgnores: ["posts/index.html"],
+    globIgnores: ["index.html", "posts/index.html"],
     maxResources: 100,
     maxBytes: 5 * 1024 * 1024,
     maxFileBytes: 2 * 1024 * 1024,
@@ -42,6 +45,8 @@ export async function verifyRecipeCanonical(directory) {
       navigationFallback: "/offline/index.html",
     },
   });
+  assert.ok(receipt.urls.includes("/"));
+  assert.ok(!receipt.urls.includes("/index.html"));
   assert.ok(receipt.urls.includes("/posts/"));
   assert.ok(!receipt.urls.includes("/posts/index.html"));
   let serving = "a",
@@ -136,23 +141,76 @@ export async function verifyRecipeCanonical(directory) {
           );
         }, "astromache-recipe-reading-" + receipt.revision);
       const before = await snapshot();
+      const routes = [
+        { path: "/", location: "/", file: "index.html", heading: "Field Notes" },
+        {
+          path: "/index.html",
+          location: "/index.html",
+          file: "index.html",
+          heading: "Field Notes",
+        },
+        { path: "/posts/", location: "/posts/", file: "posts/index.html", heading: "Posts" },
+        { path: "/posts", location: "/posts/", file: "posts/index.html", heading: "Posts" },
+        {
+          path: "/posts/index.html",
+          location: "/posts/index.html",
+          file: "posts/index.html",
+          heading: "Posts",
+        },
+      ];
+      for (let cycle = 1; cycle <= 3; cycle++) {
+        for (const [offline, version] of [
+          [true, "a"],
+          [false, "b"],
+        ]) {
+          disconnected = offline;
+          serving = offline ? "a" : "b";
+          await context.setOffline(offline);
+          for (const route of routes) {
+            const response = await page.goto(origin + route.path);
+            assert.equal(response.status(), 200, `${route.path} must remain readable`);
+            const actual = await response.body();
+            const expected = await readFile(join(root, version, route.file));
+            const label = `${route.path} must return exact ${offline ? "offline A" : "online B"} bytes`;
+            assert.equal(actual.length, expected.length, label);
+            assert.equal(
+              createHash("sha256").update(actual).digest("hex"),
+              createHash("sha256").update(expected).digest("hex"),
+              label,
+            );
+            assert.equal(await page.locator("h1").textContent(), route.heading);
+            assert.equal(new URL(page.url()).pathname, route.location);
+            assert.equal(await page.locator("body").getAttribute("data-canonical-build"), version);
+            states.push({
+              cycle,
+              path: route.path,
+              offline,
+              build: version,
+              location: route.location,
+            });
+          }
+          assert.deepEqual(await snapshot(), before, "Navigation never mutates verified A corpus");
+        }
+      }
       disconnected = true;
       await context.setOffline(true);
-      for (const path of ["/posts/", "/posts"]) {
+      for (const path of ["/posts", "/posts/index.html", "/index.html"])
+        await assert.rejects(page.evaluate((url) => fetch(url), path));
+      for (const path of [
+        "/posts?excluded-query=1",
+        "/posts/index.html?excluded-query=1",
+        "/index.html?excluded-query=1",
+      ]) {
         await page.goto(origin + path);
-        assert.equal(
-          await page.locator("h1").textContent(),
-          "Posts",
-          "Canonical and slashless actual recipe must read the cached page",
-        );
-        assert.equal(new URL(page.url()).pathname, "/posts/");
-        assert.equal(await page.locator("body").getAttribute("data-canonical-build"), "a");
-        states.push({ path, offlineBuild: "a", canonicalURL: new URL(page.url()).pathname });
+        assert.equal(await page.locator("h1").textContent(), "Offline");
       }
-      await assert.rejects(page.evaluate(() => fetch("/posts")));
-      await page.goto(origin + "/posts?excluded-query=1");
-      assert.equal(await page.locator("h1").textContent(), "Offline");
-      for (const path of ["/api", "/api/", "/api/contact", "/api?excluded-query=1"]) {
+      for (const path of [
+        "/api",
+        "/api/",
+        "/api/contact",
+        "/api/index.html",
+        "/api?excluded-query=1",
+      ]) {
         const child = await context.newPage();
         try {
           await assert.rejects(child.goto(origin + path));
@@ -162,21 +220,7 @@ export async function verifyRecipeCanonical(directory) {
       }
       await page.goto(origin + "/not-published");
       assert.equal(await page.locator("h1").textContent(), "Offline");
-      await context.setOffline(false);
-      disconnected = false;
-      serving = "b";
-      for (const path of ["/posts/", "/posts"]) {
-        await page.goto(origin + path);
-        assert.equal(await page.locator("body").getAttribute("data-canonical-build"), "b");
-        assert.equal(new URL(page.url()).pathname, "/posts/");
-        states.push({ path, reconnectBuild: "b", canonicalURL: new URL(page.url()).pathname });
-      }
-      assert.deepEqual(await snapshot(), before, "Online B never mutates verified A corpus");
-      disconnected = true;
-      await context.setOffline(true);
-      await page.goto(origin + "/posts");
-      assert.equal(await page.locator("body").getAttribute("data-canonical-build"), "a");
-      assert.equal(new URL(page.url()).pathname, "/posts/");
+      assert.deepEqual(await snapshot(), before, "Exclusion probes never mutate verified A corpus");
       await writeFile(
         join(directory, "CANONICAL-QUALIFICATION.json"),
         JSON.stringify(
@@ -193,7 +237,7 @@ export async function verifyRecipeCanonical(directory) {
         ) + "\n",
       );
       console.log(
-        "Actual exported recipe canonical-pages variant passed: slashless/canonical offline A, reconnect B, exclusions and immutable A",
+        "Actual exported recipe canonical-pages variant passed: root/nested explicit-index aliases, three offline A/reconnect B cycles, exact bytes, exclusions and immutable A",
       );
     } finally {
       await context.close();

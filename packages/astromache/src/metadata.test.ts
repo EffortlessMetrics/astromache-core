@@ -9,6 +9,27 @@ const base = {
 };
 
 test.each([
+  undefined,
+  null,
+  "https://example.test/article/",
+  { protocol: "https:", href: "javascript:alert(1)" },
+])("diagnoses canonical values that are not URL objects: %j", (canonical) => {
+  // JavaScript consumers and runtime Astro props can violate the typed contract.
+  expect(() => publicationMetadata({ ...base, canonical } as unknown as typeof base)).toThrow(
+    "Canonical publication URL must be a URL object",
+  );
+});
+
+test.each(["http://example.test/article/", "https://example.test/article/"])(
+  "preserves valid canonical URL objects: %s",
+  (canonical) => {
+    expect(publicationMetadata({ ...base, canonical: new URL(canonical) }).canonical.href).toBe(
+      canonical,
+    );
+  },
+);
+
+test.each([
   "en_US",
   "en-x",
   "sl-rozaj-rozaj",

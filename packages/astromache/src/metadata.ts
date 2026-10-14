@@ -21,6 +21,9 @@ export function publicationMetadata(input: PublicationMetadata): PublicationMeta
   ) {
     throw new Error("Publication language must be a well-formed BCP 47 tag");
   }
+  if (!(input.canonical instanceof URL)) {
+    throw new TypeError("Canonical publication URL must be a URL object");
+  }
   if (!["http:", "https:"].includes(input.canonical.protocol)) {
     throw new Error("Canonical publication URLs must use HTTP or HTTPS");
   }

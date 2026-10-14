@@ -24,6 +24,18 @@ npm ci --ignore-scripts
 
 The first command updates the dependency pin and lockfile. Review both together; keep active archives with the project so fresh installation resolves the same bytes. Run the consumer's type checks, build and affected browser checks after the frozen reinstall. Review any dependencies that require separately authorized installation scripts.
 
+### Branded starter delivery metadata
+
+The current [branded publication starter](https://github.com/EffortlessMetrics/astromache#upgrading-shared-libraries) also owns delivery inventories. Its `build` script runs `scripts/verify-licenses.mjs --emit-output`, which checks the active bundled path, archive hash and installed version against `STARTER-DELIVERY.json`. A successful dependency update and frozen reinstall alone can still leave the build failing with `astromache delivery pin` if that receipt names the previous archive.
+
+For a bundled `astromache` upgrade in that starter, before qualification:
+
+- Update `STARTER-DELIVERY.json`'s `archives.astromache` entry with the accepted archive's `file`, `version` and `sha256`, and its `sourceCommits["astromache-core"]` with the accepted source identity.
+- Align the active version, hash and source provenance in `candidate-artifacts.json`; retain the previous entry and archive as the rollback choice. Update only the library being upgraded, leaving independent specialist receipts unchanged.
+- Run `pnpm verify:licenses`, `pnpm test:licenses` and `pnpm qualify` after the frozen reinstall. Record acceptance only for checks actually run against the new delivery; prior acceptance fields do not qualify new bytes.
+
+These files belong to the application, outside the core package. Ordinary consumers without these inventories do not need to create them. For a confirmed exact registry upgrade, follow the starter's registry instructions: its guard binds the exact pin to the installed name/version and leaves historical bundled receipts unchanged. Core historical export fixtures use different receipt schemas and are not replacement inventories for the branded starter.
+
 The optional peer `@effortlessmetrics/astro-offline >=0.1.4 <0.2.0` is required when importing `astromache/static-offline`. Existing document, metadata, navigation, gallery and publication component imports do not require it. For the preset, install the exact qualified archive with `pnpm add ./vendor/effortlessmetrics-astro-offline-0.1.5.tgz --ignore-scripts` or the equivalent `npm install` command, then repeat the frozen reinstall. Search and contact libraries keep separate versions and upgrade decisions.
 
 Once registry publication is explicitly confirmed, verify the published archive identity against the accepted receipt before using exact registry pins such as `astromache@0.2.7`. Do not infer publication from a source tag, merged PR or passing CI.
@@ -32,12 +44,12 @@ Once registry publication is explicitly confirmed, verify the published archive 
 
 The original 0.1.0 document, metadata, navigation, fonts and portfolio subpaths remain available. Expanded 0.2.x adds publication components/styles and the canonical static offline preset. Retain existing import paths; review the changelog for behavior repairs and test your actual adapters. No root export or unexported internal path compatibility is promised. A dependency change may change built bytes even when imports remain compatible.
 
-Use an isolated copy to demonstrate a dependency-and-lock-only upgrade. Check content routes, listing query return, menu/overlay keyboard ownership, themes/native controls and any gallery/reading controls you use. For offline sites, rebuild the whole output and its worker together: The emitted output digest governs the worker revision; bundled dependency changes affect that revision when they change emitted bytes. A package-version-only or metadata-only change may leave the revision unchanged. Preserve site-owned cache prefixes, exclusions, budgets, scope and query policy unless deliberately changing them.
+Use an isolated copy to demonstrate an upgrade limited to dependency pins, lock entries and any matching application-owned delivery metadata. Keep routes, content, configuration and styling unchanged. Check content routes, listing query return, menu/overlay keyboard ownership, themes/native controls and any gallery/reading controls you use. For offline sites, rebuild the whole output and its worker together: The emitted output digest governs the worker revision; bundled dependency changes affect that revision when they change emitted bytes. A package-version-only or metadata-only change may leave the revision unchanged. Preserve site-owned cache prefixes, exclusions, budgets, scope and query policy unless deliberately changing them.
 
 Test an already controlled browser updating naturally: the old worker may remain active while clients are open. Do not force activation merely to make a test pass. Verify eventual new control, offline navigation/assets, reconnect freshness, rejected-install preservation and unrelated-cache isolation. Selected HTML must retain the exact built bytes and qualified canonical routes on the target host; local builds do not establish hosted readiness.
 
 ## Rollback and notices
 
-Restore the exact old manifest, lockfile and archives, run a frozen install, rebuild, and repeat the affected checks. Separately prove that the old worker/output can install and become active under the current host routing and integrity policy. An old archive may fail under changed HTML redirects or transformations. Restoring package pins or DNS does not revert workers already controlling browsers; qualify a compatible recovery artifact if the old worker cannot be adopted.
+Restore the exact old manifest, lockfile, archives and matching delivery inventories when present, run a frozen install, rebuild, and repeat the affected checks. In the branded starter, restore both `STARTER-DELIVERY.json` and `candidate-artifacts.json` with the old bundled pin before running its delivery guard and qualification. Separately prove that the old worker/output can install and become active under the current host routing and integrity policy. An old archive may fail under changed HTML redirects or transformations. Restoring package pins or DNS does not revert workers already controlling browsers; qualify a compatible recovery artifact if the old worker cannot be adopted.
 
 Retain upstream MIT OR Apache-2.0 notices, packaged font OFL notices and dependency notices. These grants do not license your replacement content, assets or application additions. Keep private source/history out of public core changes. Registry publication and production rollout each require their own authorization and acceptance evidence.

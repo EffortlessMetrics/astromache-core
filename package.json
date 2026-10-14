@@ -24,7 +24,8 @@
     "verify:interaction": "node scripts/verify-return-menu.mjs",
     "verify:taxonomy": "node scripts/verify-taxonomy.mjs",
     "verify:article-actions": "node scripts/verify-article-actions.mjs",
-    "verify:offline:snapshots": "node --test scripts/offline-cache-snapshot.test.mjs"
+    "verify:offline:snapshots": "node --test scripts/offline-cache-snapshot.test.mjs",
+    "verify:packed:transition": "node scripts/verify-packed-client-transition.mjs --negative-controls"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

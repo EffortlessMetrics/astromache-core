@@ -28,7 +28,7 @@ The first command updates the dependency pin and lockfile. Review both together;
 
 The current [branded publication starter](https://github.com/EffortlessMetrics/astromache#upgrading-shared-libraries) also owns delivery inventories. Its `build` script runs `scripts/verify-licenses.mjs --emit-output`, which checks the active bundled path, archive hash and installed version against `STARTER-DELIVERY.json`. A successful dependency update and frozen reinstall alone can still leave the build failing with `astromache delivery pin` if that receipt names the previous archive.
 
-For a bundled upgrade in that starter, before qualification:
+For a bundled `astromache` upgrade in that starter, before qualification:
 
 - Update `STARTER-DELIVERY.json`'s `archives.astromache` entry with the accepted archive's `file`, `version` and `sha256`, and its `sourceCommits["astromache-core"]` with the accepted source identity.
 - Align the active version, hash and source provenance in `candidate-artifacts.json`; retain the previous entry and archive as the rollback choice. Update only the library being upgraded, leaving independent specialist receipts unchanged.

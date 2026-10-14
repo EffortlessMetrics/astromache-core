@@ -21,14 +21,18 @@ export function publicationMetadata(input: PublicationMetadata): PublicationMeta
   ) {
     throw new Error("Publication language must be a well-formed BCP 47 tag");
   }
-  if (!(input.canonical instanceof URL)) {
+  let canonical: URL;
+  try {
+    const href = Object.getOwnPropertyDescriptor(URL.prototype, "href")!.get!.call(input.canonical);
+    canonical = new URL(href);
+  } catch {
     throw new TypeError("Canonical publication URL must be a URL object");
   }
-  if (!["http:", "https:"].includes(input.canonical.protocol)) {
+  if (!["http:", "https:"].includes(canonical.protocol)) {
     throw new Error("Canonical publication URLs must use HTTP or HTTPS");
   }
-  if (input.canonical.username || input.canonical.password || input.canonical.hash) {
+  if (canonical.username || canonical.password || canonical.hash) {
     throw new Error("Canonical publication URLs cannot contain credentials or fragments");
   }
-  return { ...input, canonical: new URL(input.canonical.href) };
+  return { ...input, canonical };
 }

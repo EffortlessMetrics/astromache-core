@@ -29,6 +29,12 @@ test.each(["http://example.test/article/", "https://example.test/article/"])(
   },
 );
 
+test("validates the URL brand independently of its prototype identity", () => {
+  const canonical = new URL(base.canonical);
+  Object.setPrototypeOf(canonical, null);
+  expect(publicationMetadata({ ...base, canonical }).canonical.href).toBe(base.canonical.href);
+});
+
 test.each([
   "en_US",
   "en-x",

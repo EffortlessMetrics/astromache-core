@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, resolve, sep } from "node:path";
 import { chromium } from "@playwright/test";
+import { snapshotOfflineCache, assertOfflineCacheUnchanged } from "./offline-cache-snapshot.mjs";
 
 async function poll(page, predicate, label) {
   const end = Date.now() + 30000;
@@ -32,6 +33,8 @@ export async function verifyPublicationWorkerUpgrade(baseline, directory) {
   );
   let serving = baseline;
   let transformed = false;
+  let interrupted = false;
+  let interruptedResponses = 0;
   const server = createServer(async (request, response) => {
     try {
       const path = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
@@ -46,6 +49,20 @@ export async function verifyPublicationWorkerUpgrade(baseline, directory) {
             .toString()
             .replace("</head>", '<meta name="qualification-transform" content="rejected"></head>'),
         );
+      if (
+        interrupted &&
+        ["/notes/a-quiet-system/", "/notes/a-quiet-system/index.html"].includes(path)
+      ) {
+        interruptedResponses++;
+        response.writeHead(200, {
+          "Content-Type": "text/html",
+          "Content-Length": body.length,
+          "Cache-Control": "no-store",
+        });
+        response.write(body.subarray(0, Math.floor(body.length / 2)));
+        setTimeout(() => response.destroy(), 25);
+        return;
+      }
       response
         .writeHead(200, {
           "Content-Type":
@@ -113,32 +130,75 @@ export async function verifyPublicationWorkerUpgrade(baseline, directory) {
         const cache = await caches.open("unrelated-consumer-cache");
         await cache.put("/sentinel", new Response("retain"));
       });
+      const oldCorpus = await page.evaluate(
+        snapshotOfflineCache,
+        `astromache-recipe-reading-${oldRevision}`,
+      );
+      assert.ok(oldCorpus.length > 0, "Historical verified corpus must contain entries");
       serving = current;
-      transformed = true;
-      const rejected = await page.evaluate(async () => {
-        const registration = await navigator.serviceWorker.getRegistration();
-        const installing = new Promise((resolve, reject) => {
-          const timer = setTimeout(
-            () => reject(new Error("Transformed replacement lifecycle timed out")),
-            30000,
-          );
-          registration.addEventListener(
-            "updatefound",
-            () => {
-              const worker = registration.installing;
-              worker.addEventListener("statechange", () => {
-                if (worker.state === "redundant" || worker.state === "installed") {
-                  clearTimeout(timer);
-                  resolve(worker.state);
-                }
-              });
-            },
-            { once: true },
-          );
+      const attemptUpgrade = () =>
+        page.evaluate(async () => {
+          const registration = await navigator.serviceWorker.getRegistration();
+          const installing = new Promise((resolve, reject) => {
+            const timer = setTimeout(
+              () => reject(new Error("Replacement lifecycle timed out")),
+              30000,
+            );
+            registration.addEventListener(
+              "updatefound",
+              () => {
+                const worker = registration.installing;
+                worker.addEventListener("statechange", () => {
+                  if (worker.state === "redundant" || worker.state === "installed") {
+                    clearTimeout(timer);
+                    resolve(worker.state);
+                  }
+                });
+              },
+              { once: true },
+            );
+          });
+          await registration.update();
+          return installing;
         });
-        await registration.update();
-        return installing;
-      });
+      interrupted = true;
+      const interruptedState = await attemptUpgrade();
+      assert.ok(interruptedResponses > 0, "Replacement must fetch the truncated response");
+      assert.equal(
+        interruptedState,
+        "redundant",
+        "Interrupted current response must reject installation",
+      );
+      assert.equal(
+        await page.evaluate(async () =>
+          Boolean((await navigator.serviceWorker.getRegistration()).waiting),
+        ),
+        false,
+        "Interrupted upgrade cannot leave a waiting worker",
+      );
+      assert.ok(
+        !(await page.evaluate(() => caches.keys())).includes(
+          `astromache-recipe-reading-${newRevision}`,
+        ),
+        "Interrupted upgrade removes its partial cache",
+      );
+      assertOfflineCacheUnchanged(
+        await page.evaluate(snapshotOfflineCache, `astromache-recipe-reading-${oldRevision}`),
+        oldCorpus,
+        "Interrupted upgrade preserves every historical cache entry and byte",
+      );
+      await context.setOffline(true);
+      await tab.reload();
+      await tab.getByRole("heading", { name: "A quiet system", exact: true }).waitFor();
+      assert.equal(
+        await tab.evaluate(async () => (await fetch("/notes/a-quiet-system/")).text()),
+        await readFile(join(baseline, "notes/a-quiet-system/index.html"), "utf8"),
+        "Historical output remains available offline after interruption",
+      );
+      await context.setOffline(false);
+      interrupted = false;
+      transformed = true;
+      const rejected = await attemptUpgrade();
       assert.equal(rejected, "redundant", "Transformed current output must reject installation");
       assert.equal(
         await page.evaluate(async () =>
@@ -222,11 +282,13 @@ export async function verifyPublicationWorkerUpgrade(baseline, directory) {
       await page.reload();
       await page.getByRole("heading", { name: "A quiet system", exact: true }).waitFor();
       console.log(
-        `Natural full-consumer worker upgrade passed: ${oldRevision} -> ${newRevision}; rejected transform preserves A, waiting clients preserved, natural B control, unrelated cache retained, exact offline B and reconnect.`,
+        `Natural full-consumer worker upgrade passed: ${oldRevision} -> ${newRevision}; interrupted download and rejected transform preserve A, waiting clients preserved, natural B control, unrelated cache retained, exact offline B and reconnect.`,
       );
       return {
         oldRevision,
         newRevision,
+        interruptedInstallPreservesOld: true,
+        interruptedPartialCacheRemoved: true,
         rejectedInstallPreservesOld: true,
         naturalActivation: true,
         unrelatedCachePreserved: true,

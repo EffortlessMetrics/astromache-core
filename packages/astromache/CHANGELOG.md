@@ -1,3 +1,7 @@
+# 0.2.12 (unpublished)
+
+Reconcile reviewed offline configuration and retained-artifact protection with later main metadata fixes, offline 0.1.5 adoption and consumer-preservation qualification. Preserve earlier candidate archives. Route-fallback aliases remain a separate follow-up.
+
 # 0.2.10 (unpublished)
 
 Detect retained generated workers independently of the newly configured filenames before any preset writes. Renaming workerFile, receiptFile or both requires removing prior generated files or using clean output; orphaned workers and extra matching receipts cannot silently enter the corpus. Same-pair retained rebuilds still allow content, cache-prefix and policy changes, and unrelated receipt-shaped JSON and JavaScript assets remain eligible. Preserve the prior 0.2.9 archive as superseded evidence of the rename bypass.

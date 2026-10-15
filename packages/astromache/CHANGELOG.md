@@ -1,3 +1,19 @@
+# 0.2.12 (unpublished)
+
+Reconcile reviewed offline configuration and retained-artifact protection with later main metadata fixes, offline 0.1.5 adoption and consumer-preservation qualification. Preserve earlier candidate archives. Route-fallback aliases remain a separate follow-up.
+
+# 0.2.10 (unpublished)
+
+Detect retained generated workers independently of the newly configured filenames before any preset writes. Renaming workerFile, receiptFile or both requires removing prior generated files or using clean output; orphaned workers and extra matching receipts cannot silently enter the corpus. Same-pair retained rebuilds still allow content, cache-prefix and policy changes, and unrelated receipt-shaped JSON and JavaScript assets remain eligible. Preserve the prior 0.2.9 archive as superseded evidence of the rename bypass.
+
+# 0.2.9 (unpublished, superseded)
+
+Reject receipt filenames longer than 255 ASCII bytes during configuration. Detect public asset collisions before output and preflight existing receipt destinations before any preset writes. Retained receipts must match their regular, unlinked generated worker's revision and ordered corpus; unrelated assets, case aliases and linked files are refused without changing output. Legitimate retained receipts still support changed content and worker policy. Existing worker destinations are checked even for new receipts; changing workerFile on retained output requires a clean output directory. The prior 0.2.8 archive remains historical evidence and is superseded by this repair.
+
+# 0.2.8 (unpublished, superseded)
+
+Honor the public static-offline receiptFile override while keeping offline-receipt.json as the default. Require portable root JSON receipt names so receipts cannot overwrite workers or HTML pages or act as ignore globs. Reject non-root Astro base paths and non-directory build formats during configuration, before rendering or writing a worker. The canonical directory preset and its pinned specialist backend support root-mounted directory URLs; unsupported output must not silently yield an unusable offline corpus. Independent packed Astro consumers cover all three configuration contracts, rejected receipt names, retained-output rebuilds and unchanged default policy.
+
 # 0.2.7 (unpublished)
 
 Align article actions by their text baselines so direct and nested native buttons retain equal intrinsic heights. Preserve existing control styling, responsive wrapping and adjacent-post navigation. Compiled desktop, mobile and forced-wrap geometry regressions cover actual Article/CopyLink components and keyboard Back-to-top behavior.

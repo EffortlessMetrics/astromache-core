@@ -1,10 +1,10 @@
 # astromache
 
-Current producer: https://github.com/EffortlessMetrics/astromache-core. Version 0.2.10 is an unpublished uniquely identified relocation candidate. The branded starter is https://github.com/EffortlessMetrics/astromache.
+Current producer: https://github.com/EffortlessMetrics/astromache-core. Version 0.2.11 is an unpublished uniquely identified relocation candidate. The branded starter is https://github.com/EffortlessMetrics/astromache.
 
 # AstroMache publication foundation candidate
 
-This working source is an expanded, **unpublished** 0.2.10 candidate. The existing npm astromache@0.1.0 release remains immutable and does not contain these new publication exports. Consumers of this candidate must use its exact local archive and SHA-256 receipt. The additive publication API uses a new minor-version identity. Publication of 0.2.10 still requires separate authorization; no registry release is performed here.
+This working source is an expanded, **unpublished** 0.2.11 candidate. The existing npm astromache@0.1.0 release remains immutable and does not contain these new publication exports. Consumers of this candidate must use its exact local archive and SHA-256 receipt. The additive publication API uses a new minor-version identity. Publication of 0.2.11 still requires separate authorization; no registry release is performed here.
 
 The foundation supplies real publication typography, responsive navigation, article presentation, cards, taxonomy lists, theme initialization/toggle, reading progress, focus mode, copy-link feedback, and gallery mechanics. The complete neutral starter and optional search/offline recipe consume these same exports. Content collection schemas, routes, dates, related-content selection, metadata policy, branding, font assets, privacy/share behavior, and search ranking remain consumer-owned.
 
@@ -85,3 +85,5 @@ The unpublished additive export astromache/static-offline returns an Astro build
 This preset requires Astro base: "/" and build.format: "directory" (the defaults). Non-root bases and other output formats fail during Astro configuration, before pages or a worker are emitted. The pinned offline backend resolves corpus URLs from the host root, and the preset discovers index.html directory pages; it does not promise subpath or file-output support. Keep existing site routing and hosting decisions deliberately when adopting this optional preset.
 
 Selected HTML must be served without rewriting or redirects; no-transform headers alone are not deployed verification. Registry publication and hosted acceptance remain NOT RUN. Source relocation is reviewed through the core repository PR.
+
+For a fallback present in the generated directory corpus, `/offline`, `/offline/` and `/offline/index.html` resolve to the same `/offline/` cache entry. Other fallback values remain literal, including filenames such as `/myindex.html`, external URLs and query-bearing values. This preset does not expand the specialist worker's fallback/query or exclusion policy.

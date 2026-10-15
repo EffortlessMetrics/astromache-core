@@ -1,3 +1,7 @@
+# 0.2.11 (unpublished)
+
+Resolve slashless navigation fallbacks against the generated directory corpus. Preserve literal filenames ending in `index.html` unless the final path segment is exactly `index.html`. Add focused generated-worker route recovery controls without modifying preserved archives or consumer content.
+
 # 0.2.10 (unpublished)
 
 Detect retained generated workers independently of the newly configured filenames before any preset writes. Renaming workerFile, receiptFile or both requires removing prior generated files or using clean output; orphaned workers and extra matching receipts cannot silently enter the corpus. Same-pair retained rebuilds still allow content, cache-prefix and policy changes, and unrelated receipt-shaped JSON and JavaScript assets remain eligible. Preserve the prior 0.2.9 archive as superseded evidence of the rename bypass.

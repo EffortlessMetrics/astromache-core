@@ -15,6 +15,7 @@ import {
   upgradePublication,
   verifyPublicationUpgradeNegatives,
 } from "./verify-publication-upgrade.mjs";
+import { customizePublicationConsumer } from "./publication-consumer-fixture.mjs";
 import { verifyPublicationWorkerUpgrade } from "./verify-publication-worker-upgrade.mjs";
 
 await import("./verify-recipe-request-contracts.mjs");
@@ -76,6 +77,7 @@ for (const [source, recipe] of products.filter(
         PATH: `${dirname(process.execPath)}${delimiter}${process.env.PATH ?? process.env.Path ?? ""}`,
       },
     });
+  if (current) await customizePublicationConsumer(directory);
   const upgrade = current
     ? await upgradePublication(directory, candidate, run, { recipe })
     : undefined;

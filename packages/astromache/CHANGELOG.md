@@ -1,3 +1,11 @@
+# 0.2.13 (unpublished)
+
+Apply generated-directory fallback aliases to the reconciled 0.2.12 parent, preserving metadata repairs, offline 0.1.5 and consumer-preservation qualification. Prior archives remain immutable.
+
+# 0.2.12 (unpublished)
+
+Reconcile reviewed offline configuration and retained-artifact protection with later main metadata fixes, offline 0.1.5 adoption and consumer-preservation qualification. Preserve earlier candidate archives. Route-fallback aliases remain a separate follow-up.
+
 # 0.2.11 (unpublished)
 
 Resolve slashless navigation fallbacks against the generated directory corpus. Preserve literal filenames ending in `index.html` unless the final path segment is exactly `index.html`. Add focused generated-worker route recovery controls without modifying preserved archives or consumer content.

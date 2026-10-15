@@ -1,6 +1,6 @@
 # PR6 generated route recovery qualification
 
-Target: PR6 source `b4d52ec010fdd90049e314650dee74d94aaeca93`; refreshed main `b112d6aea2e2b6d76fd6fbbc0af43f638621ecb0` on 2026-10-15. This follow-up is stacked on PR6 to preserve its ownership and avoid reverting later main work.
+Initial qualification target: PR6 source `b4d52ec010fdd90049e314650dee74d94aaeca93`; refreshed main `b112d6aea2e2b6d76fd6fbbc0af43f638621ecb0` on 2026-10-15. This follow-up is stacked on PR6 to preserve its ownership and avoid reverting later main work.
 
 ## Repair and negative controls
 
@@ -29,4 +29,6 @@ Local results: the installed 0.2.11 public export passes all 18 groups (two base
 
 This focused fixture exercises actual preset hooks and real service workers, using neutral HTML rather than rebuilding a full Astro site. It establishes root-directory behavior, not subpath support. Actual Astro compiler/full-consumer and full Linux/Windows qualification are not rerun locally. Existing PR6 hosted evidence belongs to its original SHA. The pinned specialist worker permits query-bearing document navigation to reach its generic fallback; resource-query negatives do not establish document-query exclusion, and this repair does not change that policy.
 
-The stacked PR targets PR6's branch. The existing non-release qualification workflow now accepts PRs targeting main or `fix/static-offline-config-contract`, retaining the same read-only permissions, exact-head checkout, Linux/Windows matrix and all test steps. The trigger addition permits current-source qualification without retargeting the stack. Run identity and results are recorded in the PR. PR6 remains the integration prerequisite: against refreshed main `a227f88be90c5b9f2913fb8addd1a21fb4ea0b80`, its merge conflicts in `package.json` and `docs/consumer-upgrades.md` require owner reconciliation, followed by affected review and qualification. Preserve later main changes, including offline 0.1.5 adoption and consumer-preservation controls. All native main-branch gates still apply before integration. No release, deployment or publication is authorized here.
+The 0.2.13 candidate refreshes this repair onto reconciled parent `d3fe021d8f71e243eb29b0cb257fabf14854a240`, which combines PR6 with main `a227f88be90c5b9f2913fb8addd1a21fb4ea0b80`. The parent retains reviewed offline preflight unchanged, later main metadata repairs, offline 0.1.5 and the upgraded-consumer preservation controls. The product module and route fixture remain byte-identical to the initially qualified repair; current-root worker behavior requires separate qualification against offline 0.1.5. The retained local 0.2.11 archive above is historical evidence, not the current 0.2.13 delivery.
+
+The non-release workflow supports main and the PR6 parent branch, preserves the Linux/Windows matrix and all existing gates, and records exact source/run identities in the PR. Parent integration precedes child retarget/integration. No deployment, release, publication or permission change is authorized.

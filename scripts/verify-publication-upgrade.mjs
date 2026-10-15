@@ -126,7 +126,53 @@ export async function verifyPublicationDelivery(directory, candidate) {
   }
 }
 
+// Capture the consumer before changing dependency delivery. Reuse this exact guard
+// in focused mutation controls and the full installed-consumer upgrade.
+const publicationDeliveryFiles = (recipe) =>
+  new Set([
+    "package.json",
+    "pnpm-lock.yaml",
+    "STARTER-DELIVERY.json",
+    ...(recipe ? ["candidate-artifacts.json"] : []),
+  ]);
+
+export async function capturePublicationPreservation(directory, candidate, { recipe }) {
+  const before = await snapshot(directory);
+  const manifest = await json(join(directory, "package.json"));
+  const allowed = publicationDeliveryFiles(recipe);
+  const verifyUnchanged = async () => {
+    const excluded = new Set([
+      "node_modules",
+      "dist",
+      ".astro",
+      "LIFECYCLE-QUALIFICATION.json",
+      "CANONICAL-QUALIFICATION.json",
+      "CURRENT-PACKED-QUALIFICATION.json",
+    ]);
+    const after = await snapshot(directory, excluded);
+    for (const file of [...allowed, `vendor/${candidate.archive}`]) delete after[file];
+    const expected = { ...before };
+    for (const file of allowed) delete expected[file];
+    assert.deepEqual(
+      after,
+      expected,
+      "Consumer routes/content/config/styles and specialist bytes/file set must remain identical",
+    );
+  };
+  return async () => {
+    const expectedManifest = structuredClone(manifest);
+    expectedManifest.dependencies.astromache = `file:vendor/${candidate.archive}`;
+    assert.deepEqual(
+      await json(join(directory, "package.json")),
+      expectedManifest,
+      "Only dependency pin may change in manifest",
+    );
+    await verifyUnchanged();
+  };
+}
+
 export async function upgradePublication(directory, candidate, run, { recipe }) {
+  const verifyUnchanged = await capturePublicationPreservation(directory, candidate, { recipe });
   const before = await snapshot(directory);
   const originalLock = await readFile(join(directory, "pnpm-lock.yaml"), "utf8");
   const manifest = await json(join(directory, "package.json"));
@@ -246,31 +292,6 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
       "Offline delivery must not change",
     );
   }
-  const allowed = new Set([
-    "package.json",
-    "pnpm-lock.yaml",
-    "STARTER-DELIVERY.json",
-    ...(recipe ? ["candidate-artifacts.json"] : []),
-  ]);
-  const verifyUnchanged = async () => {
-    const excluded = new Set([
-      "node_modules",
-      "dist",
-      ".astro",
-      "LIFECYCLE-QUALIFICATION.json",
-      "CANONICAL-QUALIFICATION.json",
-      "CURRENT-PACKED-QUALIFICATION.json",
-    ]);
-    const after = await snapshot(directory, excluded);
-    for (const file of [...allowed, `vendor/${candidate.archive}`]) delete after[file];
-    const expected = { ...before };
-    for (const file of allowed) delete expected[file];
-    assert.deepEqual(
-      after,
-      expected,
-      "Consumer routes/content/config/styles and specialist bytes/file set must remain identical",
-    );
-  };
   await verifyUnchanged();
   return {
     baseline,
@@ -283,7 +304,9 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
       installed,
       frozenLockSha256: sha256(lock),
       unrelatedLockEntriesUnchanged: true,
-      unchangedFiles: Object.keys(before).filter((file) => !allowed.has(file)).length,
+      unchangedFiles: Object.keys(before).filter(
+        (file) => !publicationDeliveryFiles(recipe).has(file),
+      ).length,
     },
   };
 }

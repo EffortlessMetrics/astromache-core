@@ -140,6 +140,14 @@ async function assertReceiptDestination(root, receiptFile, workerFile) {
   }
 }
 
+function canonicalFallback(path, pages) {
+  if (!path) return path;
+  // Resolve only an actual generated directory page, never an arbitrary URL.
+  const canonical = path?.endsWith("/index.html")
+    ? path.slice(0, -"index.html".length)
+    : path + "/";
+  return pages.includes(canonical) ? canonical : path;
+}
 /** Canonical static directory pages; site-owned redirects must be excluded. */
 export default function staticOffline({ excludedPages = [], ...options }) {
   const receiptFile = options.receiptFile ?? "offline-receipt.json";
@@ -200,7 +208,7 @@ export default function staticOffline({ excludedPages = [], ...options }) {
           globIgnores: [...(options.globIgnores ?? []), "**/*.html"],
           worker: {
             ...options.worker,
-            navigationFallback: options.worker?.navigationFallback?.replace(/index\.html$/, ""),
+            navigationFallback: canonicalFallback(options.worker?.navigationFallback, pages),
           },
           receiptFile,
         });

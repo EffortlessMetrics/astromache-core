@@ -4,21 +4,21 @@ Keep your application's routes, content, configuration and license decisions. Up
 
 ## Choose verified bytes
 
-As checked on 2026-10-10, npm exposes only `astromache@0.1.0`; the current `0.2.12` candidate is unpublished, and `@effortlessmetrics/astro-offline` is unavailable from the public registry. Obtain the exact accepted archives and receipts from the maintainer, verify their SHA-256 values, and retain the previous archives, manifest and lockfile. Never replace different bytes under an existing archive filename/version. A source checkout alone is not an accepted package receipt.
+As checked on 2026-10-10, npm exposes only `astromache@0.1.0`; the current `0.2.13` candidate is unpublished, and `@effortlessmetrics/astro-offline` is unavailable from the public registry. Obtain the exact accepted archives and receipts from the maintainer, verify their SHA-256 values, and retain the previous archives, manifest and lockfile. Never replace different bytes under an existing archive filename/version. A source checkout alone is not an accepted package receipt.
 
 Use Node `>=24.19.0 <25`; Node 24.19.x and Astro **7.3.5** are qualified. The declared Astro `^7.3.5` peer range does not mean every version has been tested. Use your existing package manager; pnpm 10.28.0 is qualified for the supplied publication starter. Consumer builds do not require the producer's compiler patches or tooling overrides.
 
 For a pnpm consumer, copy the accepted archive into its own `vendor/` directory, then run:
 
 ```sh
-pnpm add ./vendor/astromache-0.2.12.tgz astro@7.3.5 --save-exact --ignore-scripts
+pnpm add ./vendor/astromache-0.2.13.tgz astro@7.3.5 --save-exact --ignore-scripts
 pnpm install --frozen-lockfile --ignore-scripts
 ```
 
 For an npm consumer, use:
 
 ```sh
-npm install ./vendor/astromache-0.2.12.tgz astro@7.3.5 --save-exact --ignore-scripts
+npm install ./vendor/astromache-0.2.13.tgz astro@7.3.5 --save-exact --ignore-scripts
 npm ci --ignore-scripts
 ```
 
@@ -38,7 +38,7 @@ These files belong to the application, outside the core package. Ordinary consum
 
 The optional peer `@effortlessmetrics/astro-offline >=0.1.4 <0.2.0` is required when importing `astromache/static-offline`. Existing document, metadata, navigation, gallery and publication component imports do not require it. The canonical preset requires root-mounted Astro base: "/" and build.format: "directory"; incompatible settings now fail during configuration instead of emitting a broken worker. Preserve existing hosting and output decisions when selecting this optional preset. Its public receiptFile option is honored, with offline-receipt.json remaining the default. Use a root .json filename of at most 255 ASCII bytes starting with a letter or digit and containing only letters, digits, dots, underscores or hyphens; paths, glob characters and Windows device names are rejected during configuration. A public asset using that filename or a case alias is rejected before output; an existing output destination is reusable only when its receipt matches the paired generated worker. A rejected collision leaves the preset output untouched. Changing workerFile or receiptFile on retained output requires removing the prior generated files or using a clean output directory; same-filename workers can rebuild after content, cache-prefix or policy changes. Candidate 0.2.10 supersedes the preserved 0.2.8 and 0.2.9 archives: 0.2.8 could overwrite a JSON asset, and 0.2.9 could include a prior generated pair when both filenames changed. Root generated workers under another filename, orphaned generated workers and extra matching receipts require cleanup before rebuilding. For the preset, install the exact qualified archive with `pnpm add ./vendor/effortlessmetrics-astro-offline-0.1.5.tgz --ignore-scripts` or the equivalent `npm install` command, then repeat the frozen reinstall. Search and contact libraries keep separate versions and upgrade decisions.
 
-Once registry publication is explicitly confirmed, verify the published archive identity against the accepted receipt before using exact registry pins such as `astromache@0.2.12`. Do not infer publication from a source tag, merged PR or passing CI.
+Once registry publication is explicitly confirmed, verify the published archive identity against the accepted receipt before using exact registry pins such as `astromache@0.2.13`. Do not infer publication from a source tag, merged PR or passing CI.
 
 ## Compatibility and acceptance
 
@@ -54,4 +54,6 @@ Restore the exact old manifest, lockfile, archives and matching delivery invento
 
 Retain upstream MIT OR Apache-2.0 notices, packaged font OFL notices and dependency notices. These grants do not license your replacement content, assets or application additions. Keep private source/history out of public core changes. Registry publication and production rollout each require their own authorization and acceptance evidence.
 
-The unpublished 0.2.12 reconciliation combines the reviewed 0.2.10 offline preflight with later main metadata fixes, offline 0.1.5 adoption and consumer-preservation qualification. Preserved 0.2.10 and 0.2.11 archives remain unchanged; route-fallback repair is a separate follow-up.
+The unpublished 0.2.12 parent reconciliation retains later main metadata fixes, offline 0.1.5 and consumer-preservation qualification. Candidate 0.2.13 adds route-fallback recovery on that reconciled source. Preserved 0.2.10, 0.2.11 and 0.2.12 archives remain unchanged.
+
+Candidate 0.2.13 also preserves literal fallback filenames such as `/myindex.html` and resolves slashless fallback values only when they identify a generated directory page. `/offline`, `/offline/` and `/offline/index.html` therefore select the same generated `/offline/` entry. Existing 0.2.10 archives remain immutable. Subpath deployments remain unsupported.

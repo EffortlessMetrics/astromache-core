@@ -143,9 +143,10 @@ try {
     context.setDefaultTimeout(5000);
     context.setDefaultNavigationTimeout(10000);
     const page = await context.newPage();
+    const evaluate = (...args) => bounded(page.evaluate(...args), "browser evaluation");
     try {
       await page.goto(origin + "/");
-      await page.evaluate(async () => {
+      await evaluate(async () => {
         await navigator.serviceWorker.register("/sw.js");
         await Promise.race([
           navigator.serviceWorker.ready,
@@ -170,10 +171,10 @@ try {
         "slashless navigation recovers canonical directory URL",
       );
       assert.equal(await page.locator("h1").textContent(), "article");
-      const asset = await page.evaluate(async () => (await fetch("./image.svg")).text());
+      const asset = await evaluate(async () => (await fetch("./image.svg")).text());
       assert.match(asset, /<svg/);
       assert.equal(
-        await page.evaluate(async () => {
+        await evaluate(async () => {
           try {
             await fetch("/article");
             return true;
@@ -186,7 +187,7 @@ try {
       );
       for (const path of ["/api", "/api/private", "/article/?private=1"]) {
         assert.equal(
-          await page.evaluate(async (path) => {
+          await evaluate(async (path) => {
             try {
               await fetch(path);
               return true;

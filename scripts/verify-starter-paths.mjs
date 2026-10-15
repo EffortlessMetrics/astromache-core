@@ -46,6 +46,7 @@ const run = (destination, project = "publication") =>
 async function verifyDelivery(destination, project) {
   const source = projects[project];
   const upstream = JSON.parse(await readFile(join(producer, source, "package.json"), "utf8"));
+  assert.equal(upstream.license, "MIT OR Apache-2.0", "Template retains its upstream dual license");
   const app = JSON.parse(await readFile(join(destination, "package.json"), "utf8"));
   assert.equal(app.private, true);
   assert.equal(
@@ -70,6 +71,17 @@ async function verifyDelivery(destination, project) {
     .filter(Boolean)
     .map((file) => file.slice(source.length + 1))
     .filter((file) => !file.startsWith("vendor/") || activeVendor.includes(file));
+  // Export must not prepend template license grants to content or rewrite third-party notices.
+  // Check bytes as well as inventory, including fonts and opaque dependency archives.
+  for (const file of expected) {
+    if (file === "package.json" || ["LICENSE", "LICENSE-MIT", "LICENSE-APACHE"].includes(file))
+      continue;
+    assert.deepEqual(
+      await readFile(join(destination, file)),
+      await readFile(join(producer, source, file)),
+      `${project} export must preserve content and dependency bytes: ${file}`,
+    );
+  }
   for (const notice of ["LICENSE", "LICENSE-MIT", "LICENSE-APACHE"]) {
     const index = expected.indexOf(notice);
     assert(index >= 0, `Tracked product notice required: ${notice}`);

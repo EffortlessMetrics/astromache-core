@@ -30,3 +30,42 @@ for (const project of ["starters/publication", "recipes/search-offline"]) {
     }
   }
 }
+
+for (const ending of ["\n", "\r\n"]) {
+  test(`unrelated workspace astromache imports remain protected (${JSON.stringify(ending)})`, () => {
+    const original = [
+      "importers:",
+      "",
+      "  .:",
+      "    dependencies:",
+      "      astromache:",
+      "        specifier: file:vendor/astromache-old.tgz",
+      "        version: file:vendor/astromache-old.tgz",
+      "    devDependencies:",
+      "      astromache:",
+      "        specifier: 0.1.0",
+      "        version: 0.1.0",
+      "",
+      "  'apps/space caf\u00e9':",
+      "    dependencies:",
+      "      astromache:",
+      "        specifier: 0.1.0",
+      "        version: 0.1.0",
+      "",
+    ].join(ending);
+    const upgraded = original.replaceAll("astromache-old.tgz", "astromache-new.tgz");
+    verifyPublicationLockPreservation(original, upgraded);
+    for (const field of ["specifier", "version"]) {
+      const value = `${field}: 0.1.0`;
+      for (const index of [upgraded.indexOf(value), upgraded.lastIndexOf(value)]) {
+        assert.ok(index >= 0, "Mutation target must exist");
+        const mutated =
+          upgraded.slice(0, index) + upgraded.slice(index).replace(value, `${field}: 0.2.0`);
+        assert.throws(
+          () => verifyPublicationLockPreservation(original, mutated),
+          /Only astromache importer\/package\/snapshot lock entries may change/,
+        );
+      }
+    }
+  });
+}

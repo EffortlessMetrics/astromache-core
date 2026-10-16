@@ -26,7 +26,7 @@
     "verify:taxonomy": "node scripts/verify-taxonomy.mjs",
     "verify:article-actions": "node scripts/verify-article-actions.mjs",
     "verify:offline:snapshots": "node --test scripts/offline-cache-snapshot.test.mjs",
-    "verify:publication:preservation": "node --test scripts/publication-preservation.test.mjs",
+    "verify:publication:preservation": "node --test scripts/publication-preservation.test.mjs scripts/publication-lock-preservation.test.mjs",
     "verify:offline:config": "node scripts/verify-static-offline-config.mjs"
   },
   "devDependencies": {

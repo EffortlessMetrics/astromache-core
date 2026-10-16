@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { verifyPublicationLockPreservation } from "./publication-lock-preservation.mjs";
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cp, mkdir, readFile, readdir, realpath, rm, writeFile } from "node:fs/promises";
@@ -190,16 +191,7 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
   run(["install", "--lockfile-only", "--ignore-scripts"]);
   const lock = await readFile(join(directory, "pnpm-lock.yaml"));
   assert.notEqual(sha256(lock), before["pnpm-lock.yaml"], "Upgrade must update lockfile");
-  const unrelatedLock = (text) =>
-    text
-      .replace(/^ {6}astromache:\n(?: {8}.*\n)+/gm, "")
-      .replace(/^ {2}astromache@.*:\n(?: {4}.*\n|\n)*/gm, "")
-      .replace(/\n+/g, "\n");
-  assert.equal(
-    unrelatedLock(lock.toString()),
-    unrelatedLock(originalLock),
-    "Only astromache importer/package/snapshot lock entries may change",
-  );
+  verifyPublicationLockPreservation(originalLock, lock.toString());
 
   assert.ok(
     !lock.toString().includes(manifest.dependencies.astromache),

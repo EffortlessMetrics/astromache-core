@@ -60,8 +60,7 @@ for (const ending of ["\n", "\r\n"]) {
       for (const index of [upgraded.indexOf(value), upgraded.lastIndexOf(value)]) {
         assert.ok(index >= 0, "Mutation target must exist");
         const mutated =
-          upgraded.slice(0, index) +
-          upgraded.slice(index).replace(value, `${field}: 0.2.0`);
+          upgraded.slice(0, index) + upgraded.slice(index).replace(value, `${field}: 0.2.0`);
         assert.throws(
           () => verifyPublicationLockPreservation(original, mutated),
           /Only astromache importer\/package\/snapshot lock entries may change/,

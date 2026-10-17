@@ -87,3 +87,5 @@ This preset requires Astro base: "/" and build.format: "directory" (the defaults
 Selected HTML must be served without rewriting or redirects; no-transform headers alone are not deployed verification. Registry publication and hosted acceptance remain NOT RUN. Source relocation is reviewed through the core repository PR.
 
 For a fallback present in the generated directory corpus, `/offline`, `/offline/` and `/offline/index.html` resolve to the same `/offline/` cache entry. Other fallback values remain literal, including filenames such as `/myindex.html`, external URLs and query-bearing values. This preset does not expand the specialist worker's fallback/query or exclusion policy.
+
+Canonical page discovery uses the host filesystem separator. On POSIX, directory names containing a literal backslash are rejected before preset writes because browsers normalize backslashes in URLs. Rename those directories before building. A file named `asset\index.html` on POSIX is an ordinary file, not a directory page. Native Windows nested directories continue to use canonical slash-separated URLs.

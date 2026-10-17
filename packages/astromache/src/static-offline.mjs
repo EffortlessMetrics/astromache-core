@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 import { readdir, copyFile, lstat, stat, mkdir, readFile } from "node:fs/promises";
 import { generateOfflineWorker } from "@effortlessmetrics/astro-offline/integration";
 
@@ -188,6 +188,18 @@ export default function staticOffline({ excludedPages = [], ...options }) {
       "astro:build:done": async ({ dir }) => {
         const root = fileURLToPath(dir);
         await assertReceiptDestination(root, receiptFile, options.workerFile ?? "sw.js");
+        // On POSIX a backslash is a literal filename character, not a separator.
+        // Browsers normalize it in URLs, so it cannot name a canonical page.
+        if (
+          sep === "/" &&
+          (await readdir(root, { recursive: true })).some(
+            (path) => path.endsWith("/index.html") && path.includes("\\"),
+          )
+        ) {
+          throw new Error(
+            "astromache/static-offline cannot create canonical page URLs for directory names containing a literal backslash; rename the directory before building.",
+          );
+        }
         try {
           await mkdir(join(root, "404"), { recursive: true });
           await copyFile(join(root, "404.html"), join(root, "404/index.html"));
@@ -195,10 +207,14 @@ export default function staticOffline({ excludedPages = [], ...options }) {
           if (error.code !== "ENOENT") throw error;
         }
         const pages = (await readdir(root, { recursive: true }))
-          .filter((path) => path === "index.html" || /[\\/]index\.html$/.test(path))
+          .filter((path) => path === "index.html" || path.endsWith(`${sep}index.html`))
           .map(
             (path) =>
-              "/" + path.replaceAll(String.fromCharCode(92), "/").replace(/index\.html$/, ""),
+              "/" +
+              path
+                .split(sep)
+                .join("/")
+                .replace(/index\.html$/, ""),
           )
           .filter((path) => !excludedPages.includes(path))
           .sort();

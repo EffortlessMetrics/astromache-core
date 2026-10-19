@@ -250,6 +250,92 @@ ${controls}
     assert.equal(await active(), "icon-button menu-toggle");
   });
 
+  for (const width of [390, 280]) {
+    for (const selector of [".nav-items a", "#header-query"]) {
+      await test(`desktop ${selector} focus reaches the toggle at ${width}px`, async () => {
+        await page.setViewportSize({ width: 1024, height: 800 });
+        await page.goto(`${origin}/controls/`);
+        await page.locator(selector).first().focus();
+        await page.setViewportSize({ width, height: 800 });
+        await page.waitForFunction(() => document.activeElement.matches(".menu-toggle"));
+        await expectClosed();
+        await page.keyboard.press("Enter");
+        assert.equal(await page.locator(".menu-toggle").getAttribute("aria-expanded"), "true");
+        assert.equal(await page.evaluate(() => document.activeElement.textContent), "Contents");
+        await page.keyboard.press("Escape");
+        await expectClosed();
+      });
+    }
+    await test(`focused toggle reaches desktop navigation from ${width}px`, async () => {
+      await page.setViewportSize({ width, height: 800 });
+      await open("controls");
+      await page.keyboard.press("Escape");
+      assert.equal(await active(), "icon-button menu-toggle");
+      await page.setViewportSize({ width: 1024, height: 800 });
+      await page.waitForFunction(() => document.activeElement.textContent === "Contents");
+      await expectClosed();
+      await page.keyboard.press("Tab");
+      assert.equal(await page.evaluate(() => document.activeElement.textContent), "Details");
+    });
+  }
+
+  await test("visible navigation retains focus while an open menu becomes desktop navigation", async () => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await open("controls");
+    await page.locator("#header-query").focus();
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await page.waitForFunction(
+      () => document.querySelector(".menu-toggle").getAttribute("aria-expanded") === "false",
+    );
+    await expectClosed();
+    assert.equal(await active(), "header-query");
+  });
+
+  for (const selector of [".site-title", "#outside"]) {
+    await test(`${selector} focus is preserved across both breakpoint directions`, async () => {
+      await page.setViewportSize({ width: 1024, height: 800 });
+      await page.goto(`${origin}/controls/`);
+      await page.locator(selector).focus();
+      await page.setViewportSize({ width: 390, height: 800 });
+      await page.waitForFunction(
+        () => document.querySelector(".menu-toggle").getClientRects().length > 0,
+      );
+      assert.equal(
+        await page.locator(selector).evaluate((element) => element === document.activeElement),
+        true,
+      );
+      await page.setViewportSize({ width: 1024, height: 800 });
+      await page.waitForFunction(
+        () => document.querySelector(".menu-toggle").getClientRects().length === 0,
+      );
+      assert.equal(
+        await page.locator(selector).evaluate((element) => element === document.activeElement),
+        true,
+      );
+    });
+  }
+
+  for (const crossings of [12, 13]) {
+    await test(`${crossings} rapid breakpoint crossings retain usable keyboard focus`, async () => {
+      await page.setViewportSize({ width: 640, height: 800 });
+      await page.goto(`${origin}/controls/`);
+      await page.getByRole("link", { name: "Contents", exact: true }).focus();
+      for (let index = 0; index < crossings; index++)
+        await page.setViewportSize({ width: index % 2 ? 640 : 639, height: 800 });
+      if (crossings % 2) {
+        await page.waitForFunction(() => document.activeElement.matches(".menu-toggle"));
+        await page.keyboard.press("Enter");
+        assert.equal(await page.locator("main").evaluate((element) => element.inert), true);
+        await page.keyboard.press("Escape");
+      } else {
+        await page.waitForFunction(() => document.activeElement.textContent === "Contents");
+        await page.keyboard.press("Tab");
+        assert.equal(await page.evaluate(() => document.activeElement.textContent), "Details");
+      }
+      await expectClosed();
+    });
+  }
+
   const evidence = {
     headerSha256: createHash("sha256").update(headerSource).digest("hex"),
     nodeVersion: process.version,

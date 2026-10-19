@@ -6,6 +6,8 @@ The branded repository is the small editable starter. This core retains package 
 
 Use Node 24.19.x. Run `pnpm install --frozen-lockfile`, `pnpm qualify` and `pnpm verify:packed`. The additive `astromache/static-offline` preset delegates integrity and lifecycle to offline 0.1.5 while generating canonical directory cache URLs. Existing exports remain compatible.
 
+The packed checks also install a minimal stock-Astro consumer, remove its modules and reinstall with the generated frozen lockfile. This consumer imports every documented source export and verifies emitted search styles without the optional offline peer or producer compiler overrides. An explicit export inventory catches removed subpaths even when their files remain in the archive. Run `node scripts/verify-export-consumer.mjs` for this focused check, or pass an exact archive path to check an existing delivery. The optional `static-offline` runtime is qualified separately by the offline checks.
+
 Code is **MIT OR Apache-2.0**, at your option. Retain both license texts. Font files retain their separate SIL OFL notices and provenance; Still runtime contains no fonts.
 
 Historical fixture/export documentation is retained in [docs/historical-producer.md](docs/historical-producer.md). Exporters produce those preserved regression variants; the branded starter is the current default with verified offline caching and native intent prefetch. Local qualification does not establish hosted readiness or approve publication/deployment.

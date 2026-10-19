@@ -1,0 +1,29 @@
+---
+import Publication from 'astromache/publication';
+import Header from 'astromache/header';
+import Footer from 'astromache/footer';
+import Article from 'astromache/article';
+import PostList from 'astromache/post-list';
+import TaxonomySection from 'astromache/taxonomy-section';
+import TagList from 'astromache/tag-list';
+import ReadingProgress from 'astromache/reading-progress';
+import FocusMode from 'astromache/focus-mode';
+import CopyLink from 'astromache/copy-link';
+import {readingTime, formatReadingTime} from 'astromache/reading-time';
+import {publicationMetadata} from 'astromache/metadata';
+import {backgroundDownloadsAllowed} from 'astromache/navigation';
+import 'astromache/fonts.css';
+import 'astromache/publication.css';
+import 'astromache/search.css';
+const metadata=publicationMetadata({title:'Clean consumer',description:'All documented source exports',canonical:new URL('https://consumer.example/'),language:'en'});
+const items=[{title:'First',href:'/first/',description:'First article'}];
+const allowed=backgroundDownloadsAllowed(undefined,false);
+---
+<Publication {...metadata}>
+<Header slot="header" brand="Clean consumer" />
+<Article title="Article" published={{datetime:'2026-10-19',label:'October 19'}} readingTime={formatReadingTime(readingTime('A short article'))}>
+<p class="post-content">Consumer content</p><ReadingProgress/><FocusMode/><CopyLink url="https://consumer.example/"/>
+</Article>
+<PostList items={items}/><TaxonomySection label="Topic" items={items}/><TagList items={[{label:'Tag',href:'/tag/'}]}/>
+<output id="ssr-navigation">{String(allowed)}</output><Footer slot="footer" label="Consumer footer"/>
+</Publication>

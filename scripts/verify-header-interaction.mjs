@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { copyFile, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  mkdtemp,
+  mkdir,
+  readFile,
+  realpath,
+  rm,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { createServer } from "node:http";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
@@ -11,7 +20,8 @@ import { chromium } from "@playwright/test";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const require = createRequire(import.meta.url);
-const fixture = await mkdtemp(join(tmpdir(), "astromache-header-interaction-"));
+// Windows tmpdir can use a DOS alias. Keep Astro/Vite CSS identities canonical.
+const fixture = await realpath(await mkdtemp(join(tmpdir(), "astromache-header-interaction-")));
 const headerSource = await readFile(
   process.env.ASTROMACHE_HEADER_COMPONENT || join(root, "packages/astromache/src/Header.astro"),
 );
@@ -337,6 +347,8 @@ ${controls}
   }
 
   const evidence = {
+    fixture,
+    stylesheets: await page.evaluate(() => [...document.styleSheets].map((sheet) => sheet.href)),
     headerSha256: createHash("sha256").update(headerSource).digest("hex"),
     nodeVersion: process.version,
     browserVersion: browser.version(),

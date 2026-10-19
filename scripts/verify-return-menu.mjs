@@ -191,6 +191,69 @@ import ${JSON.stringify(join(root, "packages/astromache/src/publication.css").re
       assert.equal(await page.locator(".progress-percent").textContent(), "0%");
     });
   }
+  for (const width of [1440, 390, 280]) {
+    await test(`reading progress follows viewport resize at ${width}px without scrolling`, async () => {
+      const resized = await browser.newPage({ viewport: { width, height: 800 } });
+      resized.setDefaultTimeout(3000);
+      try {
+        await resized.goto(origin + "/progress-nonempty/");
+        await resized.evaluate(() => window.scrollTo(0, 600));
+        const progressMatches = () => {
+          const range = document.documentElement.scrollHeight - innerHeight;
+          const expected = (scrollY / range) * 100;
+          return (
+            document.querySelector(".progress-percent")?.textContent ===
+              `${Math.round(expected)}%` &&
+            Math.abs(
+              parseFloat(document.querySelector(".publication-progress-bar").style.width) -
+                expected,
+            ) < 0.001
+          );
+        };
+        await resized.waitForFunction(progressMatches);
+        const initial = await resized.locator(".progress-percent").textContent();
+        for (const height of [500, 1100]) {
+          await resized.setViewportSize({ width, height });
+          assert.equal(
+            await resized.evaluate(() => scrollY),
+            600,
+            "Resize must retain the scroll offset",
+          );
+          await resized.waitForFunction(progressMatches, null, { timeout: 3000 });
+          assert.notEqual(await resized.locator(".progress-percent").textContent(), initial);
+        }
+      } finally {
+        await resized.close();
+      }
+    });
+  }
+  await test("reading progress leaves completion when resize makes the page scrollable", async () => {
+    const resized = await browser.newPage({ viewport: { width: 390, height: 4000 } });
+    resized.setDefaultTimeout(3000);
+    try {
+      await resized.goto(origin + "/progress-nonempty/");
+      await resized.waitForFunction(
+        () => document.querySelector(".progress-percent")?.textContent === "100%",
+      );
+      assert.equal(await resized.locator(".time-remaining").textContent(), "Complete!");
+      await resized.setViewportSize({ width: 390, height: 800 });
+      assert.equal(await resized.evaluate(() => scrollY), 0);
+      await resized.waitForFunction(
+        () => document.querySelector(".progress-percent")?.textContent === "0%",
+        null,
+        { timeout: 3000 },
+      );
+      assert.equal(
+        await resized
+          .locator(".publication-progress-bar")
+          .evaluate((element) => element.style.width),
+        "0%",
+      );
+      assert.equal(await resized.locator(".time-remaining").textContent(), "1 min left");
+    } finally {
+      await resized.close();
+    }
+  });
   for (const [os, saved] of [
     ["dark", "light"],
     ["light", "dark"],

@@ -34,7 +34,7 @@ try {
     await writeFile(join(fixture, "package.json"), JSON.stringify({ type: "module" }));
     await writeFile(
       join(fixture, "astro.config.mjs"),
-      `export default {site:${JSON.stringify(origin)},output:'static',trailingSlash:'always'};`,
+      `export default {site:${JSON.stringify(origin)},output:'static',trailingSlash:'always',cacheDir:'./.astro-cache',vite:{cacheDir:'./.vite-cache'}};`,
     );
     for (const file of [
       "content.config.ts",

@@ -1,10 +1,6 @@
 import type { APIContext } from "astro";
 import { notes, noteLink } from "../publication-content";
-const xml = (text: string) =>
-  text.replace(
-    /[<>&"']/g,
-    (ch) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[ch]!,
-  );
+import { xml } from "../xml";
 export async function GET({ site }: APIContext) {
   const origin = site?.origin ?? "https://publication.example";
   const entries = await notes();
@@ -16,13 +12,13 @@ export async function GET({ site }: APIContext) {
         .map(
           (note) =>
             "<item><title>" +
-            xml(note.data.title) +
+            xml(note.data.title, `RSS title for note ${note.id}`) +
             "</title><link>" +
             xml(origin + noteLink(note.id)) +
             "</link><guid>" +
             xml(origin + noteLink(note.id)) +
             "</guid><description>" +
-            xml(note.data.description) +
+            xml(note.data.description, `RSS description for note ${note.id}`) +
             "</description><pubDate>" +
             note.data.published.toUTCString() +
             "</pubDate></item>",

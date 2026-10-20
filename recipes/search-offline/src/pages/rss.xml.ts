@@ -18,11 +18,9 @@ export async function GET({ site }: APIContext) {
             "<item><title>" +
             xml(note.data.title) +
             "</title><link>" +
-            origin +
-            noteLink(note.id) +
+            xml(origin + noteLink(note.id)) +
             "</link><guid>" +
-            origin +
-            noteLink(note.id) +
+            xml(origin + noteLink(note.id)) +
             "</guid><description>" +
             xml(note.data.description) +
             "</description><pubDate>" +

@@ -1,0 +1,30 @@
+04:37:13 [types] Generated 42ms
+04:37:13 [build] output: "static"
+04:37:13 [build] mode: "static"
+04:37:13 [build] directory: /workspace/scratch/unicode-heading-evidence-20261020/fixture/dist/
+04:37:13 [build] Collecting build info...
+04:37:13 [build] ✓ Completed in 71ms.
+04:37:13 [build] Building static entrypoints...
+04:37:14 [vite] ✓ built in 331ms
+04:37:14 [vite] ✓ built in 18ms
+04:37:14 [build] Rearranging server assets...
+
+ generating static routes 
+04:37:14   ├─ /main/index.html (+18ms) 
+04:37:14   ├─ /main-emoji/index.html (+3ms) 
+04:37:14   ├─ /main-explicit/index.html (+2ms) 
+04:37:14   ├─ /main-punctuation/index.html (+2ms) 
+04:37:14   ├─ /pr28/index.html (+3ms) 
+04:37:14   ├─ /pr28-emoji/index.html (+2ms) 
+04:37:14   ├─ /pr28-explicit/index.html (+2ms) 
+04:37:14   ├─ /pr28-punctuation/index.html (+2ms) 
+04:37:14 ✓ Completed in 49ms.
+
+04:37:14 [build] ✓ Completed in 432ms.
+04:37:14 [build] 8 page(s) built in 504ms
+04:37:14 [build] Complete!
+{"navigationPass":150,"navigationTotal":150,"normalizationPass":30,"normalizationTotal":30,"emptyUnresolved":6,"boundaryControlPass":36,"boundaryControlTotal":36}
+
+real	0m10.834s
+user	0m7.444s
+sys	0m2.099s

@@ -1,0 +1,4091 @@
+{
+  "observedAt": "2026-10-20T04:37:13.170Z",
+  "node": "v24.19.0",
+  "platform": "linux",
+  "arch": "x64",
+  "astro": "7.3.5",
+  "playwright": "1.58.2",
+  "variants": [
+    {
+      "name": "main",
+      "commit": "219278c7b275755e1b69636c1f7b88466c0658e7",
+      "path": "/workspace/scratch/unicode-heading-controls-20261020/packages/astromache/src/Article.astro",
+      "sourceSHA256": "258c78dea308395d7c22305ce4696af72a89ef9f0a73be48529edff52067fe02"
+    },
+    {
+      "name": "pr28",
+      "commit": "967124eaec4247e6c7375e5d876a02d6639f0822",
+      "path": "/workspace/scratch/unicode-heading-evidence-20261020/Article-pr28.astro",
+      "sourceSHA256": "7c1ff4245eb35a6a27cfc561ca0ae32d2da4c767481bd4ce81ee2c9dbff492cc"
+    }
+  ],
+  "headings": [
+    [
+      2,
+      "中文 标题",
+      "中文-标题"
+    ],
+    [
+      3,
+      "日本語の見出し",
+      "日本語の見出し"
+    ],
+    [
+      4,
+      "한국어 제목",
+      "한국어-제목"
+    ],
+    [
+      5,
+      "Привет мир",
+      "привет-мир"
+    ],
+    [
+      6,
+      "مرحبا بالعالم",
+      "مرحبا-بالعالم"
+    ],
+    [
+      2,
+      "नमस्ते दुनिया",
+      "नमस्ते-दुनिया"
+    ],
+    [
+      2,
+      "ภาษาไทย",
+      "ภาษาไทย"
+    ],
+    [
+      2,
+      "Café",
+      "café"
+    ],
+    [
+      2,
+      "Café",
+      "café"
+    ],
+    [
+      2,
+      "CAFÉ",
+      "café-1"
+    ],
+    [
+      2,
+      "CAFÉ",
+      "café-1"
+    ],
+    [
+      2,
+      "東京",
+      "東京"
+    ],
+    [
+      2,
+      "東京",
+      "東京-1"
+    ],
+    [
+      2,
+      "東京-1",
+      "東京-1-1"
+    ],
+    [
+      2,
+      "東京",
+      "東京-2"
+    ],
+    [
+      2,
+      "Å",
+      "å"
+    ],
+    [
+      2,
+      "ạ́",
+      "ạ́"
+    ],
+    [
+      2,
+      "ạ́",
+      "ạ́"
+    ],
+    [
+      2,
+      "한글",
+      "한글"
+    ],
+    [
+      2,
+      "한글",
+      "한글"
+    ],
+    [
+      2,
+      "İstanbul",
+      "i̇stanbul"
+    ],
+    [
+      2,
+      "ΟΣ",
+      "ος"
+    ],
+    [
+      2,
+      "ASCII Control",
+      "ascii-control"
+    ],
+    [
+      2,
+      "😀",
+      ""
+    ],
+    [
+      2,
+      "😀",
+      "-1"
+    ],
+    [
+      2,
+      "!!!",
+      "-2"
+    ]
+  ],
+  "cases": [
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 0,
+      "depth": 2,
+      "text": "中文 标题",
+      "id": "中文-标题",
+      "pass": true,
+      "href": "#中文-标题",
+      "click": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 1,
+      "depth": 3,
+      "text": "日本語の見出し",
+      "id": "日本語の見出し",
+      "pass": true,
+      "href": "#日本語の見出し",
+      "click": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 2,
+      "depth": 4,
+      "text": "한국어 제목",
+      "id": "한국어-제목",
+      "pass": true,
+      "href": "#한국어-제목",
+      "click": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "search": "?control=unicode",
+        "top": 0.390625
+      },
+      "deepLink": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "top": 0.390625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 3,
+      "depth": 5,
+      "text": "Привет мир",
+      "id": "привет-мир",
+      "pass": true,
+      "href": "#привет-мир",
+      "click": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "search": "?control=unicode",
+        "top": -0.171875
+      },
+      "deepLink": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "top": -0.171875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 4,
+      "depth": 6,
+      "text": "مرحبا بالعالم",
+      "id": "مرحبا-بالعالم",
+      "pass": true,
+      "href": "#مرحبا-بالعالم",
+      "click": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 5,
+      "depth": 2,
+      "text": "नमस्ते दुनिया",
+      "id": "नमस्ते-दुनिया",
+      "pass": true,
+      "href": "#नमस्ते-दुनिया",
+      "click": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 6,
+      "depth": 2,
+      "text": "ภาษาไทย",
+      "id": "ภาษาไทย",
+      "pass": true,
+      "href": "#ภาษาไทย",
+      "click": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 7,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#café",
+      "click": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "search": "?control=unicode",
+        "top": 0.46875
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "top": 0.46875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 8,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#café",
+      "click": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 9,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#café-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 10,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#café-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "search": "?control=unicode",
+        "top": -0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "top": -0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 11,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京",
+      "pass": true,
+      "href": "#東京",
+      "click": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "search": "?control=unicode",
+        "top": -0.28125
+      },
+      "deepLink": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "top": -0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 12,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-1",
+      "pass": true,
+      "href": "#東京-1",
+      "click": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "search": "?control=unicode",
+        "top": -0.46875
+      },
+      "deepLink": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "top": -0.46875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 13,
+      "depth": 2,
+      "text": "東京-1",
+      "id": "東京-1-1",
+      "pass": true,
+      "href": "#東京-1-1",
+      "click": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "search": "?control=unicode",
+        "top": 0.34375
+      },
+      "deepLink": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "top": 0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 14,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-2",
+      "pass": true,
+      "href": "#東京-2",
+      "click": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "search": "?control=unicode",
+        "top": 0.15625
+      },
+      "deepLink": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "top": 0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 15,
+      "depth": 2,
+      "text": "Å",
+      "id": "å",
+      "pass": true,
+      "href": "#å",
+      "click": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 16,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#ạ́",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 17,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#ạ́",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "search": "?control=unicode",
+        "top": -0.40625
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "top": -0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 18,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#한글",
+      "click": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 19,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#한글",
+      "click": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "search": "?control=unicode",
+        "top": 0.21875
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "top": 0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 20,
+      "depth": 2,
+      "text": "İstanbul",
+      "id": "i̇stanbul",
+      "pass": true,
+      "href": "#i̇stanbul",
+      "click": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "search": "?control=unicode",
+        "top": 0.03125
+      },
+      "deepLink": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "top": 0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 21,
+      "depth": 2,
+      "text": "ΟΣ",
+      "id": "ος",
+      "pass": true,
+      "href": "#ος",
+      "click": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 22,
+      "depth": 2,
+      "text": "ASCII Control",
+      "id": "ascii-control",
+      "pass": true,
+      "href": "#ascii-control",
+      "click": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 24,
+      "depth": 2,
+      "text": "😀",
+      "id": "-1",
+      "pass": true,
+      "href": "#-1",
+      "click": {
+        "target": "-1",
+        "hash": "#-1",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "-1",
+        "hash": "#-1",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "index": 25,
+      "depth": 2,
+      "text": "!!!",
+      "id": "-2",
+      "pass": true,
+      "href": "#-2",
+      "click": {
+        "target": "-2",
+        "hash": "#-2",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "-2",
+        "hash": "#-2",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 0,
+      "depth": 2,
+      "text": "中文 标题",
+      "id": "中文-标题",
+      "pass": true,
+      "href": "#中文-标题",
+      "click": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 1,
+      "depth": 3,
+      "text": "日本語の見出し",
+      "id": "日本語の見出し",
+      "pass": true,
+      "href": "#日本語の見出し",
+      "click": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 2,
+      "depth": 4,
+      "text": "한국어 제목",
+      "id": "한국어-제목",
+      "pass": true,
+      "href": "#한국어-제목",
+      "click": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "search": "?control=unicode",
+        "top": 0.390625
+      },
+      "deepLink": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "top": 0.390625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 3,
+      "depth": 5,
+      "text": "Привет мир",
+      "id": "привет-мир",
+      "pass": true,
+      "href": "#привет-мир",
+      "click": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "search": "?control=unicode",
+        "top": -0.171875
+      },
+      "deepLink": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "top": -0.171875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 4,
+      "depth": 6,
+      "text": "مرحبا بالعالم",
+      "id": "مرحبا-بالعالم",
+      "pass": true,
+      "href": "#مرحبا-بالعالم",
+      "click": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 5,
+      "depth": 2,
+      "text": "नमस्ते दुनिया",
+      "id": "नमस्ते-दुनिया",
+      "pass": true,
+      "href": "#नमस्ते-दुनिया",
+      "click": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 6,
+      "depth": 2,
+      "text": "ภาษาไทย",
+      "id": "ภาษาไทย",
+      "pass": true,
+      "href": "#ภาษาไทย",
+      "click": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 7,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#café",
+      "click": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "search": "?control=unicode",
+        "top": 0.46875
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "top": 0.46875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 8,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#café",
+      "click": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 9,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#café-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 10,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#café-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "search": "?control=unicode",
+        "top": -0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "top": -0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 11,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京",
+      "pass": true,
+      "href": "#東京",
+      "click": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "search": "?control=unicode",
+        "top": -0.28125
+      },
+      "deepLink": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "top": -0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 12,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-1",
+      "pass": true,
+      "href": "#東京-1",
+      "click": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "search": "?control=unicode",
+        "top": -0.46875
+      },
+      "deepLink": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "top": -0.46875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 13,
+      "depth": 2,
+      "text": "東京-1",
+      "id": "東京-1-1",
+      "pass": true,
+      "href": "#東京-1-1",
+      "click": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "search": "?control=unicode",
+        "top": 0.34375
+      },
+      "deepLink": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "top": 0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 14,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-2",
+      "pass": true,
+      "href": "#東京-2",
+      "click": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "search": "?control=unicode",
+        "top": 0.15625
+      },
+      "deepLink": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "top": 0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 15,
+      "depth": 2,
+      "text": "Å",
+      "id": "å",
+      "pass": true,
+      "href": "#å",
+      "click": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 16,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#ạ́",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 17,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#ạ́",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "search": "?control=unicode",
+        "top": -0.40625
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "top": -0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 18,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#한글",
+      "click": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 19,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#한글",
+      "click": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "search": "?control=unicode",
+        "top": 0.21875
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "top": 0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 20,
+      "depth": 2,
+      "text": "İstanbul",
+      "id": "i̇stanbul",
+      "pass": true,
+      "href": "#i̇stanbul",
+      "click": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "search": "?control=unicode",
+        "top": 0.03125
+      },
+      "deepLink": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "top": 0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 21,
+      "depth": 2,
+      "text": "ΟΣ",
+      "id": "ος",
+      "pass": true,
+      "href": "#ος",
+      "click": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 22,
+      "depth": 2,
+      "text": "ASCII Control",
+      "id": "ascii-control",
+      "pass": true,
+      "href": "#ascii-control",
+      "click": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 24,
+      "depth": 2,
+      "text": "😀",
+      "id": "-1",
+      "pass": true,
+      "href": "#-1",
+      "click": {
+        "target": "-1",
+        "hash": "#-1",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "-1",
+        "hash": "#-1",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "index": 25,
+      "depth": 2,
+      "text": "!!!",
+      "id": "-2",
+      "pass": true,
+      "href": "#-2",
+      "click": {
+        "target": "-2",
+        "hash": "#-2",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "-2",
+        "hash": "#-2",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 0,
+      "depth": 2,
+      "text": "中文 标题",
+      "id": "中文-标题",
+      "pass": true,
+      "href": "#中文-标题",
+      "click": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 1,
+      "depth": 3,
+      "text": "日本語の見出し",
+      "id": "日本語の見出し",
+      "pass": true,
+      "href": "#日本語の見出し",
+      "click": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 2,
+      "depth": 4,
+      "text": "한국어 제목",
+      "id": "한국어-제목",
+      "pass": true,
+      "href": "#한국어-제목",
+      "click": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "search": "?control=unicode",
+        "top": 0.390625
+      },
+      "deepLink": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "top": 0.390625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 3,
+      "depth": 5,
+      "text": "Привет мир",
+      "id": "привет-мир",
+      "pass": true,
+      "href": "#привет-мир",
+      "click": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "search": "?control=unicode",
+        "top": -0.171875
+      },
+      "deepLink": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "top": -0.171875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 4,
+      "depth": 6,
+      "text": "مرحبا بالعالم",
+      "id": "مرحبا-بالعالم",
+      "pass": true,
+      "href": "#مرحبا-بالعالم",
+      "click": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 5,
+      "depth": 2,
+      "text": "नमस्ते दुनिया",
+      "id": "नमस्ते-दुनिया",
+      "pass": true,
+      "href": "#नमस्ते-दुनिया",
+      "click": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 6,
+      "depth": 2,
+      "text": "ภาษาไทย",
+      "id": "ภาษาไทย",
+      "pass": true,
+      "href": "#ภาษาไทย",
+      "click": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 7,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#café",
+      "click": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "search": "?control=unicode",
+        "top": 0.46875
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "top": 0.46875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 8,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#café",
+      "click": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 9,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#café-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 10,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#café-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "search": "?control=unicode",
+        "top": -0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "top": -0.09375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 11,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京",
+      "pass": true,
+      "href": "#東京",
+      "click": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "search": "?control=unicode",
+        "top": -0.28125
+      },
+      "deepLink": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "top": -0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 12,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-1",
+      "pass": true,
+      "href": "#東京-1",
+      "click": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "search": "?control=unicode",
+        "top": -0.46875
+      },
+      "deepLink": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "top": -0.46875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 13,
+      "depth": 2,
+      "text": "東京-1",
+      "id": "東京-1-1",
+      "pass": true,
+      "href": "#東京-1-1",
+      "click": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "search": "?control=unicode",
+        "top": 0.34375
+      },
+      "deepLink": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "top": 0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 14,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-2",
+      "pass": true,
+      "href": "#東京-2",
+      "click": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "search": "?control=unicode",
+        "top": 0.15625
+      },
+      "deepLink": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "top": 0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 15,
+      "depth": 2,
+      "text": "Å",
+      "id": "å",
+      "pass": true,
+      "href": "#å",
+      "click": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 16,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#ạ́",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 17,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#ạ́",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "search": "?control=unicode",
+        "top": -0.40625
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "top": -0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 18,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#한글",
+      "click": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 19,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#한글",
+      "click": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "search": "?control=unicode",
+        "top": 0.21875
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "top": 0.21875
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 20,
+      "depth": 2,
+      "text": "İstanbul",
+      "id": "i̇stanbul",
+      "pass": true,
+      "href": "#i̇stanbul",
+      "click": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "search": "?control=unicode",
+        "top": 0.03125
+      },
+      "deepLink": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "top": 0.03125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 21,
+      "depth": 2,
+      "text": "ΟΣ",
+      "id": "ος",
+      "pass": true,
+      "href": "#ος",
+      "click": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 22,
+      "depth": 2,
+      "text": "ASCII Control",
+      "id": "ascii-control",
+      "pass": true,
+      "href": "#ascii-control",
+      "click": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 24,
+      "depth": 2,
+      "text": "😀",
+      "id": "-1",
+      "pass": true,
+      "href": "#-1",
+      "click": {
+        "target": "-1",
+        "hash": "#-1",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "-1",
+        "hash": "#-1",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "index": 25,
+      "depth": 2,
+      "text": "!!!",
+      "id": "-2",
+      "pass": true,
+      "href": "#-2",
+      "click": {
+        "target": "-2",
+        "hash": "#-2",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "-2",
+        "hash": "#-2",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 0,
+      "depth": 2,
+      "text": "中文 标题",
+      "id": "中文-标题",
+      "pass": true,
+      "href": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+      "click": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 1,
+      "depth": 3,
+      "text": "日本語の見出し",
+      "id": "日本語の見出し",
+      "pass": true,
+      "href": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+      "click": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 2,
+      "depth": 4,
+      "text": "한국어 제목",
+      "id": "한국어-제목",
+      "pass": true,
+      "href": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+      "click": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "search": "?control=unicode",
+        "top": 0.390625
+      },
+      "deepLink": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "top": 0.390625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 3,
+      "depth": 5,
+      "text": "Привет мир",
+      "id": "привет-мир",
+      "pass": true,
+      "href": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+      "click": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "search": "?control=unicode",
+        "top": -0.171875
+      },
+      "deepLink": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "top": -0.171875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 4,
+      "depth": 6,
+      "text": "مرحبا بالعالم",
+      "id": "مرحبا-بالعالم",
+      "pass": true,
+      "href": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+      "click": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 5,
+      "depth": 2,
+      "text": "नमस्ते दुनिया",
+      "id": "नमस्ते-दुनिया",
+      "pass": true,
+      "href": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+      "click": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 6,
+      "depth": 2,
+      "text": "ภาษาไทย",
+      "id": "ภาษาไทย",
+      "pass": true,
+      "href": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+      "click": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 7,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#caf%C3%A9",
+      "click": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "search": "?control=unicode",
+        "top": 0.46875
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "top": 0.46875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 8,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#cafe%CC%81",
+      "click": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 9,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#caf%C3%A9-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 10,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#cafe%CC%81-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "search": "?control=unicode",
+        "top": -0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "top": -0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 11,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC",
+      "click": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "search": "?control=unicode",
+        "top": -0.28125
+      },
+      "deepLink": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "top": -0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 12,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-1",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-1",
+      "click": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "search": "?control=unicode",
+        "top": -0.46875
+      },
+      "deepLink": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "top": -0.46875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 13,
+      "depth": 2,
+      "text": "東京-1",
+      "id": "東京-1-1",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-1-1",
+      "click": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "search": "?control=unicode",
+        "top": 0.34375
+      },
+      "deepLink": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "top": 0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 14,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-2",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-2",
+      "click": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "search": "?control=unicode",
+        "top": 0.15625
+      },
+      "deepLink": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "top": 0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 15,
+      "depth": 2,
+      "text": "Å",
+      "id": "å",
+      "pass": true,
+      "href": "#a%CC%8A",
+      "click": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 16,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#a%CC%A3%CC%81",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 17,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#a%CC%81%CC%A3",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "search": "?control=unicode",
+        "top": -0.40625
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "top": -0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 18,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#%ED%95%9C%EA%B8%80",
+      "click": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 19,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+      "click": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "search": "?control=unicode",
+        "top": 0.21875
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "top": 0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 20,
+      "depth": 2,
+      "text": "İstanbul",
+      "id": "i̇stanbul",
+      "pass": true,
+      "href": "#i%CC%87stanbul",
+      "click": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "search": "?control=unicode",
+        "top": 0.03125
+      },
+      "deepLink": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "top": 0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 21,
+      "depth": 2,
+      "text": "ΟΣ",
+      "id": "ος",
+      "pass": true,
+      "href": "#%CE%BF%CF%82",
+      "click": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 22,
+      "depth": 2,
+      "text": "ASCII Control",
+      "id": "ascii-control",
+      "pass": true,
+      "href": "#ascii-control",
+      "click": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 24,
+      "depth": 2,
+      "text": "😀",
+      "id": "-1",
+      "pass": true,
+      "href": "#-1",
+      "click": {
+        "target": "-1",
+        "hash": "#-1",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "-1",
+        "hash": "#-1",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "index": 25,
+      "depth": 2,
+      "text": "!!!",
+      "id": "-2",
+      "pass": true,
+      "href": "#-2",
+      "click": {
+        "target": "-2",
+        "hash": "#-2",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "-2",
+        "hash": "#-2",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 0,
+      "depth": 2,
+      "text": "中文 标题",
+      "id": "中文-标题",
+      "pass": true,
+      "href": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+      "click": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 1,
+      "depth": 3,
+      "text": "日本語の見出し",
+      "id": "日本語の見出し",
+      "pass": true,
+      "href": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+      "click": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 2,
+      "depth": 4,
+      "text": "한국어 제목",
+      "id": "한국어-제목",
+      "pass": true,
+      "href": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+      "click": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "search": "?control=unicode",
+        "top": 0.390625
+      },
+      "deepLink": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "top": 0.390625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 3,
+      "depth": 5,
+      "text": "Привет мир",
+      "id": "привет-мир",
+      "pass": true,
+      "href": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+      "click": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "search": "?control=unicode",
+        "top": -0.171875
+      },
+      "deepLink": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "top": -0.171875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 4,
+      "depth": 6,
+      "text": "مرحبا بالعالم",
+      "id": "مرحبا-بالعالم",
+      "pass": true,
+      "href": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+      "click": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 5,
+      "depth": 2,
+      "text": "नमस्ते दुनिया",
+      "id": "नमस्ते-दुनिया",
+      "pass": true,
+      "href": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+      "click": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 6,
+      "depth": 2,
+      "text": "ภาษาไทย",
+      "id": "ภาษาไทย",
+      "pass": true,
+      "href": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+      "click": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 7,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#caf%C3%A9",
+      "click": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "search": "?control=unicode",
+        "top": 0.46875
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "top": 0.46875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 8,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#cafe%CC%81",
+      "click": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 9,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#caf%C3%A9-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 10,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#cafe%CC%81-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "search": "?control=unicode",
+        "top": -0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "top": -0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 11,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC",
+      "click": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "search": "?control=unicode",
+        "top": -0.28125
+      },
+      "deepLink": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "top": -0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 12,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-1",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-1",
+      "click": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "search": "?control=unicode",
+        "top": -0.46875
+      },
+      "deepLink": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "top": -0.46875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 13,
+      "depth": 2,
+      "text": "東京-1",
+      "id": "東京-1-1",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-1-1",
+      "click": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "search": "?control=unicode",
+        "top": 0.34375
+      },
+      "deepLink": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "top": 0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 14,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-2",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-2",
+      "click": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "search": "?control=unicode",
+        "top": 0.15625
+      },
+      "deepLink": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "top": 0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 15,
+      "depth": 2,
+      "text": "Å",
+      "id": "å",
+      "pass": true,
+      "href": "#a%CC%8A",
+      "click": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 16,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#a%CC%A3%CC%81",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 17,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#a%CC%81%CC%A3",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "search": "?control=unicode",
+        "top": -0.40625
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "top": -0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 18,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#%ED%95%9C%EA%B8%80",
+      "click": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 19,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+      "click": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "search": "?control=unicode",
+        "top": 0.21875
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "top": 0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 20,
+      "depth": 2,
+      "text": "İstanbul",
+      "id": "i̇stanbul",
+      "pass": true,
+      "href": "#i%CC%87stanbul",
+      "click": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "search": "?control=unicode",
+        "top": 0.03125
+      },
+      "deepLink": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "top": 0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 21,
+      "depth": 2,
+      "text": "ΟΣ",
+      "id": "ος",
+      "pass": true,
+      "href": "#%CE%BF%CF%82",
+      "click": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 22,
+      "depth": 2,
+      "text": "ASCII Control",
+      "id": "ascii-control",
+      "pass": true,
+      "href": "#ascii-control",
+      "click": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 24,
+      "depth": 2,
+      "text": "😀",
+      "id": "-1",
+      "pass": true,
+      "href": "#-1",
+      "click": {
+        "target": "-1",
+        "hash": "#-1",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "-1",
+        "hash": "#-1",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "index": 25,
+      "depth": 2,
+      "text": "!!!",
+      "id": "-2",
+      "pass": true,
+      "href": "#-2",
+      "click": {
+        "target": "-2",
+        "hash": "#-2",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "-2",
+        "hash": "#-2",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 0,
+      "depth": 2,
+      "text": "中文 标题",
+      "id": "中文-标题",
+      "pass": true,
+      "href": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+      "click": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "中文-标题",
+        "hash": "#%E4%B8%AD%E6%96%87-%E6%A0%87%E9%A2%98",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 1,
+      "depth": 3,
+      "text": "日本語の見出し",
+      "id": "日本語の見出し",
+      "pass": true,
+      "href": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+      "click": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "日本語の見出し",
+        "hash": "#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E8%A6%8B%E5%87%BA%E3%81%97",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 2,
+      "depth": 4,
+      "text": "한국어 제목",
+      "id": "한국어-제목",
+      "pass": true,
+      "href": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+      "click": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "search": "?control=unicode",
+        "top": 0.390625
+      },
+      "deepLink": {
+        "target": "한국어-제목",
+        "hash": "#%ED%95%9C%EA%B5%AD%EC%96%B4-%EC%A0%9C%EB%AA%A9",
+        "top": 0.390625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 3,
+      "depth": 5,
+      "text": "Привет мир",
+      "id": "привет-мир",
+      "pass": true,
+      "href": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+      "click": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "search": "?control=unicode",
+        "top": -0.171875
+      },
+      "deepLink": {
+        "target": "привет-мир",
+        "hash": "#%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82-%D0%BC%D0%B8%D1%80",
+        "top": -0.171875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 4,
+      "depth": 6,
+      "text": "مرحبا بالعالم",
+      "id": "مرحبا-بالعالم",
+      "pass": true,
+      "href": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+      "click": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "مرحبا-بالعالم",
+        "hash": "#%D9%85%D8%B1%D8%AD%D8%A8%D8%A7-%D8%A8%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 5,
+      "depth": 2,
+      "text": "नमस्ते दुनिया",
+      "id": "नमस्ते-दुनिया",
+      "pass": true,
+      "href": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+      "click": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "नमस्ते-दुनिया",
+        "hash": "#%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87-%E0%A4%A6%E0%A5%81%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%BE",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 6,
+      "depth": 2,
+      "text": "ภาษาไทย",
+      "id": "ภาษาไทย",
+      "pass": true,
+      "href": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+      "click": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ภาษาไทย",
+        "hash": "#%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%84%E0%B8%97%E0%B8%A2",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 7,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#caf%C3%A9",
+      "click": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "search": "?control=unicode",
+        "top": 0.46875
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#caf%C3%A9",
+        "top": 0.46875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 8,
+      "depth": 2,
+      "text": "Café",
+      "id": "café",
+      "pass": true,
+      "href": "#cafe%CC%81",
+      "click": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "café",
+        "hash": "#cafe%CC%81",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 9,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#caf%C3%A9-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#caf%C3%A9-1",
+        "top": 0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 10,
+      "depth": 2,
+      "text": "CAFÉ",
+      "id": "café-1",
+      "pass": true,
+      "href": "#cafe%CC%81-1",
+      "click": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "search": "?control=unicode",
+        "top": -0.09375
+      },
+      "deepLink": {
+        "target": "café-1",
+        "hash": "#cafe%CC%81-1",
+        "top": -0.09375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 11,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC",
+      "click": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "search": "?control=unicode",
+        "top": -0.28125
+      },
+      "deepLink": {
+        "target": "東京",
+        "hash": "#%E6%9D%B1%E4%BA%AC",
+        "top": -0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 12,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-1",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-1",
+      "click": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "search": "?control=unicode",
+        "top": -0.46875
+      },
+      "deepLink": {
+        "target": "東京-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1",
+        "top": -0.46875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 13,
+      "depth": 2,
+      "text": "東京-1",
+      "id": "東京-1-1",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-1-1",
+      "click": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "search": "?control=unicode",
+        "top": 0.34375
+      },
+      "deepLink": {
+        "target": "東京-1-1",
+        "hash": "#%E6%9D%B1%E4%BA%AC-1-1",
+        "top": 0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 14,
+      "depth": 2,
+      "text": "東京",
+      "id": "東京-2",
+      "pass": true,
+      "href": "#%E6%9D%B1%E4%BA%AC-2",
+      "click": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "search": "?control=unicode",
+        "top": 0.15625
+      },
+      "deepLink": {
+        "target": "東京-2",
+        "hash": "#%E6%9D%B1%E4%BA%AC-2",
+        "top": 0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 15,
+      "depth": 2,
+      "text": "Å",
+      "id": "å",
+      "pass": true,
+      "href": "#a%CC%8A",
+      "click": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "search": "?control=unicode",
+        "top": -0.03125
+      },
+      "deepLink": {
+        "target": "å",
+        "hash": "#a%CC%8A",
+        "top": -0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 16,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#a%CC%A3%CC%81",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "search": "?control=unicode",
+        "top": -0.21875
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%A3%CC%81",
+        "top": -0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 17,
+      "depth": 2,
+      "text": "ạ́",
+      "id": "ạ́",
+      "pass": true,
+      "href": "#a%CC%81%CC%A3",
+      "click": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "search": "?control=unicode",
+        "top": -0.40625
+      },
+      "deepLink": {
+        "target": "ạ́",
+        "hash": "#a%CC%81%CC%A3",
+        "top": -0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 18,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#%ED%95%9C%EA%B8%80",
+      "click": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "search": "?control=unicode",
+        "top": 0.40625
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%ED%95%9C%EA%B8%80",
+        "top": 0.40625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 19,
+      "depth": 2,
+      "text": "한글",
+      "id": "한글",
+      "pass": true,
+      "href": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+      "click": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "search": "?control=unicode",
+        "top": 0.21875
+      },
+      "deepLink": {
+        "target": "한글",
+        "hash": "#%E1%84%92%E1%85%A1%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF",
+        "top": 0.21875
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 20,
+      "depth": 2,
+      "text": "İstanbul",
+      "id": "i̇stanbul",
+      "pass": true,
+      "href": "#i%CC%87stanbul",
+      "click": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "search": "?control=unicode",
+        "top": 0.03125
+      },
+      "deepLink": {
+        "target": "i̇stanbul",
+        "hash": "#i%CC%87stanbul",
+        "top": 0.03125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 21,
+      "depth": 2,
+      "text": "ΟΣ",
+      "id": "ος",
+      "pass": true,
+      "href": "#%CE%BF%CF%82",
+      "click": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "search": "?control=unicode",
+        "top": -0.15625
+      },
+      "deepLink": {
+        "target": "ος",
+        "hash": "#%CE%BF%CF%82",
+        "top": -0.15625
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 22,
+      "depth": 2,
+      "text": "ASCII Control",
+      "id": "ascii-control",
+      "pass": true,
+      "href": "#ascii-control",
+      "click": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "search": "?control=unicode",
+        "top": -0.34375
+      },
+      "deepLink": {
+        "target": "ascii-control",
+        "hash": "#ascii-control",
+        "top": -0.34375
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 24,
+      "depth": 2,
+      "text": "😀",
+      "id": "-1",
+      "pass": true,
+      "href": "#-1",
+      "click": {
+        "target": "-1",
+        "hash": "#-1",
+        "search": "?control=unicode",
+        "top": 0.28125
+      },
+      "deepLink": {
+        "target": "-1",
+        "hash": "#-1",
+        "top": 0.28125
+      }
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "index": 25,
+      "depth": 2,
+      "text": "!!!",
+      "id": "-2",
+      "pass": true,
+      "href": "#-2",
+      "click": {
+        "target": "-2",
+        "hash": "#-2",
+        "search": "?control=unicode",
+        "top": 0.09375
+      },
+      "deepLink": {
+        "target": "-2",
+        "hash": "#-2",
+        "top": 0.09375
+      }
+    }
+  ],
+  "normalizationControls": [
+    {
+      "variant": "main",
+      "width": 1440,
+      "original": "café",
+      "normalized": "café",
+      "expectedTarget": "café",
+      "actual": "café",
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "original": "å",
+      "normalized": "å",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "original": "한글",
+      "normalized": "한글",
+      "expectedTarget": "한글",
+      "actual": "한글",
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "original": "café",
+      "normalized": "café",
+      "expectedTarget": "café",
+      "actual": "café",
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "original": "å",
+      "normalized": "å",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "original": "한글",
+      "normalized": "한글",
+      "expectedTarget": "한글",
+      "actual": "한글",
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "original": "café",
+      "normalized": "café",
+      "expectedTarget": "café",
+      "actual": "café",
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "original": "å",
+      "normalized": "å",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "original": "한글",
+      "normalized": "한글",
+      "expectedTarget": "한글",
+      "actual": "한글",
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "original": "café",
+      "normalized": "café",
+      "expectedTarget": "café",
+      "actual": "café",
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "original": "å",
+      "normalized": "å",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "original": "한글",
+      "normalized": "한글",
+      "expectedTarget": "한글",
+      "actual": "한글",
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "original": "café",
+      "normalized": "café",
+      "expectedTarget": "café",
+      "actual": "café",
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "original": "å",
+      "normalized": "å",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "original": "한글",
+      "normalized": "한글",
+      "expectedTarget": "한글",
+      "actual": "한글",
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "original": "café",
+      "normalized": "café",
+      "expectedTarget": "café",
+      "actual": "café",
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "original": "å",
+      "normalized": "å",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "original": "ạ́",
+      "normalized": "ạ́",
+      "expectedTarget": null,
+      "actual": null,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "original": "한글",
+      "normalized": "한글",
+      "expectedTarget": "한글",
+      "actual": "한글",
+      "pass": true
+    }
+  ],
+  "emptyIdControls": [
+    {
+      "variant": "main",
+      "width": 1440,
+      "id": "",
+      "text": "😀",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "unresolved": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "id": "",
+      "text": "😀",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "unresolved": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "id": "",
+      "text": "😀",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "unresolved": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "id": "",
+      "text": "😀",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "unresolved": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "id": "",
+      "text": "😀",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "unresolved": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "id": "",
+      "text": "😀",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "unresolved": true
+    }
+  ],
+  "boundaryControls": [
+    {
+      "variant": "main",
+      "width": 1440,
+      "kind": "emoji",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "kind": "emoji",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1130,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "kind": "punctuation",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "kind": "punctuation",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1129,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "kind": "explicit",
+      "index": 0,
+      "id": "emoji-😀",
+      "href": "#emoji-😀",
+      "target": "emoji-😀",
+      "hash": "#emoji-%F0%9F%98%80",
+      "top": 1044,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 1440,
+      "kind": "explicit",
+      "index": 1,
+      "id": "punctuation",
+      "href": "#punctuation",
+      "target": "punctuation",
+      "hash": "#punctuation",
+      "top": 1314,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "kind": "emoji",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "kind": "emoji",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1130,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "kind": "punctuation",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "kind": "punctuation",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1129,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "kind": "explicit",
+      "index": 0,
+      "id": "emoji-😀",
+      "href": "#emoji-😀",
+      "target": "emoji-😀",
+      "hash": "#emoji-%F0%9F%98%80",
+      "top": 1044,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 390,
+      "kind": "explicit",
+      "index": 1,
+      "id": "punctuation",
+      "href": "#punctuation",
+      "target": "punctuation",
+      "hash": "#punctuation",
+      "top": 1314,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "kind": "emoji",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "kind": "emoji",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1130,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "kind": "punctuation",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "kind": "punctuation",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1129,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "kind": "explicit",
+      "index": 0,
+      "id": "emoji-😀",
+      "href": "#emoji-😀",
+      "target": "emoji-😀",
+      "hash": "#emoji-%F0%9F%98%80",
+      "top": 1044,
+      "pass": true
+    },
+    {
+      "variant": "main",
+      "width": 280,
+      "kind": "explicit",
+      "index": 1,
+      "id": "punctuation",
+      "href": "#punctuation",
+      "target": "punctuation",
+      "hash": "#punctuation",
+      "top": 1314,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "kind": "emoji",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "kind": "emoji",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1130,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "kind": "punctuation",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "kind": "punctuation",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1129,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "kind": "explicit",
+      "index": 0,
+      "id": "emoji-😀",
+      "href": "#emoji-%F0%9F%98%80",
+      "target": "emoji-😀",
+      "hash": "#emoji-%F0%9F%98%80",
+      "top": 1044,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 1440,
+      "kind": "explicit",
+      "index": 1,
+      "id": "punctuation",
+      "href": "#punctuation",
+      "target": "punctuation",
+      "hash": "#punctuation",
+      "top": 1314,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "kind": "emoji",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "kind": "emoji",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1130,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "kind": "punctuation",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "kind": "punctuation",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1129,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "kind": "explicit",
+      "index": 0,
+      "id": "emoji-😀",
+      "href": "#emoji-%F0%9F%98%80",
+      "target": "emoji-😀",
+      "hash": "#emoji-%F0%9F%98%80",
+      "top": 1044,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 390,
+      "kind": "explicit",
+      "index": 1,
+      "id": "punctuation",
+      "href": "#punctuation",
+      "target": "punctuation",
+      "hash": "#punctuation",
+      "top": 1314,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "kind": "emoji",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "kind": "emoji",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1130,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "kind": "punctuation",
+      "index": 0,
+      "id": "",
+      "href": "#",
+      "target": null,
+      "hash": "",
+      "top": 0,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "kind": "punctuation",
+      "index": 1,
+      "id": "-1",
+      "href": "#-1",
+      "target": "-1",
+      "hash": "#-1",
+      "top": 1129,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "kind": "explicit",
+      "index": 0,
+      "id": "emoji-😀",
+      "href": "#emoji-%F0%9F%98%80",
+      "target": "emoji-😀",
+      "hash": "#emoji-%F0%9F%98%80",
+      "top": 1044,
+      "pass": true
+    },
+    {
+      "variant": "pr28",
+      "width": 280,
+      "kind": "explicit",
+      "index": 1,
+      "id": "punctuation",
+      "href": "#punctuation",
+      "target": "punctuation",
+      "hash": "#punctuation",
+      "top": 1314,
+      "pass": true
+    }
+  ],
+  "browser": "145.0.7632.6",
+  "summary": {
+    "navigationPass": 150,
+    "navigationTotal": 150,
+    "normalizationPass": 30,
+    "normalizationTotal": 30,
+    "emptyUnresolved": 6,
+    "boundaryControlPass": 36,
+    "boundaryControlTotal": 36
+  },
+  "finishedAt": "2026-10-20T04:37:23.341Z"
+}

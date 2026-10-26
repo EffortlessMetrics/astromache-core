@@ -59,7 +59,7 @@ export async function packCurrentPublication(producer, root, manager) {
   const gitStatusPorcelainV1 = execFileSync(
     "git",
     ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
-    { cwd: producer, encoding: "utf8" },
+    { cwd: producer, encoding: "utf8", maxBuffer: Infinity },
   );
   return {
     archive,

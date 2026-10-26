@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cp, mkdir, mkdtemp, readFile, unlink, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -83,7 +83,7 @@ for (const project of ["publication", "search-offline"]) {
 }
 
 test("current publication packing attributes clean and modified checkouts", async (t) => {
-  const root = await mkdtemp(join(tmpdir(), "publication-source-state-"));
+  const root = await mkdtemp(join(tmpdir(), "ps-"));
   const source = join(root, "source");
   const packageDirectory = join(source, "packages/astromache");
   await mkdir(packageDirectory, { recursive: true });
@@ -131,6 +131,48 @@ execFileSync("tar", ["-czf", join(directory, "astromache-0.0.0.tgz"), "-C", stag
   await t.test("clean checkout", () => {
     assert.equal(clean.sourceHead, head);
     assert.deepEqual(clean.sourceState, { dirty: false, gitStatusPorcelainV1: "" });
+  });
+
+  await t.test("complete Git status larger than 1 MiB", async () => {
+    const directory = join(source, "u");
+    await mkdir(directory);
+    // Bound ASCII paths below 240 characters for Windows, and create just
+    // enough empty, unpackaged files to exceed the default exec buffer.
+    const nameLength = Math.min(180, 240 - directory.length - 1);
+    assert.ok(nameLength >= 16, "Temporary directory must leave room for fixture filenames");
+    const count = Math.ceil((1024 * 1024 + 4096) / (nameLength + 6));
+    const names = Array.from(
+      { length: count },
+      (_, index) => `${String(index).padStart(5, "0")}-${"x".repeat(nameLength - 10)}.txt`,
+    );
+    try {
+      for (let start = 0; start < count; start += 64) {
+        await Promise.all(
+          names.slice(start, start + 64).map((name) => writeFile(join(directory, name), "")),
+        );
+      }
+      const expectedStatus = names.map((name) => `?? u/${name}\0`).join("");
+      assert.ok(Buffer.byteLength(expectedStatus) > 1024 * 1024);
+      const candidate = await pack("large-status");
+      assert.equal(candidate.sourceHead, head);
+      assert.deepEqual(candidate.sourceState, {
+        dirty: true,
+        gitStatusPorcelainV1: expectedStatus,
+      });
+      assert.equal(
+        candidate.sha256,
+        createHash("sha256")
+          .update(await readFile(candidate.tarball))
+          .digest("hex"),
+        "Large status must not replace archive identity",
+      );
+      assert.equal(await readFile(join(candidate.unpacked, "index.js"), "utf8"), original);
+      console.log(
+        `Complete Git status: ${count} files, ${Buffer.byteLength(expectedStatus)} bytes; maximum fixture path ${join(directory, names[0]).length} characters`,
+      );
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 
   for (const state of ["staged", "unstaged", "staged and unstaged", "untracked"]) {

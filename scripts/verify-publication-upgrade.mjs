@@ -49,16 +49,26 @@ export async function packCurrentPublication(producer, root, manager) {
   execFileSync("tar", ["-xzf", tarball, "-C", unpacked]);
   const packed = await json(join(unpacked, "package/package.json"));
   assert.deepEqual(packed, manifest, "Pack must deliver the current public manifest");
+  const sourceHead = execFileSync("git", ["rev-parse", "HEAD"], {
+    cwd: producer,
+    encoding: "utf8",
+  }).trim();
+  // Observe checkout context after packing, including staged/unstaged and
+  // untracked changes. Git status excludes ignored files; the archive hash,
+  // rather than HEAD or a clean status, identifies the delivered bytes.
+  const gitStatusPorcelainV1 = execFileSync(
+    "git",
+    ["status", "--porcelain=v1", "-z", "--untracked-files=all"],
+    { cwd: producer, encoding: "utf8", maxBuffer: Infinity },
+  );
   return {
     archive,
     tarball,
     unpacked: join(unpacked, "package"),
     manifest,
     sha256: sha256(await readFile(tarball)),
-    sourceHead: execFileSync("git", ["rev-parse", "HEAD"], {
-      cwd: producer,
-      encoding: "utf8",
-    }).trim(),
+    sourceHead,
+    sourceState: { dirty: gitStatusPorcelainV1.length > 0, gitStatusPorcelainV1 },
   };
 }
 
@@ -79,6 +89,7 @@ async function pinDelivery(directory, candidate) {
       version: candidate.manifest.version,
       sha256: candidate.sha256,
       packageSourceHead: candidate.sourceHead,
+      packageSourceState: candidate.sourceState,
     };
     await save(join(directory, "candidate-artifacts.json"), artifacts);
   }
@@ -121,6 +132,7 @@ export async function verifyPublicationDelivery(directory, candidate) {
         version: candidate.manifest.version,
         sha256: candidate.sha256,
         packageSourceHead: candidate.sourceHead,
+        packageSourceState: candidate.sourceState,
       },
       "Candidate metadata must match current delivery",
     );
@@ -269,6 +281,7 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
           version: candidate.manifest.version,
           sha256: candidate.sha256,
           packageSourceHead: candidate.sourceHead,
+          packageSourceState: candidate.sourceState,
         },
       },
       "Only current package delivery metadata may change",
@@ -293,6 +306,7 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
       version: candidate.manifest.version,
       packageSha256: candidate.sha256,
       sourceHead: candidate.sourceHead,
+      sourceState: candidate.sourceState,
       installed,
       frozenLockSha256: sha256(lock),
       unrelatedLockEntriesUnchanged: true,

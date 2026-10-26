@@ -2,6 +2,8 @@
 
 Initial qualification target: PR6 source `b4d52ec010fdd90049e314650dee74d94aaeca93`; refreshed main `b112d6aea2e2b6d76fd6fbbc0af43f638621ecb0` on 2026-10-15. This follow-up is stacked on PR6 to preserve its ownership and avoid reverting later main work.
 
+Historical status: the history at `219278c7b275755e1b69636c1f7b88466c0658e7` contains parent PR #6 merge `b6ac990f1d1ab802989b31082e11f40d584f8d9c`, followed by child PR #21 merge `3524078ed3fcfb827507db03f583a557401d4417`. The stack-order instructions below describe that completed phase and must not be replayed on resume. Existing evidence limits and authorization holds remain in force; this local history does not establish current remote status or authorize deployment, release, publication or permission changes.
+
 ## Repair and negative controls
 
 The preset previously passed `/offline` unchanged to the worker, whose fallback lookup is exact, while the generated corpus contains `/offline/`. A real generated worker at the PR6 source failed an uncached offline navigation with `net::ERR_FAILED`; `/offline/` and `/offline/index.html` were passing controls. The old suffix replacement also rewrote `/myindex.html` to `/my`. The final fixture against the preserved PR6 module fails its literal-filename assertion, as expected.

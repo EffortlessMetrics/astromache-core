@@ -31,7 +31,7 @@ export function publicationMetadata(input: PublicationMetadata): PublicationMeta
   if (!["http:", "https:"].includes(canonical.protocol)) {
     throw new Error("Canonical publication URLs must use HTTP or HTTPS");
   }
-  if (canonical.username || canonical.password || canonical.hash) {
+  if (canonical.username || canonical.password || canonical.href.includes("#")) {
     throw new Error("Canonical publication URLs cannot contain credentials or fragments");
   }
   return { ...input, canonical };

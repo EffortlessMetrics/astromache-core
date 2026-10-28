@@ -8,7 +8,7 @@ export async function GET({ site }: APIContext) {
     "/posts/",
     "/portfolio/",
     "/search/",
-    ...entries.map((note) => noteLink(note.id)),
+    ...entries.map((note) => noteLink(encodeURIComponent(note.id))),
     ...taxonomyRoutes(entries).map((route) => "/tags/" + route.params.tag + "/"),
   ];
   return new Response(

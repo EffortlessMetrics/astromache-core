@@ -28,6 +28,14 @@ const cases = [
     taxonomy: ["category-alone", "distinct-tag"],
   },
   {
+    slug: "café&tea?#",
+    title,
+    description,
+    category: "Practice",
+    tags: ["Practice"],
+    taxonomy: ["practice"],
+  },
+  {
     slug: "café&notes",
     title,
     description,
@@ -147,7 +155,17 @@ const {note}=Astro.props;
       assert.equal(build.status, 0, build.stdout + build.stderr);
       for (const tag of taxonomy)
         assert.ok(await readFile(join(fixture, "dist/tags", tag, "index.html"), "utf8"));
-      assert.ok(await readFile(join(fixture, "dist/notes", slug, "index.html"), "utf8"));
+      assert.ok(
+        await readFile(
+          join(
+            fixture,
+            "dist/notes",
+            slug.replace(/\?/g, "%3F").replace(/#/g, "%23"),
+            "index.html",
+          ),
+          "utf8",
+        ),
+      );
       for (const file of ["rss.xml", "sitemap.xml"]) {
         const result = { adapter, slug, file, pass: false };
         try {
@@ -170,7 +188,10 @@ const {note}=Astro.props;
             assert.equal(parsed.title, title);
             assert.equal(parsed.description, description);
           } else {
-            assert.ok(parsed.links.includes(url), "Sitemap must preserve URL identity");
+            assert.ok(
+              parsed.links.includes(origin + "/notes/" + encodeURIComponent(slug) + "/"),
+              "Sitemap must encode the note ID as URL path data",
+            );
             assert.deepEqual(
               parsed.links.filter((link) => link.startsWith(origin + "/tags/")).sort(),
               taxonomy.map((tag) => origin + "/tags/" + tag + "/").sort(),

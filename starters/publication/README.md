@@ -7,3 +7,5 @@ Copy this directory independently. Use Node 24.19.x and pnpm 10.28.0; run `pnpm 
 This starter pins an **unpublished** astromache 0.2.0 archive, `vendor/astromache-0.2.0.tgz`, SHA-256 `53bf0fa41d2371c5941fa1422ae83563002744bd684e45c7b048b548d2182874`, source `0504061d9292252f65336c9b90b1a63a04816d33`. The published npm 0.1.0 snapshot is narrower and cannot replace this candidate. The additive API uses a new unpublished minor-version identity; separate authorization is required for registry publication. The original vendored release archive remains historical rollback evidence, not the active dependency.
 
 Owner code/content/sample SVGs are MIT OR Apache-2.0; IBM Plex OFL notices travel in the package. This private starter is not itself an npm package. Vite+ orchestrates ordinary Astro checks/builds, without compiler patches or Vite overrides. The optional sibling recipe adds independently qualified static search and offline behavior.
+
+Quoted ISO publication timestamps without a timezone offset are interpreted as UTC. Explicit offsets are preserved.

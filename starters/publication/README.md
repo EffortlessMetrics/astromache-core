@@ -8,4 +8,6 @@ This starter pins an **unpublished** astromache 0.2.0 archive, `vendor/astromach
 
 Owner code/content/sample SVGs are MIT OR Apache-2.0; IBM Plex OFL notices travel in the package. This private starter is not itself an npm package. Vite+ orchestrates ordinary Astro checks/builds, without compiler patches or Vite overrides. The optional sibling recipe adds independently qualified static search and offline behavior.
 
+Quoted ISO publication timestamps without a timezone offset are interpreted as UTC. Explicit offsets are preserved.
+
 Note IDs must be unique across Markdown files. Duplicate frontmatter slugs and filename-generated IDs fail content sync with both source files identified, before a note can replace another in routes, RSS or search. A rejected development edit preserves the last accepted collection until the collision is corrected.

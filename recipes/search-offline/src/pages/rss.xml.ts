@@ -14,9 +14,23 @@ export async function GET({ site }: APIContext) {
             "<item><title>" +
             xml(note.data.title, `RSS title for note ${note.id}`) +
             "</title><link>" +
-            xml(origin + noteLink(note.id)) +
+            xml(
+              origin +
+                noteLink(
+                  encodeURIComponent(
+                    note.id.normalize().replace(/#/g, "%23").replace(/\?/g, "%3F"),
+                  ),
+                ),
+            ) +
             "</link><guid>" +
-            xml(origin + noteLink(note.id)) +
+            xml(
+              origin +
+                noteLink(
+                  encodeURIComponent(
+                    note.id.normalize().replace(/#/g, "%23").replace(/\?/g, "%3F"),
+                  ),
+                ),
+            ) +
             "</guid><description>" +
             xml(note.data.description, `RSS description for note ${note.id}`) +
             "</description><pubDate>" +

@@ -197,7 +197,11 @@ const {note}=Astro.props;
               };
             }, xml);
             assert.equal(parsed.error, undefined, "Generated XML must parse without errors");
-            const url = origin + "/notes/" + slug + "/";
+            const url =
+              origin +
+              "/notes/" +
+              encodeURIComponent(slug.normalize().replace(/#/g, "%23").replace(/\?/g, "%3F")) +
+              "/";
             if (file === "rss.xml") {
               assert.deepEqual(
                 parsed.links,

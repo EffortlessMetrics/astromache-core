@@ -30,6 +30,7 @@ try {
       "export default {output:'static',trailingSlash:'always'};",
     );
     await cp(join(root, adapter, "src/content.config.ts"), join(fixture, "src/content.config.ts"));
+    await cp(join(root, adapter, "src/note-loader.ts"), join(fixture, "src/note-loader.ts"));
     await cp(
       join(root, adapter, "src/publication-content.ts"),
       join(fixture, "src/publication-content.ts"),

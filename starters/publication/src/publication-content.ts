@@ -4,6 +4,9 @@ export const notes = async () =>
     (a, b) => b.data.published.getTime() - a.data.published.getTime(),
   );
 export const noteLink = (id: string) => "/notes/" + id + "/";
+// Astro writes normalized route parameters and retains escaped ? and # in output filenames.
+export const noteArtifactLink = (id: string) =>
+  noteLink(encodeURIComponent(id.normalize().replace(/\?/g, "%3F").replace(/#/g, "%23")));
 export const tagSlug = (tag: string) =>
   tag
     .toLowerCase()

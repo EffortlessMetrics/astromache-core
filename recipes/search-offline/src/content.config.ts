@@ -6,7 +6,14 @@ export const collections = {
     schema: z.object({
       title: z.string(),
       description: z.string(),
-      published: z.coerce.date(),
+      published: z.preprocess(
+        (value) =>
+          typeof value === "string" &&
+          /^\d{4}-\d{2}-\d{2}t\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/i.test(value)
+            ? `${value}Z`
+            : value,
+        z.coerce.date(),
+      ),
       tags: z.array(z.string()),
       category: z.string(),
     }),

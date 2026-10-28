@@ -60,6 +60,10 @@ jobs:
         run: pnpm verify:packed
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
+      - name: Served note canonical and copy-link routes
+        run: node scripts/verify-note-canonical-routes.mjs
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
       - name: Offline worker default and opt-in claim contracts
         run: |
           pnpm verify:offline

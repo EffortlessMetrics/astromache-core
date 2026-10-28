@@ -19,8 +19,13 @@ import { customizePublicationConsumer } from "./publication-consumer-fixture.mjs
 import { verifyPublicationWorkerUpgrade } from "./verify-publication-worker-upgrade.mjs";
 
 await import("./verify-recipe-request-contracts.mjs");
+await import("./verify-publication-note-ids.mjs");
 
 const producer = await realpath(fileURLToPath(new URL("../", import.meta.url)));
+execFileSync(process.execPath, ["--test", join(producer, "scripts/note-loader.test.mjs")], {
+  cwd: producer,
+  stdio: "inherit",
+});
 execFileSync(process.execPath, [join(producer, "scripts/verify-starter-paths.mjs")], {
   cwd: producer,
   stdio: "inherit",

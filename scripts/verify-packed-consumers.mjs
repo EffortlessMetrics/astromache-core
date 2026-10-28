@@ -168,5 +168,27 @@ const receipt = {
   portfolioCanonicalSha256: createHash("sha256").update(canonicalScopes(gallery)).digest("hex"),
 };
 await verifyPackedPortfolioBrowser(dir);
+// Runtime data can violate the statically typed props even in a packed consumer.
+await writeFile(
+  join(dir, "src/pages/malformed-metadata.astro"),
+  `---
+import Document from "astromache/document";
+const title = JSON.parse('null');
+---
+<Document title={title} description="Consumer" canonical={new URL("https://example.test/")} language="en" />
+`,
+);
+let malformedBuild;
+try {
+  execFileSync(process.execPath, [manager, "build"], { cwd: dir, encoding: "utf8", stdio: "pipe" });
+} catch (error) {
+  malformedBuild = error;
+}
+assert.ok(malformedBuild, "Malformed runtime metadata must fail the consumer build");
+assert.match(
+  `${malformedBuild.stdout}\n${malformedBuild.stderr}`,
+  /Publication metadata requires a title, description and language/,
+  "Packed Document must report the metadata validation error",
+);
 await writeFile(join(run, "receipt.json"), JSON.stringify(receipt, null, 2));
 console.log("Independent packed native consumer receipt", JSON.stringify(receipt));

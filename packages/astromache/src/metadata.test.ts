@@ -58,6 +58,7 @@ test.each([
   "file:///article",
   "https://user:secret@example.test/",
   "https://example.test/#fragment",
+  "https://example.test/#",
 ])("rejects an unsafe or noncanonical document URL: %s", (canonical) => {
   expect(() => publicationMetadata({ ...base, canonical: new URL(canonical) })).toThrow();
 });
@@ -71,4 +72,9 @@ test("metadata is isolated from later caller URL mutations", () => {
 
 test.each(["title", "description", "language"] as const)("rejects missing %s", (key) => {
   expect(() => publicationMetadata({ ...base, [key]: " " })).toThrow();
+});
+
+test("accepts an encoded hash in a canonical path", () => {
+  const canonical = new URL("https://example.test/%23section");
+  expect(publicationMetadata({ ...base, canonical }).canonical.href).toBe(canonical.href);
 });

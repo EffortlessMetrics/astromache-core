@@ -5,6 +5,7 @@ import { cp, mkdir, mkdtemp, readFile, readdir, realpath, writeFile } from "node
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { verifyPackedPortfolioBrowser } from "./verify-packed-portfolio-browser.mjs";
+import { verifyNavigationPrefetchBrowser } from "./verify-navigation-prefetch.mjs";
 
 // Windows hosted tmpdir can use a DOS alias (RUNNER~1). Astro/Vite CSS module
 // identities must use the same canonical path as the files they resolve.
@@ -168,5 +169,6 @@ const receipt = {
   portfolioCanonicalSha256: createHash("sha256").update(canonicalScopes(gallery)).digest("hex"),
 };
 await verifyPackedPortfolioBrowser(dir);
+await verifyNavigationPrefetchBrowser(join(installed, "src/navigation.ts"));
 await writeFile(join(run, "receipt.json"), JSON.stringify(receipt, null, 2));
 console.log("Independent packed native consumer receipt", JSON.stringify(receipt));

@@ -138,18 +138,16 @@ if(!Number.isFinite(wordsPerMinute)||wordsPerMinute<=0)throw new RangeError("Rea
       }
     }
 
-    // Throttled scroll handler
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (scrollTimer) return;
-        scrollTimer = window.setTimeout(() => {
-          updateProgress();
-          scrollTimer = undefined;
-        }, 100);
-      },
-      { passive: true }
-    );
+    // Scroll and viewport changes share one throttled progress update.
+    function scheduleProgressUpdate() {
+      if (scrollTimer) return;
+      scrollTimer = window.setTimeout(() => {
+        updateProgress();
+        scrollTimer = undefined;
+      }, 100);
+    }
+    window.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
+    window.addEventListener("resize", scheduleProgressUpdate, { passive: true });
 
     // Initial update
     updateProgress();

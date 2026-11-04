@@ -1,6 +1,7 @@
 ---
-export interface Link {label:string;href:string;date?:{datetime:string;label:string};}
-export interface Props {title:string;published:{datetime:string;label:string};readingTime?:string;lens?:Link;tags?:ReadonlyArray<Link>;related?:ReadonlyArray<Link>;previous?:Link;next?:Link;backHref?:string;backLabel?:string;returnStorageKey?:string;backId?:string;topButtonId?:string;}
+import type { Link, RelatedLink } from './article-types';
+export type { Link, RelatedLink } from './article-types';
+export interface Props {title:string;published:{datetime:string;label:string};readingTime?:string;lens?:Link;tags?:ReadonlyArray<Link>;related?:ReadonlyArray<RelatedLink>;previous?:Link;next?:Link;backHref?:string;backLabel?:string;returnStorageKey?:string;backId?:string;topButtonId?:string;}
 const {title,published,readingTime,lens,tags=[],related=[],previous,next,backHref='/',backLabel='Go back',returnStorageKey,backId='article-back',topButtonId='back-to-top'}=Astro.props;
 ---
 <a class="back-link" href={backHref} id={backId} data-article-back data-return-key={returnStorageKey}><slot name="back-icon"/><span>{backLabel}</span></a>
@@ -11,7 +12,7 @@ const {title,published,readingTime,lens,tags=[],related=[],previous,next,backHre
 <hr class="article-divider" />
 <ul class="tag-section article-tags">{tags.map(tag=><li><a href={tag.href}>{tag.label}</a></li>)}</ul>
 <div class="article-actions"><slot name="actions"/><button type="button" id={topButtonId} data-article-top>Back to Top</button></div>
-{related.length>0&&<section class="related-posts"><h2 id="related-posts">Related Posts</h2><ul>{related.map(link=><li><a href={link.href}><span>{link.label}</span>{link.date&&<time datetime={link.date.datetime}>{link.date.label}</time>}</a></li>)}</ul></section>}
+{related.length>0&&<section class="related-posts"><h2 id="related-posts">Related Posts</h2><ul>{related.map(link=><li><a href={link.href}><span>{link.label}</span>{link.displayDate&&<time datetime={link.displayDate.datetime}>{link.displayDate.label}</time>}</a></li>)}</ul></section>}
 <hr class="article-divider" />
 <nav class="adjacent-posts" aria-label="Adjacent posts">{previous&&<a href={previous.href} aria-label={`Previous Post: ${previous.label}`}><span aria-hidden="true">‹</span><span>Previous Post <small>{previous.label}</small></span></a>}{next&&<a class="adjacent-next" href={next.href} aria-label={`Next Post: ${next.label}`}><span>Next Post <small>{next.label}</small></span><span aria-hidden="true">›</span></a>}</nav>
 <slot name="reading-tools"/>

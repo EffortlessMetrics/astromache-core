@@ -38,9 +38,10 @@ try {
 import Article from '../components/Article.astro';
 import CopyLink from '../components/CopyLink.astro';
 import '../components/publication.css';
+const undated = {label:'Undated article',href:'/undated/',date:new Date()};
 ---
-<html lang="en"><head><meta name="viewport" content="width=device-width"/><title>Neutral action geometry</title></head><body><main>
-<Article title="Neutral article" published={{datetime:'2026-01-01',label:'January'}} related={[{label:'Related article',href:'/related/',date:{datetime:'2025-03-04',label:'Mar 4, 2025'}},{label:'Undated article',href:'/undated/'}]} previous={{label:'Earlier article',href:'/earlier/'}} next={{label:'Later article',href:'/later/'}}>
+<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/><title>Neutral action geometry</title></head><body><main>
+<Article title="Neutral article" published={{datetime:'2026-01-01',label:'January'}} related={[{label:'Related article',href:'/related/',displayDate:{datetime:'2025-03-04',label:'Mar 4, 2025'}},undated]} previous={{label:'Earlier article',href:'/earlier/'}} next={{label:'Later article',href:'/later/'}}>
   <p style="min-height:1200px">Neutral article content.</p>
   <Fragment slot="actions"><div><button type="button" data-fixture-share aria-label="Share this article">Share</button><div hidden>Neutral share options.</div><span class="sr-only" role="status"></span></div><CopyLink url="https://example.com/"/></Fragment>
 </Article>
@@ -103,6 +104,12 @@ import '../components/publication.css';
         await page.getByRole("link", { name: "Next Post: Later article" }).getAttribute("href"),
         "/later/",
       );
+      const previous = page.getByRole("link", { name: "Previous Post: Earlier article" });
+      const next = page.getByRole("link", { name: "Next Post: Later article" });
+      assert.equal(await previous.locator('[aria-hidden="true"]').innerText(), "‹");
+      assert.equal(await previous.locator("small").innerText(), "Earlier article");
+      assert.equal(await next.locator('[aria-hidden="true"]').innerText(), "›");
+      assert.equal(await next.locator("small").innerText(), "Later article");
       await page.locator(".article-actions").scrollIntoViewIfNeeded();
       const share = page.getByRole("button", { name: "Share this article", exact: true });
       const top = page.getByRole("button", { name: "Back to Top", exact: true });

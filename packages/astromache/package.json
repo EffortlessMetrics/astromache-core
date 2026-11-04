@@ -29,6 +29,7 @@
     "src/Header.astro",
     "src/Footer.astro",
     "src/Article.astro",
+    "src/article-types.ts",
     "src/PostList.astro",
     "src/TaxonomySection.astro",
     "src/ReadingProgress.astro",

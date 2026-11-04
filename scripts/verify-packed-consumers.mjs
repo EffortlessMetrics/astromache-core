@@ -53,6 +53,7 @@ const expected = [
   "src/Header.astro",
   "src/Footer.astro",
   "src/Article.astro",
+  "src/article-types.ts",
   "src/PostList.astro",
   "src/TaxonomySection.astro",
   "src/TagList.astro",

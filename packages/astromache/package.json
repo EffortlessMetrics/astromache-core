@@ -1,12 +1,10 @@
 {
   "name": "astromache",
-  "version": "0.2.13",
+  "version": "0.3.0-publishing.0",
   "private": false,
   "description": "Astro publication components, metadata validation and bounded native navigation helpers",
   "homepage": "https://github.com/EffortlessMetrics/astromache-core#readme",
-  "bugs": {
-    "url": "https://github.com/EffortlessMetrics/astromache-core/issues"
-  },
+  "bugs": { "url": "https://github.com/EffortlessMetrics/astromache-core/issues" },
   "license": "MIT OR Apache-2.0",
   "repository": {
     "type": "git",
@@ -14,33 +12,16 @@
     "directory": "packages/astromache"
   },
   "files": [
-    "CHANGELOG.md",
-    "LICENSE",
-    "LICENSE-MIT",
-    "LICENSE-APACHE",
-    "fonts",
-    "src/fonts.css",
-    "src/Portfolio.astro",
-    "src/PortfolioLightbox.astro",
-    "src/Document.astro",
-    "src/metadata.ts",
-    "src/navigation.ts",
-    "src/Publication.astro",
-    "src/Header.astro",
-    "src/Footer.astro",
-    "src/Article.astro",
-    "src/article-types.ts",
-    "src/PostList.astro",
-    "src/TaxonomySection.astro",
-    "src/ReadingProgress.astro",
-    "src/FocusMode.astro",
-    "src/CopyLink.astro",
-    "src/reading-time.ts",
-    "src/publication.css",
-    "src/search.css",
-    "src/TagList.astro",
-    "src/static-offline.mjs",
-    "src/static-offline.d.ts"
+    "CHANGELOG.md", "LICENSE", "LICENSE-MIT", "LICENSE-APACHE", "fonts",
+    "src/fonts.css", "src/Portfolio.astro", "src/PortfolioLightbox.astro",
+    "src/Document.astro", "src/metadata.ts", "src/navigation.ts",
+    "src/Publication.astro", "src/Header.astro", "src/Footer.astro",
+    "src/Article.astro", "src/article-types.ts", "src/PostList.astro",
+    "src/TaxonomySection.astro", "src/ReadingProgress.astro",
+    "src/FocusMode.astro", "src/CopyLink.astro", "src/reading-time.ts",
+    "src/publication.css", "src/search.css", "src/TagList.astro",
+    "src/static-offline.mjs", "src/static-offline.d.ts",
+    "src/PublicationHead.astro", "src/publishing"
   ],
   "type": "module",
   "exports": {
@@ -62,28 +43,21 @@
     "./publication.css": "./src/publication.css",
     "./search.css": "./src/search.css",
     "./tag-list": "./src/TagList.astro",
-    "./static-offline": {
-      "types": "./src/static-offline.d.ts",
-      "import": "./src/static-offline.mjs"
-    }
+    "./static-offline": { "types": "./src/static-offline.d.ts", "import": "./src/static-offline.mjs" },
+    "./publication-head": "./src/PublicationHead.astro",
+    "./static-publication": { "types": "./src/publishing/index.d.ts", "import": "./src/publishing/index.mjs" },
+    "./markdown-negotiation": { "types": "./src/publishing/negotiation.d.ts", "import": "./src/publishing/negotiation.mjs" }
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
+  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
   "dependencies": {
-    "bcp-47": "2.1.1"
+    "bcp-47": "2.1.1",
+    "hast-util-from-html": "2.1.0",
+    "hast-util-to-mdast": "10.1.2",
+    "mdast-util-to-markdown": "2.2.3",
+    "mdast-util-gfm": "3.1.0",
+    "saxes": "6.0.0"
   },
-  "peerDependencies": {
-    "@effortlessmetrics/astro-offline": ">=0.1.4 <0.2.0",
-    "astro": "^7.3.5"
-  },
-  "peerDependenciesMeta": {
-    "@effortlessmetrics/astro-offline": {
-      "optional": true
-    }
-  },
-  "engines": {
-    "node": ">=24.19.0 <25"
-  }
+  "peerDependencies": { "@effortlessmetrics/astro-offline": ">=0.1.4 <0.2.0", "astro": "^7.3.5" },
+  "peerDependenciesMeta": { "@effortlessmetrics/astro-offline": { "optional": true } },
+  "engines": { "node": ">=24.19.0 <25" }
 }

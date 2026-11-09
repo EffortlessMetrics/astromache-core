@@ -35,6 +35,26 @@ jobs:
           cp pnpm-lock.yaml publishing-evidence/pnpm-lock.yaml
           sha256sum publishing-evidence/pnpm-lock.yaml >> publishing-evidence/source.txt
           git diff -- pnpm-lock.yaml > publishing-evidence/lock.diff
+      - name: Prepare a pinned, script-disabled test runtime
+        env:
+          TEST_RUNTIME: ${{ runner.temp }}/publication-runtime
+        run: |
+          mkdir -p "$TEST_RUNTIME"
+          cp vendor/effortlessmetrics-astro-offline-0.1.5.tgz "$TEST_RUNTIME/"
+          node --input-type=module -e '
+            import fs from "node:fs";
+            const pkg=JSON.parse(fs.readFileSync("packages/astromache/package.json","utf8"));
+            const deps={...pkg.dependencies,astro:"7.3.5",typescript:"6.0.3",prettier:"3.9.9","@effortlessmetrics/astro-offline":"file:effortlessmetrics-astro-offline-0.1.5.tgz"};
+            fs.writeFileSync(process.env.TEST_RUNTIME+"/package.json",JSON.stringify({private:true,type:"module",dependencies:deps,packageManager:"pnpm@10.28.0"},null,2));
+          '
+          pnpm --dir "$TEST_RUNTIME" install --ignore-scripts --no-frozen-lockfile
+          pnpm --dir "$TEST_RUNTIME" install --ignore-scripts --frozen-lockfile
+          cp "$(command -v node)" "$TEST_RUNTIME/node"
+          # This is a dependency/runtime fixture, not a product distribution.
+          # No fonts, credentials, private content or repository history are copied.
+          find "$TEST_RUNTIME" -type f \( -iname '*.woff' -o -iname '*.woff2' -o -iname '*.ttf' -o -iname '*.otf' -o -iname '*.eot' \) -delete
+          tar -C "$TEST_RUNTIME" -czf publishing-evidence/test-runtime.tgz .
+          sha256sum publishing-evidence/test-runtime.tgz >> publishing-evidence/source.txt
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: static-publication-lock-${{ github.sha }}

@@ -27,17 +27,17 @@ jobs:
           version: 10.28.0
       - name: Resolve candidate dependency graph without lifecycle scripts
         run: |
-          mkdir -p .publishing-evidence
-          git rev-parse HEAD > .publishing-evidence/source.txt
-          node --version >> .publishing-evidence/source.txt
-          pnpm --version >> .publishing-evidence/source.txt
+          mkdir -p publishing-evidence
+          git rev-parse HEAD > publishing-evidence/source.txt
+          node --version >> publishing-evidence/source.txt
+          pnpm --version >> publishing-evidence/source.txt
           pnpm install --lockfile-only --ignore-scripts
-          cp pnpm-lock.yaml .publishing-evidence/pnpm-lock.yaml
-          sha256sum .publishing-evidence/pnpm-lock.yaml >> .publishing-evidence/source.txt
-          git diff -- pnpm-lock.yaml > .publishing-evidence/lock.diff
+          cp pnpm-lock.yaml publishing-evidence/pnpm-lock.yaml
+          sha256sum publishing-evidence/pnpm-lock.yaml >> publishing-evidence/source.txt
+          git diff -- pnpm-lock.yaml > publishing-evidence/lock.diff
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: static-publication-lock-${{ github.sha }}
-          path: .publishing-evidence/
+          path: publishing-evidence/
           if-no-files-found: error
           retention-days: 14

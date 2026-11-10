@@ -46,7 +46,8 @@ export function readDocument(html) {
   const alternates = elements(head, (n) => n.tagName === "link" && words(value(n, "rel")).includes("alternate") && value(n, "type") === "text/markdown");
   const alternate = one(alternates, "Markdown alternate", false);
   return {
-    tree, head, canonical, alternate: alternate && httpURL(value(alternate, "href"), "Markdown alternate"),
+    tree, head, canonical, hasBody: visibleElements(tree, (n) => has(n, "dataArticleBody") || has(n, "dataPublicationBody")).length > 0,
+    alternate: alternate && httpURL(value(alternate, "href"), "Markdown alternate"),
     title: text(one(elements(head, (n) => n.tagName === "title"), "title")),
     description: meta(head, "description"),
     author: meta(head, "author"), published: meta(head, "article:published_time"), modified: meta(head, "article:modified_time"),
@@ -97,7 +98,6 @@ export function renderedPublication(document) {
   const body = one(bodies, "visible publication body");
   const assets = new Set();
   const sources = visibleElements(tree, (n) => has(n, "dataPublicationSource"));
-  // Explicit source markers must be outside the body to avoid duplicate attribution.
   const bodyNodes = new Set(elements(body, () => true));
   const sourceNodes = sources.filter((n) => !bodyNodes.has(n));
   const cleaned = clean({ type: "root", children: [...sourceNodes, ...body.children] }, canonical, assets);
@@ -113,4 +113,20 @@ export function renderedPublication(document) {
   const mdast = toMdast(cleaned);
   const markdown = toMarkdown({ type: "root", children: [...metadata, ...mdast.children] }, { extensions: [gfmToMarkdown()], fences: true });
   return { markdown, assets: [...assets], canonical: canonical.href, alternate: alternate.href, title };
+}
+
+/** Text for search is derived from the published body, never source comments/frontmatter. */
+export function publicationText(document) {
+  const body = one(visibleElements(document.tree, (n) => has(n, "dataArticleBody") || has(n, "dataPublicationBody")), "visible publication body");
+  const walk = (node) => {
+    if (node.type === "comment") return "";
+    if (node.type === "text") return node.value;
+    if (node.type === "element") {
+      if (hidden(node) || ["script", "style", "template", "button", "input", "select", "textarea"].includes(node.tagName)) return "";
+      if (has(node, "dataPublicationText")) return String(value(node, "dataPublicationText"));
+      if (node.tagName === "img") return String(value(node, "alt") ?? "");
+    }
+    return (node.children ?? []).map(walk).join(" ");
+  };
+  return walk(body).replace(/\s+/g, " ").trim();
 }

@@ -17,6 +17,8 @@ export interface StaticPublicationOptions {
   feed?: string;
   /** Array or {data: array}; each entry has a canonical root-relative or absolute url. */
   searchIndex?: string;
+  /** Replace search entries' text from their rendered public bodies before offline hashing. */
+  renderedSearch?: boolean;
 }
 export interface PublicationReport {
   schemaVersion: number;

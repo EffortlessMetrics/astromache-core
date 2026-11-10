@@ -3,7 +3,7 @@ import { relative, resolve, dirname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { SaxesParser } from "saxes";
-import { readDocument, renderedPublication } from "./rendered.mjs";
+import { readDocument, renderedPublication, publicationText } from "./rendered.mjs";
 import { httpURL } from "./metadata.mjs";
 export { publicationHead, markdownURL, jsonForHTML } from "./metadata.mjs";
 
@@ -30,7 +30,6 @@ async function contained(root, name) {
   const target = resolve(root, name);
   const rel = relative(root, target);
   if (rel === ".." || rel.startsWith(".." + sep) || resolve(target) === resolve(root)) throw new Error(`Unsafe output destination: ${name}`);
-  // Check every existing ancestor, including ones the producer is about to create.
   let cursor = target;
   while (cursor !== root) {
     try { if ((await lstat(cursor)).isSymbolicLink()) throw new Error(`Symlink output destination: ${name}`); }
@@ -51,7 +50,6 @@ function xmlValues(xml, wanted) {
   parser.write(xml).close();
   return values;
 }
-
 export async function auditPublication(rootDirectory, options = {}) {
   const root = await realpath(rootDirectory);
   const inventory = await files(root);
@@ -61,7 +59,10 @@ export async function auditPublication(rootDirectory, options = {}) {
   for (const path of inventory.filter((name) => name.endsWith(".html"))) {
     const html = await readFile(resolve(root, path), "utf8");
     const document = readDocument(html);
-    if (!document.canonical) continue;
+    if (!document.canonical) {
+      if (document.alternate) throw new Error("Markdown alternate has no canonical");
+      continue;
+    }
     const identity = document.canonical.href;
     const previous = canonicals.get(identity);
     if (previous && previous.hash !== digest(html)) throw new Error(`Conflicting canonical publication: ${identity}`);
@@ -102,23 +103,33 @@ export async function auditPublication(rootDirectory, options = {}) {
   if (options.feed) {
     for (const url of xmlValues(await readLocal(options.feed), (key) => key === "rss/channel/item/link")) requireCanonical(url, "RSS");
   }
+  let searchOutput;
   if (options.searchIndex) {
     const snapshot = JSON.parse(await readLocal(options.searchIndex));
     const rows = Array.isArray(snapshot) ? snapshot : snapshot.data;
     if (!Array.isArray(rows)) throw new Error("Search index requires an array or data array");
     for (const row of rows) {
       if (typeof row.url !== "string") throw new Error("Search entry requires a URL");
-      requireCanonical(new URL(row.url, origin).href, "Search");
+      const url = new URL(row.url, origin).href;
+      requireCanonical(url, "Search");
+      if (options.renderedSearch) row.text = publicationText(canonicals.get(url).document);
+    }
+    if (options.renderedSearch) {
+      if (!Array.isArray(snapshot)) snapshot.version = digest(JSON.stringify(rows));
+      searchOutput = JSON.stringify(snapshot);
     }
   }
   const generated = [], planned = new Map();
   for (const item of documents) {
-    if (!item.document.alternate) continue;
+    if (!item.document.alternate) {
+      if (options.markdown !== false && item.document.hasBody && !item.document.noindex) throw new Error(`Publication body has no Markdown alternate: ${item.path}`);
+      continue;
+    }
     if (options.markdown === false) throw new Error("Markdown disabled but HTML still advertises it");
     const rendered = renderedPublication(item.document);
     const path = localPath(rendered.alternate, origin);
     if (!path?.startsWith("_markdown/")) throw new Error("Markdown must use the publication's static namespace");
-    if (planned.has(path)) throw new Error(`Duplicate Markdown destination: ${path}`);
+    if ([...planned.keys()].some((name) => name.normalize("NFC").toLowerCase() === path.normalize("NFC").toLowerCase())) throw new Error(`Duplicate Markdown destination: ${path}`);
     if (inventory.some((name) => name.normalize("NFC").toLowerCase() === path.normalize("NFC").toLowerCase())) throw new Error(`Markdown output collision: ${path}; use a clean build`);
     for (const asset of rendered.assets) {
       const local = localPath(asset, origin);
@@ -129,9 +140,8 @@ export async function auditPublication(rootDirectory, options = {}) {
   }
   if (inventory.some((name) => name.startsWith("_markdown/")) || inventory.includes(receipt)) throw new Error("Stale or consumer-owned publication output; use a clean build");
   for (const path of [...planned.keys(), receipt]) await contained(root, path);
-  return { root, inventory, generated, planned, html: documents.map(({ path, hash }) => ({ path, sha256: hash })) };
+  return { root, inventory, generated, planned, searchOutput, html: documents.map(({ path, hash }) => ({ path, sha256: hash })) };
 }
-
 export async function buildPublication(directory, options) {
   const result = await auditPublication(directory, options);
   for (const [path, content] of result.planned) {
@@ -139,13 +149,14 @@ export async function buildPublication(directory, options) {
     await mkdir(dirname(target), { recursive: true });
     await writeFile(target, content, { flag: "wx" });
   }
-  const report = { schemaVersion: 1, html: result.html, documents: result.generated };
+  if (result.searchOutput !== undefined) await writeFile(await contained(result.root, options.searchIndex), result.searchOutput);
+  const report = { schemaVersion: 1, html: result.html, documents: result.generated,
+    ...(result.searchOutput === undefined ? {} : { searchSha256: digest(result.searchOutput) }) };
   const target = await contained(result.root, receipt);
   await mkdir(dirname(target), { recursive: true });
   await writeFile(target, JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
   return report;
 }
-
 export default function staticPublication(options) {
   if (!options || !options.origin) throw new TypeError("staticPublication requires an origin");
   const origin = httpURL(options.origin).origin;

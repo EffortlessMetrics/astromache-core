@@ -2,62 +2,53 @@ name: Static publication candidate
 on:
   push:
     branches: [feat/static-publication-20261109]
-    paths:
-      - packages/astromache/package.json
-      - .github/workflows/publishing-candidate.yml
 permissions:
   contents: read
 concurrency:
   group: static-publication-candidate-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  resolve-candidate-lock:
+  qualification:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 25
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           ref: ${{ github.sha }}
-          persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '24.19.0'
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
         with:
           version: 10.28.0
-      - name: Resolve candidate dependency graph without lifecycle scripts
+      - name: Resolve and commit the real candidate lock on this branch only
+        run: |
+          pnpm install --lockfile-only --ignore-scripts
+          git config user.name EffortlessSteven
+          git config user.email 15812269+EffortlessSteven@users.noreply.github.com
+          git add pnpm-lock.yaml
+          if ! git diff --cached --quiet; then
+            git commit -m "Lock static publication dependencies"
+            git push origin HEAD:refs/heads/feat/static-publication-20261109
+          fi
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Record exact tested source
         run: |
           mkdir -p publishing-evidence
           git rev-parse HEAD > publishing-evidence/source.txt
+          git rev-parse HEAD^{tree} >> publishing-evidence/source.txt
           node --version >> publishing-evidence/source.txt
           pnpm --version >> publishing-evidence/source.txt
-          pnpm install --lockfile-only --ignore-scripts
-          cp pnpm-lock.yaml publishing-evidence/pnpm-lock.yaml
-          sha256sum publishing-evidence/pnpm-lock.yaml >> publishing-evidence/source.txt
-          git diff -- pnpm-lock.yaml > publishing-evidence/lock.diff
-      - name: Prepare a pinned, script-disabled test runtime
-        env:
-          TEST_RUNTIME: ${{ runner.temp }}/publication-runtime
-        run: |
-          mkdir -p "$TEST_RUNTIME"
-          cp vendor/effortlessmetrics-astro-offline-0.1.5.tgz "$TEST_RUNTIME/"
-          node --input-type=module -e '
-            import fs from "node:fs";
-            const pkg=JSON.parse(fs.readFileSync("packages/astromache/package.json","utf8"));
-            const deps={...pkg.dependencies,astro:"7.3.5",typescript:"6.0.3",prettier:"3.9.9","@effortlessmetrics/astro-offline":"file:effortlessmetrics-astro-offline-0.1.5.tgz"};
-            fs.writeFileSync(process.env.TEST_RUNTIME+"/package.json",JSON.stringify({private:true,type:"module",dependencies:deps,packageManager:"pnpm@10.28.0"},null,2));
-          '
-          pnpm --dir "$TEST_RUNTIME" install --ignore-scripts --no-frozen-lockfile
-          pnpm --dir "$TEST_RUNTIME" install --ignore-scripts --frozen-lockfile
-          cp "$(command -v node)" "$TEST_RUNTIME/node"
-          # This is a dependency/runtime fixture, not a product distribution.
-          # No fonts, credentials, private content or repository history are copied.
-          find "$TEST_RUNTIME" -type f \( -iname '*.woff' -o -iname '*.woff2' -o -iname '*.ttf' -o -iname '*.otf' -o -iname '*.eot' \) -delete
-          tar -C "$TEST_RUNTIME" -czf publishing-evidence/test-runtime.tgz .
-          sha256sum publishing-evidence/test-runtime.tgz >> publishing-evidence/source.txt
+      - name: Real parser, metadata, negotiation and filesystem regressions
+        run: node --test scripts/publishing-contract.test.mjs scripts/publishing-rendered.test.mjs
+      - name: Independently installed package, actual Astro and offline integration
+        run: node scripts/verify-static-publication.mjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
         with:
-          name: static-publication-lock-${{ github.sha }}
+          name: static-publication-${{ github.sha }}
           path: publishing-evidence/
           if-no-files-found: error
           retention-days: 14

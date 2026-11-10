@@ -67,12 +67,27 @@ function clean(node, canonical, assets) {
   if (node.type === "element") {
     if (hidden(node) || ["script", "style", "template", "button", "input", "select", "textarea"].includes(node.tagName)) return undefined;
     if (has(node, "dataPublicationText")) return { type: "text", value: String(value(node, "dataPublicationText")) };
-    if (["svg", "math", "canvas"].includes(node.tagName)) throw new Error(`${node.tagName} requires a data-publication-text alternative`);
+    if (["svg", "math", "canvas", "object", "embed"].includes(node.tagName)) throw new Error(`${node.tagName} requires a data-publication-text alternative`);
     if (["iframe", "video", "audio"].includes(node.tagName)) {
       const src = value(node, "src") ?? elements(node, (n) => n.tagName === "source")[0]?.properties?.src;
       const label = value(node, "title") ?? value(node, "ariaLabel");
       if (!src || !label) throw new Error(`${node.tagName} requires a source and accessible title for Markdown`);
       return { type: "element", tagName: "p", properties: {}, children: [{ type: "element", tagName: "a", properties: { href: absolute(src, canonical, false) }, children: [{ type: "text", value: String(label) }] }] };
+    }
+    if (["td", "th"].includes(node.tagName) && [value(node, "colSpan"), value(node, "rowSpan")].some((n) => n !== undefined && Number(n) !== 1)) {
+      throw new Error("Spanning table cells require a data-publication-text alternative");
+    }
+    // Astro/Shiki writes the language on PRE; the Markdown converter reads CODE.
+    if (node.tagName === "pre" && value(node, "dataLanguage")) {
+      const language = String(value(node, "dataLanguage"));
+      if (!/^[a-zA-Z0-9_+.#-]+$/.test(language)) throw new Error("Invalid code language annotation");
+      node = { ...node, children: (node.children ?? []).map((child) => {
+        if (child.type !== "element" || child.tagName !== "code") return child;
+        const classes = words(value(child, "className")).filter(Boolean);
+        const declared = classes.find((name) => name.startsWith("language-"));
+        if (declared && declared !== "language-" + language) throw new Error("Conflicting code language annotations");
+        return { ...child, properties: { ...child.properties, className: declared ? classes : [...classes, "language-" + language] } };
+      }) };
     }
     const properties = { ...node.properties };
     for (const key of Object.keys(properties)) if (/^on/i.test(key)) delete properties[key];
@@ -126,7 +141,9 @@ export function publicationText(document) {
       if (has(node, "dataPublicationText")) return String(value(node, "dataPublicationText"));
       if (node.tagName === "img") return String(value(node, "alt") ?? "");
     }
-    return (node.children ?? []).map(walk).join(" ");
+    const content = (node.children ?? []).map(walk).join("");
+    const block = ["address", "article", "aside", "blockquote", "br", "dd", "div", "dl", "dt", "figcaption", "figure", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "section", "table", "td", "th", "tr", "ul"].includes(node.tagName);
+    return block ? " " + content + " " : content;
   };
   return walk(body).replace(/\s+/g, " ").trim();
 }

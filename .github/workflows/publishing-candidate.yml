@@ -24,17 +24,21 @@ jobs:
         with:
           version: 10.28.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Apply reviewed changes and remove this one-time preparation workflow
+      - name: Apply reviewed source changes without changing workflows
         run: |
-          python3 scripts/finalize-static-publication.py
-          git rm scripts/finalize-static-publication.py .github/workflows/publishing-candidate.yml
-          git diff --check
-          git config user.name EffortlessSteven
-          git config user.email 15812269+EffortlessSteven@users.noreply.github.com
-          git add README.md package.json packages/astromache scripts/publishing-*.test.mjs scripts/verify-static-publication.mjs scripts/verify-packed-consumers.mjs .github/workflows/qualification.yml
-          git commit -m "Complete static publishing contracts and package qualification"
-          git push origin HEAD:refs/heads/feat/static-publication-20261109
+          if test -f scripts/finalize-static-publication.py; then
+            python3 scripts/finalize-static-publication.py
+            git restore .github/workflows/qualification.yml
+            git rm scripts/finalize-static-publication.py
+            git diff --check
+            git config user.name EffortlessSteven
+            git config user.email 15812269+EffortlessSteven@users.noreply.github.com
+            git add README.md package.json packages/astromache scripts/publishing-*.test.mjs scripts/verify-static-publication.mjs scripts/verify-packed-consumers.mjs
+            git commit -m "Complete static publishing contracts and package qualification"
+            git push origin HEAD:refs/heads/feat/static-publication-20261109
+          fi
       - name: Record exact tested source
+        if: always()
         run: |
           mkdir -p publishing-evidence
           git rev-parse HEAD > publishing-evidence/source.txt

@@ -1,6 +1,6 @@
 # Astromache core
 
-Reusable public machinery for the [astromache starter](https://github.com/EffortlessMetrics/astromache). This repository owns the unchanged npm identity `astromache`. Version **0.2.13** is an unpublished repair candidate; the existing registry release remains immutable. Install exact reviewed archives until a separately authorized release.
+Reusable public machinery for the [astromache starter](https://github.com/EffortlessMetrics/astromache). This repository owns the unchanged npm identity `astromache`. Version **0.3.0-publishing.1** is an unpublished static-publication candidate; the existing registry release remains immutable. Install exact reviewed archives until a separately authorized release.
 
 The branded repository is the small editable starter. This core retains package source, public regression consumers and historical producer fixtures. Offline and static-search remain independent specialist packages. Private sites consume packages as siblings; no private site source or Git history is imported here.
 
@@ -23,3 +23,11 @@ Starter exporters set the generated application package to `UNLICENSED` and move
 For exact archive installation, compatibility checks and browser-worker rollback limits, see [upgrade an existing consumer](docs/consumer-upgrades.md).
 
 Run `pnpm verify:publication:current` to freshly pack the current package and qualify disposable full publication and search-offline consumers outside this checkout. The upgrade changes only the dependency pin, matching delivery metadata and lock entries; application files and frozen specialist archives must retain identical bytes. It verifies a clean frozen reinstall, installed archive/export identity, full browser flows and natural historical-to-current worker adoption, including rejected deliveries and a broken public export. JSON receipts identify the packed bytes and saved lockfiles. `node scripts/verify-publication-products.mjs` separately retains the historical 0.2.0 qualification; neither command publishes a package.
+
+## Static publication output
+
+The new publishing capability and optional host adapter are described in
+[the static publishing guide](packages/astromache/STATIC-PUBLICATION.md).
+`pnpm verify:publication:static` runs real parser, filesystem, metadata and
+negotiation controls. `pnpm verify:publication:packed` independently installs
+an archive and builds real Astro content with the offline integration.

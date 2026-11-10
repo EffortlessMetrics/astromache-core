@@ -32,6 +32,7 @@ const entries = execFileSync("tar", ["-tzf", tarball], { encoding: "utf8" })
   .filter((entry) => !entry.endsWith("/"));
 const expected = [
   "CHANGELOG.md",
+  "STATIC-PUBLICATION.md",
   "LICENSE",
   "LICENSE-MIT",
   "LICENSE-APACHE",
@@ -63,6 +64,14 @@ const expected = [
   "src/reading-time.ts",
   "src/publication.css",
   "src/search.css",
+  "src/PublicationHead.astro",
+  "src/publishing/index.d.ts",
+  "src/publishing/index.mjs",
+  "src/publishing/metadata.d.mts",
+  "src/publishing/metadata.mjs",
+  "src/publishing/negotiation.d.ts",
+  "src/publishing/negotiation.mjs",
+  "src/publishing/rendered.mjs",
 ];
 assert.deepEqual(
   entries.sort(),

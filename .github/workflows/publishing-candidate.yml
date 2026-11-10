@@ -1,4 +1,4 @@
-name: Static publication candidate
+name: Finalize static publication candidate
 on:
   push:
     branches: [feat/static-publication-20261109]
@@ -11,11 +11,12 @@ jobs:
   qualification:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           ref: ${{ github.sha }}
-          persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
         with:
           node-version: '24.19.0'
@@ -23,7 +24,17 @@ jobs:
         with:
           version: 10.28.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Record exact tested source and retain a local qualification fixture
+      - name: Apply reviewed changes and remove this one-time preparation workflow
+        run: |
+          python3 scripts/finalize-static-publication.py
+          git rm scripts/finalize-static-publication.py .github/workflows/publishing-candidate.yml
+          git diff --check
+          git config user.name EffortlessSteven
+          git config user.email 15812269+EffortlessSteven@users.noreply.github.com
+          git add README.md package.json packages/astromache scripts/publishing-*.test.mjs scripts/verify-static-publication.mjs scripts/verify-packed-consumers.mjs .github/workflows/qualification.yml
+          git commit -m "Complete static publishing contracts and package qualification"
+          git push origin HEAD:refs/heads/feat/static-publication-20261109
+      - name: Record exact tested source
         run: |
           mkdir -p publishing-evidence
           git rev-parse HEAD > publishing-evidence/source.txt
@@ -31,14 +42,8 @@ jobs:
           node --version >> publishing-evidence/source.txt
           pnpm --version >> publishing-evidence/source.txt
           git archive --format=tar HEAD | gzip > publishing-evidence/source.tar.gz
-          cp "$(command -v node)" ./qualification-node
-          tar -czf publishing-evidence/qualification-runtime.tgz node_modules packages/astromache/node_modules qualification-node
-          rm qualification-node
-          sha256sum publishing-evidence/*.gz publishing-evidence/*.tgz >> publishing-evidence/source.txt
-      - name: Real parser, metadata, negotiation and filesystem regressions
-        run: node --test scripts/publishing-*.test.mjs
-      - name: Independently installed package, actual Astro and offline integration
-        run: node scripts/verify-static-publication.mjs
+      - run: pnpm verify:publication:static
+      - run: pnpm verify:publication:packed
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

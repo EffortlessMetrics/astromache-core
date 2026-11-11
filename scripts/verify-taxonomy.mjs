@@ -52,7 +52,7 @@ try {
       "---\nimport {notes,tagSlug} from '../publication-content';const entries=await notes();\n---\n<html><body>{entries.map(note=><a href={'/tags/'+tagSlug(note.data.category)+'/'}>{note.data.category}</a>)}</body></html>",
     );
     await writeFile(
-      join(fixture, "src/pages/notes/[slug].astro"),
+      join(fixture, "src/pages/notes/[...slug].astro"),
       "---\nimport {notes,tagSlug} from '../../publication-content';export async function getStaticPaths(){return (await notes()).map(note=>({params:{slug:note.id},props:{note}}));}const {note}=Astro.props;\n---\n<html><body><a href={'/tags/'+tagSlug(note.data.category)+'/'}>{note.data.category}</a></body></html>",
     );
     const note = join(fixture, "src/content/notes/taxonomy-regression.md");

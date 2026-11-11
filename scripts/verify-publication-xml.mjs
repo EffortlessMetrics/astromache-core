@@ -19,9 +19,12 @@ const temporary = await realpath(await mkdtemp(join(tmpdir(), "astromache-public
 const title = `Café <🛰️> & "quoted" 'notes'`;
 const description = `Observations <today> & "tomorrow" 'again'`;
 const origin = "https://publication.example";
+// Literal output names and URLs independently specify Astro's route contract.
 const cases = [
   {
     slug: "café-🛰️",
+    artifact: "café-🛰️",
+    path: "/notes/caf%C3%A9-%F0%9F%9B%B0%EF%B8%8F/",
     title: title + "\twith tab\nand line feed",
     description,
     category: "Category Alone",
@@ -30,6 +33,8 @@ const cases = [
   },
   {
     slug: "decomposed-cafe\u0301",
+    artifact: "decomposed-café",
+    path: "/notes/decomposed-caf%C3%A9/",
     title,
     description,
     category: "Practice",
@@ -38,6 +43,8 @@ const cases = [
   },
   {
     slug: "café&tea?#",
+    artifact: "café&tea%3F%23",
+    path: "/notes/caf%C3%A9%26tea%253F%2523/",
     title,
     description,
     category: "Practice",
@@ -46,6 +53,8 @@ const cases = [
   },
   {
     slug: "café&notes",
+    artifact: "café&notes",
+    path: "/notes/caf%C3%A9%26notes/",
     title,
     description,
     category: "Category Without Tags",
@@ -54,6 +63,8 @@ const cases = [
   },
   {
     slug: "café&amp;notes",
+    artifact: "café&amp;notes",
+    path: "/notes/caf%C3%A9%26amp%3Bnotes/",
     title: title + " Literal &#1; and &#x1;",
     description: description + " Literal &#1; and &#x1;",
     category: "Practice",
@@ -62,8 +73,30 @@ const cases = [
   },
   {
     slug: "whitespace",
+    artifact: "whitespace",
+    path: "/notes/whitespace/",
     title: "Café\tA\nB\rC\r\nD 🛰️",
     description: "Description\tA\nB\rC\r\nD",
+    category: "Practice",
+    tags: ["Practice"],
+    taxonomy: ["practice"],
+  },
+  {
+    filename: "nested/filename-note.md",
+    artifact: "nested/filename-note",
+    path: "/notes/nested/filename-note/",
+    title,
+    description,
+    category: "Practice",
+    tags: ["Practice"],
+    taxonomy: ["practice"],
+  },
+  {
+    slug: "série/nested/cafe\u0301&tea?#",
+    artifact: "série/nested/café&tea%3F%23",
+    path: "/notes/s%C3%A9rie/nested/caf%C3%A9%26tea%253F%2523/",
+    title,
+    description,
     category: "Practice",
     tags: ["Practice"],
     taxonomy: ["practice"],
@@ -127,7 +160,7 @@ const {label}=Astro.props;
 <html><head><meta charset="utf-8"/></head><body><h1>{label}</h1></body></html>`,
     );
     await writeFile(
-      join(fixture, "src/pages/notes/[slug].astro"),
+      join(fixture, "src/pages/notes/[...slug].astro"),
       `---
 import {notes} from '../../publication-content';
 export async function getStaticPaths(){return(await notes()).map(note=>({params:{slug:note.id},props:{note}}));}
@@ -135,14 +168,34 @@ const {note}=Astro.props;
 ---
 <html><head><meta charset="utf-8"/></head><body><h1>{note.data.title}</h1></body></html>`,
     );
-    for (const { slug, title, description, category, tags, taxonomy, invalid } of cases) {
+    for (const {
+      slug,
+      filename,
+      artifact,
+      path,
+      title,
+      description,
+      category,
+      tags,
+      taxonomy,
+      invalid,
+    } of cases) {
+      await rm(join(fixture, "src/content/notes"), { recursive: true, force: true });
+      const file = join(fixture, "src/content/notes", filename ?? "fixture.md");
+      await mkdir(dirname(file), { recursive: true });
       await writeFile(
-        join(fixture, "src/content/notes/fixture.md"),
-        `---\ntitle: ${JSON.stringify(title)}\nslug: ${JSON.stringify(slug)}\ndescription: ${JSON.stringify(description)}\npublished: 2026-10-20\ncategory: ${JSON.stringify(category)}\ntags: ${JSON.stringify(tags)}\n---\n\nNeutral content.\n`,
+        file,
+        `---\ntitle: ${JSON.stringify(title)}\n${slug === undefined ? "" : `slug: ${JSON.stringify(slug)}\n`}description: ${JSON.stringify(description)}\npublished: 2026-10-20\ncategory: ${JSON.stringify(category)}\ntags: ${JSON.stringify(tags)}\n---\n\nNeutral content.\n`,
       );
-      const build = spawnSync(process.execPath, [cli, "build"], { cwd: fixture, encoding: "utf8" });
+      const build = spawnSync(process.execPath, [cli, "build"], {
+        cwd: fixture,
+        encoding: "utf8",
+        timeout: 90_000,
+        maxBuffer: 2 * 1024 * 1024,
+      });
+      assert.equal(build.error, undefined, `Build execution failed: ${build.error}`);
       if (invalid) {
-        const result = { adapter, slug, file: "rss.xml", pass: false };
+        const result = { adapter, id: slug ?? filename, file: "rss.xml", pass: false };
         try {
           assert.notEqual(build.status, 0, "XML-invalid metadata must reject the build");
           assert.match(build.stdout + build.stderr, /XML 1\.0.*U\+0001/);
@@ -166,17 +219,7 @@ const {note}=Astro.props;
       assert.equal(build.status, 0, build.stdout + build.stderr);
       for (const tag of taxonomy)
         assert.ok(await readFile(join(fixture, "dist/tags", tag, "index.html"), "utf8"));
-      assert.ok(
-        await readFile(
-          join(
-            fixture,
-            "dist/notes",
-            slug.normalize().replace(/\?/g, "%3F").replace(/#/g, "%23"),
-            "index.html",
-          ),
-          "utf8",
-        ),
-      );
+      assert.ok(await readFile(join(fixture, "dist/notes", artifact, "index.html"), "utf8"));
       const server = await preview({
         root: fixture,
         logLevel: "silent",
@@ -184,7 +227,7 @@ const {note}=Astro.props;
       });
       try {
         for (const file of ["rss.xml", "sitemap.xml"]) {
-          const result = { adapter, slug, file, pass: false };
+          const result = { adapter, id: slug ?? filename, file, pass: false };
           try {
             const xml = await readFile(join(fixture, "dist", file), "utf8");
             const parsed = await page.evaluate((xml) => {
@@ -199,11 +242,7 @@ const {note}=Astro.props;
               };
             }, xml);
             assert.equal(parsed.error, undefined, "Generated XML must parse without errors");
-            const url =
-              origin +
-              "/notes/" +
-              encodeURIComponent(slug.normalize().replace(/#/g, "%23").replace(/\?/g, "%3F")) +
-              "/";
+            const url = origin + path;
             if (file === "rss.xml") {
               assert.deepEqual(
                 parsed.links,

@@ -2,7 +2,26 @@
 
 An optional standalone sibling to the complete starters/publication project. It consumes astromache 0.2.0, @effortlessmetrics/static-search 0.1.0 and @effortlessmetrics/astro-offline 0.1.5 directly from exact vendored candidate archives. It is private, not an npm package and does not change either real site's dependency on the starter.
 
-From the producer checkout root, use Node 24.19.x to run `node scripts/create-starter.mjs search-offline ../my-search-publication`. In that new directory, use pnpm 10.28.0; run `pnpm install --frozen-lockfile` and `pnpm qualify`, then `pnpm dev`. Set your site URL and replace the sample notes/gallery. Search corpus schema, substring matching, results and routes are local recipe policy; the static-search package owns loader/backend lifecycle. The corpus version is a SHA-256 of serialized notes. No MiniSearch or worker engine is implied.
+## Create a new search publication from the producer
+
+Use Node 24.19.x. From the root of an `astromache-core` clone, export a new application outside that checkout:
+
+```sh
+node scripts/create-starter.mjs search-offline ../my-search-publication
+cd ../my-search-publication
+```
+
+## Run an exported application
+
+If you received this README inside an exported application, start in that application's root directory. The producer's `scripts/create-starter.mjs` is not included and is not needed here. Use Node 24.19.x and pnpm 10.28.0:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm qualify
+pnpm dev
+```
+
+Set your site URL and replace the sample notes/gallery. Search corpus schema, substring matching, results and routes are local recipe policy; the static-search package owns loader/backend lifecycle. The corpus version is a SHA-256 of serialized notes. No MiniSearch or worker engine is implied.
 
 The recipe explicitly selects network-first document navigation so ordinary online reloads show the current deployment. The library default remains cache-first. Successful online HTML never mutates the integrity-checked offline corpus; offline fallback and assets remain at the active verified build until natural activation. Existing cache-first workers require closing their controlled tabs once; no forced reload or activation is performed. The previous 0.1.0 archive remains in the producer for rollback and is excluded from standalone exports.
 

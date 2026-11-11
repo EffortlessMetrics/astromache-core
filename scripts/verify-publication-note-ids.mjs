@@ -56,7 +56,7 @@ try {
     // The loader is the subject. A small native route independently observes its
     // entries without substituting product data or requiring component fixtures.
     await writeFile(
-      join(root, "src/pages/notes/[slug].astro"),
+      join(root, "src/pages/notes/[...slug].astro"),
       "---\n" +
         "import {notes} from '../../publication-content';\n" +
         "export async function getStaticPaths(){return (await notes()).map(note=>({params:{slug:note.id},props:{note}}));}\n" +

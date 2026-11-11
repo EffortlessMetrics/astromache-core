@@ -3,10 +3,16 @@ export const notes = async () =>
   (await getCollection("notes")).sort(
     (a, b) => b.data.published.getTime() - a.data.published.getTime(),
   );
-export const noteLink = (id: string) => "/notes/" + id + "/";
-// Astro writes normalized route parameters and retains escaped ? and # in output filenames.
-export const noteArtifactLink = (id: string) =>
-  noteLink(encodeURIComponent(id.normalize().replace(/\?/g, "%3F").replace(/#/g, "%23")));
+// Astro writes normalized path segments and retains escaped ? and # in output filenames.
+// Encode each segment for the public URL without turning nested route separators into %2F.
+export const noteLink = (id: string) =>
+  "/notes/" +
+  id
+    .normalize()
+    .split("/")
+    .map((segment) => encodeURIComponent(segment.replace(/\?/g, "%3F").replace(/#/g, "%23")))
+    .join("/") +
+  "/";
 export const tagSlug = (tag: string) =>
   tag
     .toLowerCase()

@@ -159,6 +159,8 @@ function clean(node, canonical, assets, links, skip) {
       const label = value(node, "title") ?? value(node, "ariaLabel");
       if (!src || !label)
         throw new Error(`${node.tagName} requires a source and accessible title for Markdown`);
+      const href = absolute(src, canonical, false);
+      if (/^https?:/i.test(href)) links.add(href);
       return {
         type: "element",
         tagName: "p",
@@ -167,7 +169,7 @@ function clean(node, canonical, assets, links, skip) {
           {
             type: "element",
             tagName: "a",
-            properties: { href: absolute(src, canonical, false) },
+            properties: { href },
             children: [{ type: "text", value: String(label) }],
           },
         ],

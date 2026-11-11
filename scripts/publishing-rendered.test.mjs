@@ -35,6 +35,11 @@ for (const hidden of [
   "hidden",
   'aria-hidden="true"',
   'style="display:none"',
+  'style="display:none;color:red"',
+  'style="color:red;display:none"',
+  'style="DISPLAY: NONE !important;color:red"',
+  'style="visibility:hidden;color:red"',
+  'style="color:red;visibility:hidden!important"',
   "data-publication-exclude",
 ]) {
   test(`exclude ${hidden}, comments, scripts and template source`, () => {
@@ -369,3 +374,32 @@ test("noindex aliases still require an emitted same-origin target", () =>
     );
     await assert.rejects(auditPublication(root, { origin }), /Canonical URL has no static target/);
   }));
+
+for (const [name, media] of [
+  ["iframe src", (src) => `<iframe src="${src}" title="Recording"></iframe>`],
+  ["video src", (src) => `<video src="${src}" title="Recording"></video>`],
+  ["audio src", (src) => `<audio src="${src}" title="Recording"></audio>`],
+  ["video source", (src) => `<video title="Recording"><source src="${src}"></video>`],
+  ["audio source", (src) => `<audio title="Recording"><source src="${src}"></audio>`],
+]) {
+  test(`embedded ${name} links use the ordinary target and fragment checks`, () =>
+    fixture(async (root) => {
+      await writeFile(join(root, "article/index.html"), page(media("/recording.mp4")));
+      await assert.rejects(buildPublication(root, { origin }), /Missing publication link target/);
+      await assert.rejects(readFile(join(root, "_markdown/article.md")), { code: "ENOENT" });
+      await writeFile(join(root, "recording.mp4"), "Fixture media bytes");
+      await auditPublication(root, { origin });
+      await writeFile(join(root, "article/index.html"), page(media("#missing")));
+      await assert.rejects(auditPublication(root, { origin }), /Missing publication fragment/);
+      await writeFile(
+        join(root, "article/index.html"),
+        page('<h2 id="part">Part</h2>' + media("#part")),
+      );
+      await auditPublication(root, { origin });
+      await writeFile(
+        join(root, "article/index.html"),
+        page(media("https://media.example/recording.mp4")),
+      );
+      await auditPublication(root, { origin });
+    }));
+}

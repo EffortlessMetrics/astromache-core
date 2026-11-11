@@ -85,13 +85,17 @@ try {
     );
   await put(
     "src/pages/custom.astro",
-    `---\nconst markdown=process.env.NO_MARKDOWN!=='1';const noindex=process.env.NOINDEX_CUSTOM==='1';const media=process.env.MISSING_MEDIA==='1'?'/missing.mp4':'/recording.mp4';\n---\n<!doctype html><html lang="en"><head><title>Custom</title><meta name="DESCRIPTION" content="Custom rendered metadata"><meta property="og:type" content="website"><meta property="og:title" content="Custom"><meta property="og:description" content="Custom rendered metadata"><meta property="og:url" content="https://publication.example/custom/"><link rel="CANONICAL" href="https://publication.example/custom/">{markdown&&<link rel="ALTERNATE" type="TEXT/MARKDOWN" href="https://publication.example/_markdown/custom.md"/>}{noindex&&<meta name="ROBOTS" content="NOINDEX"/>}</head><body><h1>Custom</h1><article data-article-body><p>Case-preserved custom text.</p><aside style="display:none;color:red">HIDDEN INLINE SENTINEL</aside><video src={media} title="Fixture recording"></video><audio title="Nested recording"><source src={media}/></audio></article></body></html>`,
+    `---\nconst markdown=process.env.NO_MARKDOWN!=='1';const noindex=process.env.NOINDEX_CUSTOM==='1';const media=process.env.MISSING_MEDIA==='1'?'/missing.mp4':'/recording.mp4';const fragment=process.env.MISSING_FRAGMENT==='1'?'missing':'player';\n---\n<!doctype html><html lang="en"><head><title>Custom</title><meta name="DESCRIPTION" content="Custom rendered metadata"><meta property="og:type" content="website"><meta property="og:title" content="Custom"><meta property="og:description" content="Custom rendered metadata"><meta property="og:url" content="https://publication.example/custom/"><link rel="CANONICAL" href="https://publication.example/custom/">{markdown&&<link rel="ALTERNATE" type="TEXT/MARKDOWN" href="https://publication.example/_markdown/custom.md"/>}{noindex&&<meta name="ROBOTS" content="NOINDEX"/>}</head><body><h1>Custom</h1><article data-article-body><p>Case-preserved custom text.</p><aside style="display:none;color:red">HIDDEN INLINE SENTINEL</aside><video src={media} title="Fixture recording"></video><audio title="Nested recording"><source src={media}/></audio><iframe src={'/embed.html#'+fragment} title="Standalone player"></iframe></article></body></html>`,
   );
   await put(
     "public/sitemap.xml",
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://publication.example/notes/public/</loc></url></urlset>',
   );
   await put("public/recording.mp4", "Fixture media bytes");
+  await put(
+    "public/embed.html",
+    '<html><head></head><body><div id="player">Player</div></body></html>',
+  );
   await put("public/verification.html", "<html><head></head><body>Verification</body></html>");
   run(["exec", "astro", "build"]);
   const html = await readFile(join(root, "dist/notes/public/index.html"), "utf8");
@@ -118,6 +122,10 @@ try {
     /\[Fixture recording\]\(https:\/\/publication\.example\/recording\.mp4\)/,
   );
   assert.match(customMarkdown, /\[Nested recording\]/);
+  assert.match(
+    customMarkdown,
+    /\[Standalone player\]\(https:\/\/publication\.example\/embed\.html#player\)/,
+  );
   assert.doesNotMatch(customMarkdown, /HIDDEN INLINE SENTINEL/);
   assert.equal(
     report.html.find((item) => item.path === "notes/public/index.html").sha256,
@@ -148,6 +156,14 @@ try {
   assert.equal(missingMedia.status, 1, missingMedia.stdout + missingMedia.stderr);
   assert.match(missingMedia.stdout + missingMedia.stderr, /Missing publication link target/);
   await assert.rejects(readFile(join(root, "dist/_markdown/custom.md")), { code: "ENOENT" });
+  const missingFragment = spawnSync(process.execPath, [manager, "exec", "astro", "build"], {
+    cwd: root,
+    env: { ...process.env, ASTRO_TELEMETRY_DISABLED: "1", MISSING_FRAGMENT: "1" },
+    encoding: "utf8",
+  });
+  assert.equal(missingFragment.status, 1, missingFragment.stdout + missingFragment.stderr);
+  assert.match(missingFragment.stdout + missingFragment.stderr, /Missing publication fragment/);
+  await assert.rejects(readFile(join(root, "dist/_markdown/custom.md")), { code: "ENOENT" });
   run(["exec", "astro", "build"], root, { NO_MARKDOWN: "1" });
   const disabled = await readFile(join(root, "dist/notes/public/index.html"), "utf8");
   assert.doesNotMatch(disabled, /text\/markdown/);
@@ -164,6 +180,7 @@ try {
       "metadata component compilation",
       "custom HTML keyword casing and noindex refusal",
       "embedded-media target checks and hidden inline exclusion",
+      "non-publication HTML fragment targets and missing-fragment refusal",
       "HTML byte integrity",
       "offline manifest includes Markdown",
       "disabled clean rebuild",

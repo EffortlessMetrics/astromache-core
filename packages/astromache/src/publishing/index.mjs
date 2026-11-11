@@ -87,11 +87,13 @@ export async function auditPublication(rootDirectory, options = {}) {
   const inventory = await files(root);
   const origin = httpURL(options.origin, "Publication origin").origin;
   const documents = [];
+  const htmlDocuments = new Map();
   const canonicals = new Map();
   const noindexCanonicals = new Set();
   for (const path of inventory.filter((name) => name.endsWith(".html"))) {
     const html = await readFile(resolve(root, path), "utf8");
     const document = readDocument(html);
+    htmlDocuments.set(path, document);
     if (!document.canonical) {
       if (document.alternate) throw new Error("Markdown alternate has no canonical");
       continue;
@@ -223,7 +225,7 @@ export async function auditPublication(rootDirectory, options = {}) {
       if (!target) throw new Error(`Missing publication link target: ${link}`);
       const fragment = decodeURIComponent(url.hash.slice(1).split(":~:")[0]);
       if (fragment && target.endsWith(".html")) {
-        const targetDocument = documents.find((entry) => entry.path === target)?.document;
+        const targetDocument = htmlDocuments.get(target);
         if (
           !targetDocument ||
           !elements(

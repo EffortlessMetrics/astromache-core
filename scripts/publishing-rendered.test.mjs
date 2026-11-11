@@ -403,3 +403,34 @@ for (const [name, media] of [
       await auditPublication(root, { origin });
     }));
 }
+
+for (const [name, link] of [
+  ["anchor", (fragment) => `<a href="/embed.html#${fragment}">Standalone player</a>`],
+  [
+    "iframe",
+    (fragment) => `<iframe src="/embed.html#${fragment}" title="Standalone player"></iframe>`,
+  ],
+]) {
+  test(`${name} non-publication HTML fragments remain valid`, () =>
+    fixture(async (root) => {
+      const embedded =
+        '<html><head></head><body><div id="player">Player</div><a name="legacy">Legacy</a></body></html>';
+      await writeFile(join(root, "embed.html"), embedded);
+      for (const fragment of ["player", "%70layer", "legacy"]) {
+        await writeFile(join(root, "article/index.html"), page(link(fragment)));
+        const report = await auditPublication(root, { origin });
+        assert.equal(report.generated.length, 1);
+        assert.equal(report.html.length, 1, "standalone HTML does not become a publication");
+      }
+      await writeFile(join(root, "article/index.html"), page(link("missing")));
+      await assert.rejects(buildPublication(root, { origin }), /Missing publication fragment/);
+      await assert.rejects(readFile(join(root, "_markdown/article.md")), { code: "ENOENT" });
+      assert.equal(await readFile(join(root, "embed.html"), "utf8"), embedded);
+      await writeFile(join(root, "article/index.html"), page(link("player")));
+      await buildPublication(root, { origin });
+      assert.match(
+        await readFile(join(root, "_markdown/article.md"), "utf8"),
+        /embed\.html#player/,
+      );
+    }));
+}

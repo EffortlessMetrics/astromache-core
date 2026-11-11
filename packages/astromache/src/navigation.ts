@@ -68,7 +68,12 @@ export function installNavigationPrefetch(
     )
       return;
     if (event instanceof MouseEvent && anchor(event.relatedTarget) === link) return;
-    const url = new URL(link.href, location.href);
+    let url: URL;
+    try {
+      url = new URL(link.href, location.href);
+    } catch {
+      return;
+    }
     if (
       url.origin !== location.origin ||
       url.username ||

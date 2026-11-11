@@ -7,7 +7,10 @@ export async function GET({ site }: APIContext) {
     "/",
     "/posts/",
     "/portfolio/",
-    ...entries.map((note) => noteLink(note.id)),
+    // Astro normalizes route parameters and writes ? and # as literal percent escapes.
+    ...entries.map((note) =>
+      noteLink(encodeURIComponent(note.id.normalize().replace(/#/g, "%23").replace(/\?/g, "%3F"))),
+    ),
     ...taxonomyRoutes(entries).map((route) => "/tags/" + route.params.tag + "/"),
   ];
   return new Response(

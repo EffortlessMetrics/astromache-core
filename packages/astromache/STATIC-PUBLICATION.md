@@ -1,7 +1,8 @@
 # Static publication output
 
-`0.3.0-publishing.1` is an unpublished candidate. Install its exact qualified
-archive; this guide does not establish a registry release or authorize deployment.
+The publishing exports are part of `0.3.0`. Before registry publication is verified,
+install the exact qualified archive and retain its SHA-256 receipt. This guide
+does not authorize or establish consumer deployment.
 
 ## Enable the feature
 

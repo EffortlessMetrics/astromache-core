@@ -43,6 +43,10 @@ const undated = {label:'Undated article',href:'/undated/',date:new Date()};
 <html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width"/><title>Neutral action geometry</title></head><body><main>
 <Article title="Neutral article" published={{datetime:'2026-01-01',label:'January'}} related={[{label:'Related article',href:'/related/',displayDate:{datetime:'2025-03-04',label:'Mar 4, 2025'}},undated]} previous={{label:'Earlier article',href:'/earlier/'}} next={{label:'Later article',href:'/later/'}}>
   <p style="min-height:1200px">Neutral article content.</p>
+  <h2 id="café%2Fnotes" tabindex="-1">Encoded heading</h2><p style="min-height:300px">Intended encoded destination.</p>
+  <h2 id="café/notes" tabindex="-1">Slash heading</h2><p style="min-height:300px">Distinct slash destination.</p>
+  <h2 id="topic:~:text=notes" tabindex="-1">Directive heading</h2><p style="min-height:300px">Intended directive destination.</p>
+  <h2 id="topic" tabindex="-1">Plain heading</h2><p style="min-height:300px">Distinct plain destination.</p>
   <Fragment slot="actions"><div><button type="button" data-fixture-share aria-label="Share this article">Share</button><div hidden>Neutral share options.</div><span class="sr-only" role="status"></span></div><CopyLink url="https://example.com/"/></Fragment>
 </Article>
 </main></body></html>`,
@@ -80,6 +84,7 @@ const undated = {label:'Undated article',href:'/undated/',date:new Date()};
     ["wrapped", 280, 844],
   ]) {
     const page = await browser.newPage({ viewport: { width, height }, reducedMotion: "reduce" });
+    page.setDefaultTimeout(3000);
     const result = { label, viewport: { width, height }, pass: false };
     try {
       await page.goto(`http://127.0.0.1:${server.address().port}/`);
@@ -156,9 +161,36 @@ const undated = {label:'Undated article',href:'/undated/',date:new Date()};
     } catch (error) {
       result.error = error.message;
     } finally {
-      await page.close();
       results.push(result);
     }
+    for (const [heading, id] of [
+      ["Encoded heading", "café%2Fnotes"],
+      ["Directive heading", "topic:~:text=notes"],
+      ["Slash heading", "café/notes"],
+      ["Plain heading", "topic"],
+    ]) {
+      const permalinkResult = { label: `${label}: ${heading} permalink`, pass: false };
+      try {
+        await page.goto(`http://127.0.0.1:${server.address().port}/`);
+        const link = page.getByRole("link", { name: `Link to ${heading}`, exact: true });
+        await link.focus();
+        await page.keyboard.press("Enter");
+        await page.waitForFunction(() => document.activeElement?.tagName === "H2");
+        permalinkResult.destination = await page.evaluate(() => document.activeElement.id);
+        assert.equal(permalinkResult.destination, id, "Permalink must focus its own heading");
+        assert.equal(decodeURIComponent(new URL(page.url()).hash.slice(1)), id);
+        await page.waitForFunction((targetId) => {
+          const bounds = document.getElementById(targetId).getBoundingClientRect();
+          return bounds.top >= -1 && bounds.bottom <= innerHeight + 1;
+        }, id);
+        permalinkResult.pass = true;
+      } catch (error) {
+        permalinkResult.error = error.message;
+      } finally {
+        results.push(permalinkResult);
+      }
+    }
+    await page.close();
   }
   console.log(JSON.stringify(results, null, 2));
   if (evidence)

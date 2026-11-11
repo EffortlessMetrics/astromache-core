@@ -1,3 +1,11 @@
+## 0.3.0
+
+- Deliver the expanded publication foundation and the static publishing exports described below, preserving the original 0.1.0 subpaths and historical candidate archives.
+- Preserve reading progress after viewport resize, keyboard focus across responsive header layouts, encoded heading permalinks, and safe handling of malformed prefetch links.
+- Report invalid runtime publication metadata before string operations, and reject ambiguous POSIX backslash page paths before offline output changes.
+- Validate embedded-media targets and fragments in standalone HTML while retaining canonical publication membership and unchanged HTML bytes.
+- Qualify all 22 public subpaths, installed stock-Astro consumers, publication/browser/offline flows, and dependency-preserving consumer upgrades.
+
 ## 0.3.0-publishing.1 — unpublished
 
 - Add reusable social metadata and Markdown discovery without replacing existing document APIs.

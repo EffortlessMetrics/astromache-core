@@ -21,6 +21,7 @@ import { verifyPublicationWorkerUpgrade } from "./verify-publication-worker-upgr
 await import("./verify-recipe-request-contracts.mjs");
 await import("./verify-publication-note-ids.mjs");
 await import("./verify-publication-xml.mjs");
+await import("./verify-rss-http.mjs");
 
 const producer = await realpath(fileURLToPath(new URL("../", import.meta.url)));
 execFileSync(process.execPath, ["--test", join(producer, "scripts/note-loader.test.mjs")], {

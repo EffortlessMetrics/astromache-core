@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { relative, sep } from "node:path";
 import { glob, type DataStore, type Loader, type LoaderContext } from "astro/loaders";
+import { noteLink } from "./note-route";
 
 export const noteLoader = (): Loader => {
   const base = "./src/content/notes";
@@ -42,6 +43,35 @@ export const noteLoader = (): Loader => {
     // This preserves its ID generation and schema parsing without allowing a
     // duplicate ID to overwrite an entry, even when file loads run concurrently.
     await loader.load({ ...context, store, watcher: undefined });
+    // The glob reads concurrently. Validate derived routes in source-file order
+    // so the first conflicting pair and its diagnostic are reproducible.
+    const ordered = [...entries.values()].sort((a, b) => {
+      const left = a.filePath ?? a.id;
+      const right = b.filePath ?? b.id;
+      return left < right ? -1 : left > right ? 1 : 0;
+    });
+    const routes = new Map<string, { id: string; file: string; route: string }>();
+    for (const entry of ordered) {
+      const file = entry.filePath ?? entry.id;
+      let route: string;
+      try {
+        route = noteLink(entry.id);
+      } catch (error) {
+        throw new Error(
+          `${error instanceof Error ? error.message : String(error)} Source: ${JSON.stringify(file)}.`,
+        );
+      }
+      // Compare actual artifact names conservatively for case-insensitive hosts;
+      // the original IDs and emitted URL casing remain unchanged.
+      const key = decodeURIComponent(route).toLowerCase();
+      const previousRoute = routes.get(key);
+      if (previousRoute !== undefined) {
+        throw new Error(
+          `Duplicate note route: ${JSON.stringify(previousRoute.id)} from ${JSON.stringify(previousRoute.file)} (${JSON.stringify(previousRoute.route)}) and ${JSON.stringify(entry.id)} from ${JSON.stringify(file)} (${JSON.stringify(route)}) collide at portable output path ${JSON.stringify(key)}. Rename one note or slug.`,
+        );
+      }
+      routes.set(key, { id: entry.id, file, route });
+    }
     for (const id of context.store.keys()) {
       if (!entries.has(id)) context.store.delete(id);
     }

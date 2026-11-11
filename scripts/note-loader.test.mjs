@@ -14,14 +14,20 @@ for (const adapter of ["starters/publication", "recipes/search-offline"])
     const { createWatcherWrapper } = await import(
       pathToFileURL(join(source, "node_modules/astro/dist/content/watcher.js"))
     );
+    const routeCode = stripTypeScriptTypes(
+      await readFile(join(source, adapter, "src/note-route.ts"), "utf8"),
+    );
+    const routeModule = "data:text/javascript;base64," + Buffer.from(routeCode).toString("base64");
     const code = stripTypeScriptTypes(
       await readFile(join(source, adapter, "src/note-loader.ts"), "utf8"),
-    ).replace(
-      '"astro/loaders"',
-      JSON.stringify(
-        pathToFileURL(join(source, "node_modules/astro/dist/content/loaders/glob.js")).href,
-      ),
-    );
+    )
+      .replace('"./note-route"', JSON.stringify(routeModule))
+      .replace(
+        '"astro/loaders"',
+        JSON.stringify(
+          pathToFileURL(join(source, "node_modules/astro/dist/content/loaders/glob.js")).href,
+        ),
+      );
     const { noteLoader } = await import(
       "data:text/javascript;base64," + Buffer.from(code).toString("base64")
     );
@@ -110,6 +116,41 @@ for (const adapter of ["starters/publication", "recipes/search-offline"])
       assert.deepEqual(store.keys(), ["recovered"]);
       for (const event of ["add", "change", "unlink"])
         assert.equal(emitter.listenerCount(event), 1);
+      for (const [first, second, route, diagnostic = /Duplicate note route/] of [
+        ["topic?", "topic%3F", "/notes/topic%253F/"],
+        ["topic#", "topic%23", "/notes/topic%2523/"],
+        ["café", "cafe\u0301", "/notes/caf%C3%A9/"],
+        ["topic?", "topic%3f", "/notes/topic%253f/"],
+        ["Alpha", "alpha", "/notes/alpha/"],
+        ["É", "é", "/notes/%C3%A9/"],
+        ["safe", "topic%253F", undefined, /Unsupported note ID/],
+        ["safe", "branch/../leaf", undefined, /Invalid note ID/],
+      ]) {
+        await writeFile(file, JSON.stringify({ slug: first }));
+        emitter.emit("change", file);
+        await waitFor(() => data.has(first));
+        const previousErrors = errors.length;
+        await writeFile(duplicate, JSON.stringify({ slug: second }));
+        emitter.emit("add", duplicate);
+        await waitFor(() => errors.length === previousErrors + 1);
+        assert.match(errors.at(-1), diagnostic);
+        if (route) assert.ok(errors.at(-1).includes(route));
+        assert.ok(errors.at(-1).includes(JSON.stringify(second)));
+        assert.deepEqual(
+          store.keys(),
+          [first],
+          "Rejected route aliases preserve the accepted collection",
+        );
+        watcher.removeAllTrackedListeners();
+        await assert.rejects(loader.load(context), diagnostic);
+        assert.deepEqual(store.keys(), [first]);
+        for (const event of ["add", "change", "unlink"])
+          assert.equal(emitter.listenerCount(event), 1);
+        await rm(duplicate);
+        emitter.emit("unlink", duplicate);
+        await loader.load(context);
+        assert.deepEqual(store.keys(), [first]);
+      }
     } finally {
       emitter.removeAllListeners();
       await rm(root, { recursive: true, force: true });

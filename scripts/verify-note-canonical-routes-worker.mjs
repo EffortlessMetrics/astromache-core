@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { cp, mkdir, writeFile } from "node:fs/promises";
+import { cp, mkdir, rm, writeFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { preview } from "astro";
@@ -21,6 +21,27 @@ const cases = [
     path: "/notes/s%C3%A9rie/nested/caf%C3%A9%26tea%253F%2523/",
   },
 ];
+// Dates above give this literal per-page order. Check absent boundary edges as
+// well as present edges, so another page cannot compensate for a missing link.
+const expectedAdjacency = [
+  [{ label: "Previous Post: Canonical fixture 1", href: "/notes/caf%C3%A9%26tea%253F%2523/" }],
+  [
+    { label: "Previous Post: Canonical fixture 2", href: "/notes/ordinary-note/" },
+    { label: "Next Post: Canonical fixture 0", href: "/notes/decomposed-caf%C3%A9/" },
+  ],
+  [
+    { label: "Previous Post: Canonical fixture 3", href: "/notes/nested/filename-note/" },
+    { label: "Next Post: Canonical fixture 1", href: "/notes/caf%C3%A9%26tea%253F%2523/" },
+  ],
+  [
+    {
+      label: "Previous Post: Canonical fixture 4",
+      href: "/notes/s%C3%A9rie/nested/caf%C3%A9%26tea%253F%2523/",
+    },
+    { label: "Next Post: Canonical fixture 2", href: "/notes/ordinary-note/" },
+  ],
+  [{ label: "Next Post: Canonical fixture 3", href: "/notes/nested/filename-note/" }],
+];
 const failures = [];
 let browser;
 try {
@@ -30,6 +51,8 @@ try {
     const fixture = join(temp, product);
     await mkdir(dirname(fixture), { recursive: true });
     await cp(join(root, product), fixture, { recursive: true });
+    // This known corpus makes the oldest/newest absent edges explicit too.
+    await rm(join(fixture, "src/content/notes"), { recursive: true, force: true });
     for (const [index, { slug, filename }] of cases.entries()) {
       const file = join(fixture, "src/content/notes", filename ?? `canonical-${index}.md`);
       await mkdir(dirname(file), { recursive: true });
@@ -155,6 +178,11 @@ try {
           };
         }, html);
         assert.equal(links.title, `Canonical fixture ${index}`);
+        assert.deepEqual(
+          links.adjacent,
+          expectedAdjacency[index],
+          `${product}: exact adjacent links for fixture ${index}`,
+        );
         for (const adjacent of links.adjacent) {
           const match = adjacent.label.match(/(Previous|Next) Post: Canonical fixture (\d+)/);
           if (!match) continue;

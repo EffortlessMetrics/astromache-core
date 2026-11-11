@@ -30,3 +30,5 @@ Upstream template code, original sample content and sample SVGs are MIT OR Apach
 Quoted ISO publication timestamps without a timezone offset are interpreted as UTC. Explicit offsets are preserved.
 
 Note IDs must be unique across Markdown files. Duplicate frontmatter slugs and filename-generated IDs fail content sync with both source files identified, before a note can replace another in routes, RSS or search. A rejected development edit preserves the last accepted collection until the collision is corrected.
+
+Note routes accept Unicode, reserved `?`/`#` characters and nonempty nested path segments. Distinct IDs must also have distinct NFC-normalized output routes: for example, `topic?` and `topic%3F` cannot coexist. Empty or dot segments, backslashes, controls, and percent encodings that invalidate or change Astro's route lookup (such as `topic%253F`) fail content sync with the source file identified. Use Unicode or reserved characters directly instead of additional encoding. Output paths must also differ when decoded and lowercased for portability to case-insensitive hosts; emitted URLs retain their original casing.

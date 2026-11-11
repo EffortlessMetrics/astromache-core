@@ -148,6 +148,8 @@ try {
     // Older source candidates predate the shared XML serializer.
     if (existsSync(join(source, adapter, "src/xml.ts")))
       await cp(join(source, adapter, "src/xml.ts"), join(fixture, "src/xml.ts"));
+    if (existsSync(join(source, adapter, "src/note-route.ts")))
+      await cp(join(source, adapter, "src/note-route.ts"), join(fixture, "src/note-route.ts"));
     if (existsSync(join(source, adapter, "src/note-loader.ts")))
       await cp(join(source, adapter, "src/note-loader.ts"), join(fixture, "src/note-loader.ts"));
     await writeFile(

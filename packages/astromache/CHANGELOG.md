@@ -1,3 +1,11 @@
+## 0.3.0-publishing.1 — unpublished
+
+- Add reusable social metadata and Markdown discovery without replacing existing document APIs.
+- Generate static Markdown from marked rendered content, preserve Shiki language fences, and reject unsupported lossy rich content.
+- Reconcile sitemap/RSS/search references with emitted canonicals; optionally derive search text from rendered bodies before offline hashing.
+- Add explicit HTML-fallback negotiation helper. No Worker route or hosting security setting is installed.
+- Preserve original HTML bytes, detect output/path collisions, and qualify disabled clean rebuilds with actual Astro and independent archives.
+
 # 0.2.13 (unpublished)
 
 Apply generated-directory fallback aliases to the reconciled 0.2.12 parent, preserving metadata repairs, offline 0.1.5 and consumer-preservation qualification. Prior archives remain immutable.

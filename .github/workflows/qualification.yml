@@ -35,9 +35,9 @@ jobs:
           git rev-parse HEAD
           node --version
           pnpm --version
+      - run: pnpm install --frozen-lockfile
       - name: Consumer upgrade preservation controls
         run: node --test scripts/publication-preservation.test.mjs scripts/publication-lock-preservation.test.mjs
-      - run: pnpm install --frozen-lockfile
       - run: pnpm exec vp --version
       - name: Required native and compatibility compilers, template diagnostics, lint, tests and output
         run: pnpm qualify
@@ -55,6 +55,8 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.qualification/browsers
       - name: Neutral taxonomy routes and collision diagnostics
         run: pnpm verify:taxonomy
+      - name: Installed static publication consumer
+        run: pnpm verify:publication:packed
       - name: Independent packed consumers
         # Chromium is scoped to this hosted checkout, not global configuration.
         run: pnpm verify:packed

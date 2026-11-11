@@ -1,6 +1,6 @@
 {
   "name": "astromache",
-  "version": "0.2.13",
+  "version": "0.3.0-publishing.1",
   "private": false,
   "description": "Astro publication components, metadata validation and bounded native navigation helpers",
   "homepage": "https://github.com/EffortlessMetrics/astromache-core#readme",
@@ -40,7 +40,10 @@
     "src/search.css",
     "src/TagList.astro",
     "src/static-offline.mjs",
-    "src/static-offline.d.ts"
+    "src/static-offline.d.ts",
+    "src/PublicationHead.astro",
+    "src/publishing",
+    "STATIC-PUBLICATION.md"
   ],
   "type": "module",
   "exports": {
@@ -65,6 +68,15 @@
     "./static-offline": {
       "types": "./src/static-offline.d.ts",
       "import": "./src/static-offline.mjs"
+    },
+    "./publication-head": "./src/PublicationHead.astro",
+    "./static-publication": {
+      "types": "./src/publishing/index.d.ts",
+      "import": "./src/publishing/index.mjs"
+    },
+    "./markdown-negotiation": {
+      "types": "./src/publishing/negotiation.d.ts",
+      "import": "./src/publishing/negotiation.mjs"
     }
   },
   "publishConfig": {
@@ -72,7 +84,12 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "bcp-47": "2.1.1"
+    "bcp-47": "2.1.1",
+    "hast-util-from-html": "2.1.0",
+    "hast-util-to-mdast": "10.1.2",
+    "mdast-util-gfm": "3.1.0",
+    "mdast-util-to-markdown": "2.2.3",
+    "saxes": "6.0.0"
   },
   "peerDependencies": {
     "@effortlessmetrics/astro-offline": ">=0.1.4 <0.2.0",

@@ -1,3 +1,15 @@
+# Static publication candidate 0.3.0-publishing.1
+
+This unpublished candidate adds `astromache/publication-head`,
+`astromache/static-publication` and `astromache/markdown-negotiation`.
+See [the static publishing guide](STATIC-PUBLICATION.md).
+The integration emits Markdown from rendered public bodies at build time and
+checks discovery outputs before offline hashing. It never rewrites emitted HTML.
+The optional negotiation helper is not installed automatically.
+
+The sections below retain the previous 0.2.x and original published contracts;
+they do not identify this candidate as released or approve deployment.
+
 # astromache
 
 Current producer: https://github.com/EffortlessMetrics/astromache-core. Version 0.2.13 is an unpublished uniquely identified relocation candidate. The branded starter is https://github.com/EffortlessMetrics/astromache.

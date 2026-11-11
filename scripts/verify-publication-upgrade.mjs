@@ -203,7 +203,7 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
   run(["install", "--lockfile-only", "--ignore-scripts"]);
   const lock = await readFile(join(directory, "pnpm-lock.yaml"));
   assert.notEqual(sha256(lock), before["pnpm-lock.yaml"], "Upgrade must update lockfile");
-  verifyPublicationLockPreservation(originalLock, lock.toString());
+  verifyPublicationLockPreservation(originalLock, lock.toString(), candidate.manifest);
 
   assert.ok(
     !lock.toString().includes(manifest.dependencies.astromache),

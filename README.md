@@ -1,10 +1,12 @@
 # Astromache core
 
-Reusable public machinery for the [astromache starter](https://github.com/EffortlessMetrics/astromache). This repository owns the unchanged npm identity `astromache`. Version **0.3.0-publishing.1** is an unpublished static-publication candidate; the existing registry release remains immutable. Install exact reviewed archives until a separately authorized release.
+Reusable public machinery for the [astromache starter](https://github.com/EffortlessMetrics/astromache). This repository owns the unchanged npm identity `astromache`. Version **0.3.0** combines the publication foundation, static Markdown and metadata exports, and reviewed component repairs. Registry availability is established by the release receipt, not this source version; use the exact reviewed archive until publication is verified. Existing published versions and historical candidate archives remain immutable.
 
 The branded repository is the small editable starter. This core retains package source, public regression consumers and historical producer fixtures. Offline and static-search remain independent specialist packages. Private sites consume packages as siblings; no private site source or Git history is imported here.
 
 Use Node 24.19.x. Run `pnpm install --frozen-lockfile`, `pnpm qualify` and `pnpm verify:packed`. The additive `astromache/static-offline` preset delegates integrity and lifecycle to offline 0.1.5 while generating canonical directory cache URLs. Existing exports remain compatible.
+
+The packed checks also install a minimal stock-Astro consumer, remove its modules and reinstall with the generated frozen lockfile. This consumer resolves the explicit public export inventory, imports the foundation source exports and verifies emitted search styles without the optional offline peer or producer compiler overrides. An explicit export inventory catches removed subpaths even when their files remain in the archive. Run `node scripts/verify-export-consumer.mjs` for this focused check, or pass an exact archive path to check an existing delivery. The optional `static-offline` runtime is qualified separately by the offline checks; the publishing exports are exercised by the independently installed static-publication consumer.
 
 Code is **MIT OR Apache-2.0**, at your option. Retain both license texts. Font files retain their separate SIL OFL notices and provenance; Still runtime contains no fonts.
 

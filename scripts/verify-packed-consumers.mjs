@@ -5,6 +5,7 @@ import { cp, mkdir, mkdtemp, readFile, readdir, realpath, writeFile } from "node
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { verifyPackedPortfolioBrowser } from "./verify-packed-portfolio-browser.mjs";
+import { verifyNavigationPrefetchBrowser } from "./verify-navigation-prefetch.mjs";
 
 // Windows hosted tmpdir can use a DOS alias (RUNNER~1). Astro/Vite CSS module
 // identities must use the same canonical path as the files they resolve.
@@ -178,5 +179,28 @@ const receipt = {
   portfolioCanonicalSha256: createHash("sha256").update(canonicalScopes(gallery)).digest("hex"),
 };
 await verifyPackedPortfolioBrowser(dir);
+await verifyNavigationPrefetchBrowser(join(installed, "src/navigation.ts"));
+// Runtime data can violate the statically typed props even in a packed consumer.
+await writeFile(
+  join(dir, "src/pages/malformed-metadata.astro"),
+  `---
+import Document from "astromache/document";
+const title = JSON.parse('null');
+---
+<Document title={title} description="Consumer" canonical={new URL("https://example.test/")} language="en" />
+`,
+);
+let malformedBuild;
+try {
+  execFileSync(process.execPath, [manager, "build"], { cwd: dir, encoding: "utf8", stdio: "pipe" });
+} catch (error) {
+  malformedBuild = error;
+}
+assert.ok(malformedBuild, "Malformed runtime metadata must fail the consumer build");
+assert.match(
+  `${malformedBuild.stdout}\n${malformedBuild.stderr}`,
+  /Publication metadata requires a title, description and language/,
+  "Packed Document must report the metadata validation error",
+);
 await writeFile(join(run, "receipt.json"), JSON.stringify(receipt, null, 2));
 console.log("Independent packed native consumer receipt", JSON.stringify(receipt));

@@ -1,9 +1,8 @@
 ---
 import Publication from 'astromache/publication';import Header from 'astromache/header';import Footer from 'astromache/footer';
 import 'astromache/fonts.css';import 'astromache/publication.css';import '../styles/publication.css';
-interface Props {title:string;description:string;article?:boolean;}
-const {title,description,article=false}=Astro.props;
-const canonical=new URL(Astro.url.pathname,Astro.site);
+interface Props {title:string;description:string;article?:boolean;canonical?:URL;}
+const {title,description,article=false,canonical=new URL(Astro.url.pathname,Astro.site)}=Astro.props;
 const links=[{label:'Posts',href:'/posts/'},{label:'Gallery',href:'/portfolio/'}].map(link=>({...link,current:Astro.url.pathname===link.href}));
 ---
 <Publication title={title} description={description} canonical={canonical} language="en" themeStorageKey="field-notes-theme">

@@ -74,6 +74,17 @@ test.each(["title", "description", "language"] as const)("rejects missing %s", (
   expect(() => publicationMetadata({ ...base, [key]: " " })).toThrow();
 });
 
+test.each(["title", "description", "language"] as const)(
+  "diagnoses non-string %s values from runtime consumers",
+  (key) => {
+    for (const value of [undefined, null, 42, {}]) {
+      expect(() => publicationMetadata({ ...base, [key]: value } as typeof base)).toThrow(
+        "Publication metadata requires a title, description and language",
+      );
+    }
+  },
+);
+
 test("accepts an encoded hash in a canonical path", () => {
   const canonical = new URL("https://example.test/%23section");
   expect(publicationMetadata({ ...base, canonical }).canonical.href).toBe(canonical.href);

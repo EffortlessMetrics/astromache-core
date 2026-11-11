@@ -47,6 +47,7 @@ try {
       if (file.isFile()) await cp(join(source, file.name), join(root, "src", file.name));
     }
     await cp(join(source, "pages/rss.xml.ts"), join(root, "src/pages/rss.xml.ts"));
+    await cp(join(source, "pages/sitemap.xml.ts"), join(root, "src/pages/sitemap.xml.ts"));
     if (recipe) {
       await cp(
         join(source, "pages/search-index.json.ts"),
@@ -56,7 +57,7 @@ try {
     // The loader is the subject. A small native route independently observes its
     // entries without substituting product data or requiring component fixtures.
     await writeFile(
-      join(root, "src/pages/notes/[slug].astro"),
+      join(root, "src/pages/notes/[...slug].astro"),
       "---\n" +
         "import {notes} from '../../publication-content';\n" +
         "export async function getStaticPaths(){return (await notes()).map(note=>({params:{slug:note.id},props:{note}}));}\n" +
@@ -69,6 +70,7 @@ try {
     const resetNotes = async () => {
       await rm(noteDirectory, { recursive: true, force: true });
       await rm(join(root, ".astro"), { recursive: true, force: true });
+      await rm(join(root, "dist"), { recursive: true, force: true });
       await mkdir(noteDirectory, { recursive: true });
     };
     const build = () =>
@@ -141,6 +143,109 @@ try {
           new Set(["First note", "Second note"]),
         );
       }
+    });
+    await check("distinct escaped, Unicode and nested routes retain every note", async () => {
+      const controls = [
+        { id: "topic?", artifact: "topic%3F", path: "/notes/topic%253F/" },
+        { id: "topic#", artifact: "topic%23", path: "/notes/topic%2523/" },
+        { id: "other%3F", artifact: "other%3F", path: "/notes/other%253F/" },
+        { id: "café", artifact: "café", path: "/notes/caf%C3%A9/" },
+        { id: "cafe", artifact: "cafe", path: "/notes/cafe/" },
+        { id: "nested/café", artifact: "nested/café", path: "/notes/nested/caf%C3%A9/" },
+        { id: "UniqueCase", artifact: "UniqueCase", path: "/notes/UniqueCase/" },
+      ];
+      for (const [index, { id }] of controls.entries())
+        await writeNote(`control-${index}.md`, `Distinct note ${index}`, id);
+      accepted(build());
+      const rss = await readFile(join(root, "dist/rss.xml"), "utf8");
+      const sitemap = await readFile(join(root, "dist/sitemap.xml"), "utf8");
+      const guids = [...rss.matchAll(/<guid>(.*?)<\/guid>/g)].map((match) => match[1]);
+      assert.equal(guids.length, controls.length);
+      assert.equal(new Set(guids).size, controls.length);
+      for (const [index, { artifact, path }] of controls.entries()) {
+        const html = await readFile(join(root, "dist/notes", artifact, "index.html"), "utf8");
+        assert.ok(html.includes(`<title>Distinct note ${index}</title>`));
+        const url = `https://publication.example${path}`;
+        assert.ok(rss.includes(`<link>${url}</link><guid>${url}</guid>`));
+        assert.ok(sitemap.includes(`<loc>${url}</loc>`));
+      }
+      if (recipe) {
+        const search = JSON.parse(await readFile(join(root, "dist/search-index.json"), "utf8"));
+        assert.deepEqual(
+          new Set(search.data.map((note) => note.url)),
+          new Set(controls.map((note) => note.path)),
+        );
+      }
+    });
+    for (const [name, ids, route] of [
+      ["reserved query escape", ["topic?", "topic%3F"], "/notes/topic%253F/"],
+      ["reserved fragment escape", ["topic#", "topic%23"], "/notes/topic%2523/"],
+      ["NFC normalization", ["café", "cafe\u0301"], "/notes/caf%C3%A9/"],
+      ["reserved escape case", ["topic?", "topic%3f"], "/notes/topic%253f/"],
+      ["ASCII filename case", ["Alpha", "alpha"], "/notes/alpha/"],
+      ["Unicode filename case", ["É", "é"], "/notes/%C3%A9/"],
+      ["nested reserved escape", ["nested/topic?", "nested/topic%3F"], "/notes/nested/topic%253F/"],
+    ]) {
+      await check(`${name} route collision rejects before pages and feeds`, async () => {
+        await writeNote("one.md", "First note", ids[0]);
+        await writeNote("two.md", "Second note", ids[1]);
+        const result = build();
+        assert.equal(result.error, undefined, `Build execution failed: ${result.error}`);
+        const output = result.stdout + result.stderr;
+        assert.notEqual(
+          result.status,
+          0,
+          `Derived-route collision must fail content sync: ${output}`,
+        );
+        assert.match(output, /Duplicate note route/);
+        for (const value of [route, ...ids.map((id) => JSON.stringify(id)), "one.md", "two.md"])
+          assert.ok(output.includes(value), `Diagnostic must identify ${value}: ${output}`);
+        assert.doesNotMatch(output, /generating static routes/);
+        for (const file of ["rss.xml", "sitemap.xml"])
+          await assert.rejects(readFile(join(root, "dist", file)), { code: "ENOENT" });
+      });
+    }
+    for (const [id, sibling, diagnostic] of [
+      ["branch/../leaf", "leaf", /Invalid note ID/],
+      ["branch//leaf", "branch/leaf", /Invalid note ID/],
+      ["trailing/", "trailing", /Invalid note ID/],
+      ["topic%253F", "topic?", /Unsupported note ID/],
+      ["bad%escape", "control", /Unsupported note ID/],
+    ]) {
+      await check(`ambiguous ID ${JSON.stringify(id)} rejects before output`, async () => {
+        await writeNote("one.md", "First note", id);
+        await writeNote("two.md", "Second note", sibling);
+        const result = build();
+        assert.equal(result.error, undefined);
+        assert.notEqual(result.status, 0, result.stdout + result.stderr);
+        const output = result.stdout + result.stderr;
+        assert.match(output, diagnostic);
+        assert.ok(output.includes(JSON.stringify(id)));
+        assert.ok(output.includes("one.md"));
+        assert.doesNotMatch(output, /generating static routes/);
+        for (const file of ["rss.xml", "sitemap.xml"])
+          await assert.rejects(readFile(join(root, "dist", file)), { code: "ENOENT" });
+      });
+    }
+    await check("three NFC aliases identify a deterministic first source pair", async () => {
+      await writeNote("z-last.md", "Last note", "café");
+      await writeNote("a-first.md", "First note", "cafe\u0301");
+      await writeNote("m-middle.md", "Middle note", "cafe\u0341");
+      const diagnostics = [];
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const result = build();
+        assert.equal(result.error, undefined);
+        assert.notEqual(result.status, 0, result.stdout + result.stderr);
+        const output = result.stdout + result.stderr;
+        const diagnostic = output.match(/Duplicate note route[^\n]+/)?.[0];
+        assert.ok(diagnostic);
+        assert.ok(diagnostic.includes("a-first.md"));
+        assert.ok(diagnostic.includes("m-middle.md"));
+        assert.ok(!diagnostic.includes("z-last.md"));
+        assert.doesNotMatch(output, /generating static routes/);
+        diagnostics.push(diagnostic);
+      }
+      assert.equal(diagnostics[0], diagnostics[1]);
     });
     await check("distinct notes sharing an explicit ID are rejected", async () => {
       await writeNote("one.md", "First note", "same");

@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
+import { preview } from "astro";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const source = process.env.ASTROMACHE_XML_SOURCE_ROOT
@@ -18,9 +19,12 @@ const temporary = await realpath(await mkdtemp(join(tmpdir(), "astromache-public
 const title = `Café <🛰️> & "quoted" 'notes'`;
 const description = `Observations <today> & "tomorrow" 'again'`;
 const origin = "https://publication.example";
+// Literal output names and URLs independently specify Astro's route contract.
 const cases = [
   {
     slug: "café-🛰️",
+    artifact: "café-🛰️",
+    path: "/notes/caf%C3%A9-%F0%9F%9B%B0%EF%B8%8F/",
     title: title + "\twith tab\nand line feed",
     description,
     category: "Category Alone",
@@ -28,7 +32,29 @@ const cases = [
     taxonomy: ["category-alone", "distinct-tag"],
   },
   {
+    slug: "decomposed-cafe\u0301",
+    artifact: "decomposed-café",
+    path: "/notes/decomposed-caf%C3%A9/",
+    title,
+    description,
+    category: "Practice",
+    tags: ["Practice"],
+    taxonomy: ["practice"],
+  },
+  {
+    slug: "café&tea?#",
+    artifact: "café&tea%3F%23",
+    path: "/notes/caf%C3%A9%26tea%253F%2523/",
+    title,
+    description,
+    category: "Practice",
+    tags: ["Practice"],
+    taxonomy: ["practice"],
+  },
+  {
     slug: "café&notes",
+    artifact: "café&notes",
+    path: "/notes/caf%C3%A9%26notes/",
     title,
     description,
     category: "Category Without Tags",
@@ -37,6 +63,8 @@ const cases = [
   },
   {
     slug: "café&amp;notes",
+    artifact: "café&amp;notes",
+    path: "/notes/caf%C3%A9%26amp%3Bnotes/",
     title: title + " Literal &#1; and &#x1;",
     description: description + " Literal &#1; and &#x1;",
     category: "Practice",
@@ -45,8 +73,30 @@ const cases = [
   },
   {
     slug: "whitespace",
+    artifact: "whitespace",
+    path: "/notes/whitespace/",
     title: "Café\tA\nB\rC\r\nD 🛰️",
     description: "Description\tA\nB\rC\r\nD",
+    category: "Practice",
+    tags: ["Practice"],
+    taxonomy: ["practice"],
+  },
+  {
+    filename: "nested/filename-note.md",
+    artifact: "nested/filename-note",
+    path: "/notes/nested/filename-note/",
+    title,
+    description,
+    category: "Practice",
+    tags: ["Practice"],
+    taxonomy: ["practice"],
+  },
+  {
+    slug: "série/nested/cafe\u0301&tea?#",
+    artifact: "série/nested/café&tea%3F%23",
+    path: "/notes/s%C3%A9rie/nested/caf%C3%A9%26tea%253F%2523/",
+    title,
+    description,
     category: "Practice",
     tags: ["Practice"],
     taxonomy: ["practice"],
@@ -98,6 +148,8 @@ try {
     // Older source candidates predate the shared XML serializer.
     if (existsSync(join(source, adapter, "src/xml.ts")))
       await cp(join(source, adapter, "src/xml.ts"), join(fixture, "src/xml.ts"));
+    if (existsSync(join(source, adapter, "src/note-route.ts")))
+      await cp(join(source, adapter, "src/note-route.ts"), join(fixture, "src/note-route.ts"));
     if (existsSync(join(source, adapter, "src/note-loader.ts")))
       await cp(join(source, adapter, "src/note-loader.ts"), join(fixture, "src/note-loader.ts"));
     await writeFile(
@@ -110,7 +162,7 @@ const {label}=Astro.props;
 <html><head><meta charset="utf-8"/></head><body><h1>{label}</h1></body></html>`,
     );
     await writeFile(
-      join(fixture, "src/pages/notes/[slug].astro"),
+      join(fixture, "src/pages/notes/[...slug].astro"),
       `---
 import {notes} from '../../publication-content';
 export async function getStaticPaths(){return(await notes()).map(note=>({params:{slug:note.id},props:{note}}));}
@@ -118,14 +170,34 @@ const {note}=Astro.props;
 ---
 <html><head><meta charset="utf-8"/></head><body><h1>{note.data.title}</h1></body></html>`,
     );
-    for (const { slug, title, description, category, tags, taxonomy, invalid } of cases) {
+    for (const {
+      slug,
+      filename,
+      artifact,
+      path,
+      title,
+      description,
+      category,
+      tags,
+      taxonomy,
+      invalid,
+    } of cases) {
+      await rm(join(fixture, "src/content/notes"), { recursive: true, force: true });
+      const file = join(fixture, "src/content/notes", filename ?? "fixture.md");
+      await mkdir(dirname(file), { recursive: true });
       await writeFile(
-        join(fixture, "src/content/notes/fixture.md"),
-        `---\ntitle: ${JSON.stringify(title)}\nslug: ${JSON.stringify(slug)}\ndescription: ${JSON.stringify(description)}\npublished: 2026-10-20\ncategory: ${JSON.stringify(category)}\ntags: ${JSON.stringify(tags)}\n---\n\nNeutral content.\n`,
+        file,
+        `---\ntitle: ${JSON.stringify(title)}\n${slug === undefined ? "" : `slug: ${JSON.stringify(slug)}\n`}description: ${JSON.stringify(description)}\npublished: 2026-10-20\ncategory: ${JSON.stringify(category)}\ntags: ${JSON.stringify(tags)}\n---\n\nNeutral content.\n`,
       );
-      const build = spawnSync(process.execPath, [cli, "build"], { cwd: fixture, encoding: "utf8" });
+      const build = spawnSync(process.execPath, [cli, "build"], {
+        cwd: fixture,
+        encoding: "utf8",
+        timeout: 90_000,
+        maxBuffer: 2 * 1024 * 1024,
+      });
+      assert.equal(build.error, undefined, `Build execution failed: ${build.error}`);
       if (invalid) {
-        const result = { adapter, slug, file: "rss.xml", pass: false };
+        const result = { adapter, id: slug ?? filename, file: "rss.xml", pass: false };
         try {
           assert.notEqual(build.status, 0, "XML-invalid metadata must reject the build");
           assert.match(build.stdout + build.stderr, /XML 1\.0.*U\+0001/);
@@ -149,41 +221,76 @@ const {note}=Astro.props;
       assert.equal(build.status, 0, build.stdout + build.stderr);
       for (const tag of taxonomy)
         assert.ok(await readFile(join(fixture, "dist/tags", tag, "index.html"), "utf8"));
-      assert.ok(await readFile(join(fixture, "dist/notes", slug, "index.html"), "utf8"));
-      for (const file of ["rss.xml", "sitemap.xml"]) {
-        const result = { adapter, slug, file, pass: false };
-        try {
-          const xml = await readFile(join(fixture, "dist", file), "utf8");
-          const parsed = await page.evaluate((xml) => {
-            const document = new DOMParser().parseFromString(xml, "application/xml");
-            return {
-              error: document.querySelector("parsererror")?.textContent,
-              links: [...document.querySelectorAll("item > link, item > guid, url > loc")].map(
-                (element) => element.textContent,
-              ),
-              title: document.querySelector("item > title")?.textContent,
-              description: document.querySelector("item > description")?.textContent,
-            };
-          }, xml);
-          assert.equal(parsed.error, undefined, "Generated XML must parse without errors");
-          const url = origin + "/notes/" + slug + "/";
-          if (file === "rss.xml") {
-            assert.deepEqual(parsed.links, [url, url], "RSS must preserve link and GUID identity");
-            assert.equal(parsed.title, title);
-            assert.equal(parsed.description, description);
-          } else {
-            assert.ok(parsed.links.includes(url), "Sitemap must preserve URL identity");
-            assert.deepEqual(
-              parsed.links.filter((link) => link.startsWith(origin + "/tags/")).sort(),
-              taxonomy.map((tag) => origin + "/tags/" + tag + "/").sort(),
-              "Sitemap must list every generated category/tag route exactly once",
-            );
+      assert.ok(await readFile(join(fixture, "dist/notes", artifact, "index.html"), "utf8"));
+      const server = await preview({
+        root: fixture,
+        logLevel: "silent",
+        server: { host: "127.0.0.1", port: 0 },
+      });
+      try {
+        for (const file of ["rss.xml", "sitemap.xml"]) {
+          const result = { adapter, id: slug ?? filename, file, pass: false };
+          try {
+            const xml = await readFile(join(fixture, "dist", file), "utf8");
+            const parsed = await page.evaluate((xml) => {
+              const document = new DOMParser().parseFromString(xml, "application/xml");
+              return {
+                error: document.querySelector("parsererror")?.textContent,
+                links: [...document.querySelectorAll("item > link, item > guid, url > loc")].map(
+                  (element) => element.textContent,
+                ),
+                title: document.querySelector("item > title")?.textContent,
+                description: document.querySelector("item > description")?.textContent,
+              };
+            }, xml);
+            assert.equal(parsed.error, undefined, "Generated XML must parse without errors");
+            const url = origin + path;
+            if (file === "rss.xml") {
+              assert.deepEqual(
+                parsed.links,
+                [url, url],
+                "RSS must preserve link and GUID identity",
+              );
+              assert.equal(parsed.title, title);
+              assert.equal(parsed.description, description);
+            } else {
+              const location = parsed.links.find((link) => link.startsWith(origin + "/notes/"));
+              assert.ok(location, "Sitemap must include the note route");
+              const locationUrl = new URL(location);
+              assert.equal(locationUrl.search, "");
+              assert.equal(locationUrl.hash, "");
+              const response = await page.request.get(
+                `http://127.0.0.1:${server.port}${locationUrl.pathname}`,
+              );
+              assert.equal(
+                response.status(),
+                200,
+                "Sitemap location must reach the generated route",
+              );
+              assert.equal(
+                await page.evaluate(
+                  (html) =>
+                    new DOMParser().parseFromString(html, "text/html").querySelector("h1")
+                      ?.textContent,
+                  await response.text(),
+                ),
+                title.replace(/\r\n?/g, "\n"),
+                "Sitemap location must reach the expected note",
+              );
+              assert.deepEqual(
+                parsed.links.filter((link) => link.startsWith(origin + "/tags/")).sort(),
+                taxonomy.map((tag) => origin + "/tags/" + tag + "/").sort(),
+                "Sitemap must list every generated category/tag route exactly once",
+              );
+            }
+            result.pass = true;
+          } catch (error) {
+            result.error = error.message;
           }
-          result.pass = true;
-        } catch (error) {
-          result.error = error.message;
+          results.push(result);
         }
-        results.push(result);
+      } finally {
+        await server.stop();
       }
     }
   }

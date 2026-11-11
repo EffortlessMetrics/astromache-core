@@ -8,7 +8,14 @@ export interface PublicationMetadata {
 }
 
 export function publicationMetadata(input: PublicationMetadata): PublicationMetadata {
-  if (!input.title.trim() || !input.description.trim() || !input.language.trim()) {
+  if (
+    typeof input.title !== "string" ||
+    typeof input.description !== "string" ||
+    typeof input.language !== "string" ||
+    !input.title.trim() ||
+    !input.description.trim() ||
+    !input.language.trim()
+  ) {
     throw new Error("Publication metadata requires a title, description and language");
   }
   const language = parse(input.language, { normalize: false });

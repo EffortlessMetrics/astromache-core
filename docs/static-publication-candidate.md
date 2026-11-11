@@ -1,9 +1,7 @@
-# Static publication implementation candidate
+# Static publication release preparation
 
-This branch implements build-time rendered-content Markdown, publication metadata, output reconciliation and an optional bounded negotiation helper as the unpublished `0.3.0-publishing.1` candidate. Static HTML remains independent of request-time compute. Existing document/article APIs, consumer content, specialist offline/search ownership and deployment settings are unchanged.
+The `0.3.0` source combines the reviewed static-publication implementation from PR #45 with the remaining scoped component and consumer-qualification repairs. It supplies build-time rendered-content Markdown, publication metadata, output reconciliation and an optional bounded negotiation helper. Static HTML remains independent of request-time compute. Consumer content, specialist offline/search ownership and deployment settings remain separate.
 
-The publishing exports and resolved dependency lock are present. `pnpm qualify` runs the parser/converter contracts, and normal Linux/Windows qualification includes the independently installed static-publication consumer. Temporary dependency-preparation workflows have been removed.
+PR #45 landed as `417bc6992b0be06083ec358f6436b0751b44b35f`. Its exact source and landed main passed Linux and Windows qualification in runs [42992485605](https://github.com/EffortlessMetrics/astromache-core/actions/runs/42992485605) and [42994950001](https://github.com/EffortlessMetrics/astromache-core/actions/runs/42994950001). Those results retain their original candidate identity; the composed release candidate requires its own checks and archive receipt.
 
-Run 42754946337 qualified the preceding head's Linux product checks through the installed static-publication consumer and independent packed consumers, then failed the full-consumer upgrade lock-preservation guard. Windows qualification was cancelled. Repairs to that guard and current review findings require fresh qualification; no complete final-candidate pass, registry release or deployment is claimed here.
-
-The existing release checklist governs archive review and registry publication. Source integration, registry publication and consumer deployment are distinct outcomes. Retain exact source/archive identities and current test results in the PR rather than treating this status document as a qualification receipt.
+The existing release checklist governs archive review and registry publication. Source integration, registry publication and consumer deployment are distinct outcomes. Retain the final source/archive identities and current test results in the release PR and receipt. No registry publication is established by this document.

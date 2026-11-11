@@ -120,10 +120,12 @@ export async function auditPublication(rootDirectory, options = {}) {
     ].find((candidate) => inventory.includes(candidate));
   };
   const resolves = (url) => targetPath(url) !== undefined;
-  for (const [url, item] of canonicals) {
+  for (const item of documents) {
+    const url = item.document.canonical.href;
     if (item.document.canonical.origin !== origin) continue;
     const target = targetPath(url);
     if (!target) throw new Error(`Canonical URL has no static target: ${url}`);
+    if (item.document.noindex) continue;
     const destination = documents.find((entry) => entry.path === target)?.document;
     if (destination?.noindex) throw new Error(`Canonical URL resolves to noindex content: ${url}`);
     if (destination?.canonical.href !== url)

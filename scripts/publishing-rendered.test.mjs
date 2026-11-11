@@ -314,3 +314,58 @@ test("canonical identity must belong to the actual served target", () =>
       );
     }
   }));
+
+for (const robots of ["robots", "ROBOTS", "RoBoTs"]) {
+  test(`HTML metadata names preserve noindex semantics: ${robots}`, () =>
+    fixture(async (root) => {
+      await writeFile(
+        join(root, "article/index.html"),
+        page(undefined, `<meta name="${robots}" content="NOINDEX">`),
+      );
+      await assert.rejects(auditPublication(root, { origin }), /noindex/);
+    }));
+}
+for (const [canonical, alternate, type] of [
+  ["canonical", "alternate", "text/markdown"],
+  ["CANONICAL", "ALTERNATE", "TEXT/MARKDOWN"],
+  ["CaNoNiCaL", "AlTeRnAtE", "TeXt/MaRkDoWn"],
+]) {
+  test(`HTML link keywords retain publication identity: ${canonical}/${alternate}/${type}`, () =>
+    fixture(async (root) => {
+      await writeFile(
+        join(root, "article/index.html"),
+        page()
+          .replace('rel="canonical"', `rel="${canonical}"`)
+          .replace('rel="alternate"', `rel="${alternate}"`)
+          .replace('type="text/markdown"', `type="${type}"`),
+      );
+      const result = await auditPublication(root, { origin });
+      assert.equal(result.generated.length, 1);
+      assert.equal(result.generated[0].canonical, origin + "/article/");
+    }));
+}
+test("mixed-case duplicate canonical and robots declarations still reject", () => {
+  assert.throws(
+    () => readDocument(page(undefined, `<link rel="CANONICAL" href="${origin}/article/">`)),
+    /canonical/,
+  );
+  assert.throws(
+    () =>
+      readDocument(
+        page(
+          undefined,
+          '<meta name="robots" content="noindex"><meta name="ROBOTS" content="index">',
+        ),
+      ),
+    /robots/,
+  );
+});
+test("noindex aliases still require an emitted same-origin target", () =>
+  fixture(async (root) => {
+    await mkdir(join(root, "old"));
+    await writeFile(
+      join(root, "old/index.html"),
+      `<html><head><title>Redirect</title><meta name="robots" content="noindex"><link rel="canonical" href="${origin}/missing/"></head><body>Redirect</body></html>`,
+    );
+    await assert.rejects(auditPublication(root, { origin }), /Canonical URL has no static target/);
+  }));

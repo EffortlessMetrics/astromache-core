@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtemp, mkdir, readFile, writeFile, readdir, rm, realpath } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, relative, isAbsolute } from "node:path";
@@ -84,6 +84,10 @@ try {
       `---\nimport Document from 'astromache/document';const canonical=new URL('${name === "index" ? "/" : "/offline/"}',Astro.site);\n---\n<Document title="Fixture" description="Fixture description" canonical={canonical} language="en"><h1>Fixture</h1><a href="/notes/public/">Public article</a></Document>`,
     );
   await put(
+    "src/pages/custom.astro",
+    `---\nconst markdown=process.env.NO_MARKDOWN!=='1';const noindex=process.env.NOINDEX_CUSTOM==='1';\n---\n<!doctype html><html lang="en"><head><title>Custom</title><meta name="DESCRIPTION" content="Custom rendered metadata"><meta property="og:type" content="website"><meta property="og:title" content="Custom"><meta property="og:description" content="Custom rendered metadata"><meta property="og:url" content="https://publication.example/custom/"><link rel="CANONICAL" href="https://publication.example/custom/">{markdown&&<link rel="ALTERNATE" type="TEXT/MARKDOWN" href="https://publication.example/_markdown/custom.md"/>}{noindex&&<meta name="ROBOTS" content="NOINDEX"/>}</head><body><h1>Custom</h1><article data-article-body><p>Case-preserved custom text.</p></article></body></html>`,
+  );
+  await put(
     "public/sitemap.xml",
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://publication.example/notes/public/</loc></url></urlset>',
   );
@@ -105,17 +109,32 @@ try {
   const report = JSON.parse(
     await readFile(join(root, "dist/_meta/astromache-publication.json"), "utf8"),
   );
-  assert.equal(report.documents.length, 1);
+  assert.equal(report.documents.length, 2);
+  assert.match(
+    await readFile(join(root, "dist/_markdown/custom.md"), "utf8"),
+    /Case-preserved custom text/,
+  );
   assert.equal(
     report.html.find((item) => item.path === "notes/public/index.html").sha256,
     sha(html),
   );
-  assert.equal(report.documents[0].sha256, sha(md));
+  assert.equal(
+    report.documents.find((item) => item.canonical.endsWith("/notes/public/")).sha256,
+    sha(md),
+  );
   const offline = await readFile(join(root, "dist/offline-receipt.json"), "utf8");
   assert.match(offline, /_markdown\/notes\/public.md/);
   assert.doesNotMatch(offline, /draft|future/);
   for (const id of ["draft", "future"])
     await assert.rejects(readFile(join(root, `dist/notes/${id}/index.html`)), { code: "ENOENT" });
+  const rejected = spawnSync(process.execPath, [manager, "exec", "astro", "build"], {
+    cwd: root,
+    env: { ...process.env, ASTRO_TELEMETRY_DISABLED: "1", NOINDEX_CUSTOM: "1" },
+    encoding: "utf8",
+  });
+  assert.equal(rejected.status, 1, rejected.stdout + rejected.stderr);
+  assert.match(rejected.stdout + rejected.stderr, /noindex/);
+  await assert.rejects(readFile(join(root, "dist/_markdown/custom.md")), { code: "ENOENT" });
   run(["exec", "astro", "build"], root, { NO_MARKDOWN: "1" });
   const disabled = await readFile(join(root, "dist/notes/public/index.html"), "utf8");
   assert.doesNotMatch(disabled, /text\/markdown/);
@@ -130,6 +149,7 @@ try {
       "draft and future exclusion",
       "real GFM conversion",
       "metadata component compilation",
+      "custom HTML keyword casing and noindex refusal",
       "HTML byte integrity",
       "offline manifest includes Markdown",
       "disabled clean rebuild",

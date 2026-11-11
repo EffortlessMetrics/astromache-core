@@ -7,6 +7,10 @@ import { httpURL, markdownURL } from "./metadata.mjs";
 const has = (node, key) => Object.hasOwn(node.properties ?? {}, key);
 const value = (node, key) => node.properties?.[key];
 const words = (v) => (Array.isArray(v) ? v : String(v ?? "").split(/\s+/));
+const asciiLower = (value) =>
+  String(value ?? "").replace(/[A-Z]/g, (letter) => letter.toLowerCase());
+const hasRel = (node, token) =>
+  words(value(node, "rel")).some((word) => asciiLower(word) === token);
 const text = (node) =>
   node.type === "text" ? node.value : (node.children ?? []).map(text).join("");
 export function elements(tree, predicate) {
@@ -53,7 +57,9 @@ function meta(head, key, required = false) {
   const node = one(
     elements(
       head,
-      (n) => n.tagName === "meta" && (value(n, "name") === key || value(n, "property") === key),
+      (n) =>
+        n.tagName === "meta" &&
+        (asciiLower(value(n, "name")) === key || value(n, "property") === key),
     ),
     key,
     required,
@@ -67,7 +73,7 @@ export function readDocument(html) {
     "head",
   );
   const canonicalNode = one(
-    elements(head, (n) => n.tagName === "link" && words(value(n, "rel")).includes("canonical")),
+    elements(head, (n) => n.tagName === "link" && hasRel(n, "canonical")),
     "canonical",
     false,
   );
@@ -76,8 +82,8 @@ export function readDocument(html) {
     head,
     (n) =>
       n.tagName === "link" &&
-      words(value(n, "rel")).includes("alternate") &&
-      value(n, "type") === "text/markdown",
+      hasRel(n, "alternate") &&
+      asciiLower(value(n, "type")) === "text/markdown",
   );
   const alternate = one(alternates, "Markdown alternate", false);
   if (!canonical)

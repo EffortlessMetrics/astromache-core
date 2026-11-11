@@ -159,3 +159,25 @@ test("HTML requests carry the same variant boundary as negotiated Markdown", asy
   assert.equal(response.headers.get("vary"), "Accept");
   assert.equal(response.headers.get("cache-control"), "private, no-store");
 });
+
+test("negotiation preserves the request origin for double-slash paths", async () => {
+  for (const path of ["//other.host/a", "///other.host/a"]) {
+    const requests = [];
+    const response = await negotiateMarkdown(
+      new Request("https://example.test" + path + "?lang=en", {
+        headers: { accept: "text/markdown", "x-fixture": "preserved" },
+      }),
+      async (request) => {
+        requests.push(request);
+        return new Response("Markdown", { headers: { "content-type": "text/markdown" } });
+      },
+    );
+    assert.equal(requests.length, 1);
+    const target = new URL(requests[0].url);
+    assert.equal(target.origin, "https://example.test");
+    assert.equal(target.pathname, "/_markdown" + path + ".md");
+    assert.equal(target.search, "?lang=en");
+    assert.equal(requests[0].headers.get("x-fixture"), "preserved");
+    assert.equal(await response.text(), "Markdown");
+  }
+});

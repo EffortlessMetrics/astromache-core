@@ -88,6 +88,7 @@ export async function auditPublication(rootDirectory, options = {}) {
   const origin = httpURL(options.origin, "Publication origin").origin;
   const documents = [];
   const canonicals = new Map();
+  const noindexCanonicals = new Set();
   for (const path of inventory.filter((name) => name.endsWith(".html"))) {
     const html = await readFile(resolve(root, path), "utf8");
     const document = readDocument(html);
@@ -95,13 +96,18 @@ export async function auditPublication(rootDirectory, options = {}) {
       if (document.alternate) throw new Error("Markdown alternate has no canonical");
       continue;
     }
+    const item = { path, hash: digest(html), document };
+    documents.push(item);
     const identity = document.canonical.href;
+    if (document.noindex) {
+      if (document.alternate) throw new Error("noindex content cannot advertise Markdown");
+      noindexCanonicals.add(identity);
+      continue;
+    }
     const previous = canonicals.get(identity);
     if (previous && previous.hash !== digest(html))
       throw new Error(`Conflicting canonical publication: ${identity}`);
-    const item = { path, hash: digest(html), document };
     canonicals.set(identity, item);
-    documents.push(item);
   }
   const targetPath = (url) => {
     const path = localPath(url, origin);
@@ -115,10 +121,17 @@ export async function auditPublication(rootDirectory, options = {}) {
   };
   const resolves = (url) => targetPath(url) !== undefined;
   for (const [url, item] of canonicals) {
-    if (item.document.canonical.origin === origin && !resolves(url))
-      throw new Error(`Canonical URL has no static target: ${url}`);
+    if (item.document.canonical.origin !== origin) continue;
+    const target = targetPath(url);
+    if (!target) throw new Error(`Canonical URL has no static target: ${url}`);
+    const destination = documents.find((entry) => entry.path === target)?.document;
+    if (destination?.noindex) throw new Error(`Canonical URL resolves to noindex content: ${url}`);
+    if (destination?.canonical.href !== url)
+      throw new Error(`Canonical target does not declare the same identity: ${url}`);
   }
   const requireCanonical = (url, surface) => {
+    if (!canonicals.has(url) && noindexCanonicals.has(url))
+      throw new Error(`${surface} advertises noindex content: ${url}`);
     if (!canonicals.has(url) || !resolves(url))
       throw new Error(`${surface} URL is not an emitted canonical: ${url}`);
     if (canonicals.get(url).document.noindex)

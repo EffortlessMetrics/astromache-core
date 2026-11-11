@@ -35,9 +35,9 @@ jobs:
           git rev-parse HEAD
           node --version
           pnpm --version
+      - run: pnpm install --frozen-lockfile
       - name: Consumer upgrade preservation controls
         run: node --test scripts/publication-preservation.test.mjs scripts/publication-lock-preservation.test.mjs
-      - run: pnpm install --frozen-lockfile
       - run: pnpm exec vp --version
       - name: Required native and compatibility compilers, template diagnostics, lint, tests and output
         run: pnpm qualify

@@ -42,7 +42,8 @@
     "pnpm": "10.28.0",
     "typescript": "6.0.3",
     "typescript-native": "npm:typescript@7.1.0-dev.20261003.1",
-    "vite-plus": "1.0.0"
+    "vite-plus": "1.0.0",
+    "yaml": "2.9.1"
   },
   "engines": {
     "node": ">=24.19.0 <25"

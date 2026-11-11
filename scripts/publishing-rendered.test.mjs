@@ -227,3 +227,90 @@ test("body links and fragments are checked against actual output", () =>
     );
     await assert.rejects(auditPublication(root, options), /Missing publication link target/);
   }));
+
+test("non-publication HTML does not require publication fields", () =>
+  fixture(async (root) => {
+    await writeFile(
+      join(root, "verification.html"),
+      "<html><head></head><body>Verification</body></html>",
+    );
+    await writeFile(
+      join(root, "embed.html"),
+      '<html><head><title>One</title><title>Two</title><meta name="description" content="One"><meta name="description" content="Two"></head><body>Embed</body></html>',
+    );
+    const report = await buildPublication(root, options);
+    assert.equal(report.documents.length, 1);
+    assert.equal(
+      await readFile(join(root, "verification.html"), "utf8"),
+      "<html><head></head><body>Verification</body></html>",
+    );
+  }));
+
+test("an alternate without a canonical still rejects non-publication HTML", () =>
+  fixture(async (root) => {
+    await writeFile(
+      join(root, "verification.html"),
+      '<html><head><link rel="alternate" type="text/markdown" href="' +
+        origin +
+        '/_markdown/verification.md"></head><body>Verification</body></html>',
+    );
+    await assert.rejects(auditPublication(root, options), /alternate has no canonical/);
+  }));
+
+test("noindex redirect aliases preserve the indexable target canonical", () =>
+  fixture(async (root) => {
+    await mkdir(join(root, "old"));
+    const redirect =
+      '<html><head><title>Redirect</title><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=/article/"><link rel="canonical" href="' +
+      origin +
+      '/article/"></head><body><a href="/article/">Redirect</a></body></html>';
+    await writeFile(join(root, "old/index.html"), redirect);
+    const report = await buildPublication(root, options);
+    assert.equal(report.documents.length, 1);
+    assert.equal(report.html.length, 2);
+    assert.equal(await readFile(join(root, "old/index.html"), "utf8"), redirect);
+  }));
+
+test("noindex-only canonicals are not discovery targets or Markdown publications", () =>
+  fixture(async (root) => {
+    await writeFile(
+      join(root, "article/index.html"),
+      page(undefined, '<meta name="robots" content="noindex">', false),
+    );
+    await assert.rejects(auditPublication(root, options), /noindex/);
+    await writeFile(
+      join(root, "article/index.html"),
+      page(undefined, '<meta name="robots" content="noindex">'),
+    );
+    await assert.rejects(auditPublication(root, { origin }), /noindex/);
+  }));
+
+test("an indexable alias cannot advertise a noindex canonical destination", () =>
+  fixture(async (root) => {
+    await writeFile(
+      join(root, "article/index.html"),
+      page(undefined, '<meta name="robots" content="noindex">', false),
+    );
+    await mkdir(join(root, "alias"));
+    await writeFile(join(root, "alias/index.html"), page(undefined, "", false));
+    await assert.rejects(auditPublication(root, { ...options, markdown: false }), /noindex/);
+  }));
+
+test("canonical identity must belong to the actual served target", () =>
+  fixture(async (root) => {
+    await mkdir(join(root, "alias"));
+    await writeFile(join(root, "alias/index.html"), page(undefined, "", false));
+    for (const target of [
+      '<html><head><meta name="robots" content="noindex"></head><body>Hidden target</body></html>',
+      page(undefined, "", false).replace(
+        'href="' + origin + '/article/"',
+        'href="' + origin + '/alias/"',
+      ),
+    ]) {
+      await writeFile(join(root, "article/index.html"), target);
+      await assert.rejects(
+        auditPublication(root, { ...options, markdown: false }),
+        /Canonical target/,
+      );
+    }
+  }));

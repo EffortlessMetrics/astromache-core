@@ -66,8 +66,6 @@ export function readDocument(html) {
     elements(tree, (n) => n.tagName === "head"),
     "head",
   );
-  if (elements(head, (n) => n.tagName === "base").length)
-    throw new Error("Publication does not support a base element");
   const canonicalNode = one(
     elements(head, (n) => n.tagName === "link" && words(value(n, "rel")).includes("canonical")),
     "canonical",
@@ -82,6 +80,15 @@ export function readDocument(html) {
       value(n, "type") === "text/markdown",
   );
   const alternate = one(alternates, "Markdown alternate", false);
+  if (!canonical)
+    return {
+      tree,
+      head,
+      canonical,
+      alternate: alternate && httpURL(value(alternate, "href"), "Markdown alternate"),
+    };
+  if (elements(head, (n) => n.tagName === "base").length)
+    throw new Error("Publication does not support a base element");
   return {
     tree,
     head,

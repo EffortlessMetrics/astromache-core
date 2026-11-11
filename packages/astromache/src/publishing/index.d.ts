@@ -27,6 +27,8 @@ export interface PublicationReport {
   schemaVersion: number;
   html: Array<{ path: string; sha256: string }>;
   documents: Array<{ html: string; canonical: string; markdown: string; sha256: string }>;
+  /** Present when renderedSearch rewrote the search index. */
+  searchSha256?: string;
 }
 export function markdownURL(canonical: URL | string): URL;
 export function publicationHead(input: PublicationHeadOptions): {

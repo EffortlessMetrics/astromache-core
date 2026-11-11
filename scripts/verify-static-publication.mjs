@@ -56,7 +56,7 @@ try {
     assert.ok(pkg.exports[name]);
   await put(
     "astro.config.mjs",
-    `import {defineConfig} from 'astro/config';\nimport publication from 'astromache/static-publication';\nimport offline from 'astromache/static-offline';\nexport default defineConfig({site:'https://publication.example',output:'static',trailingSlash:'always',integrations:[publication({origin:'https://publication.example',markdown:process.env.NO_MARKDOWN!=='1',sitemap:'sitemap.xml'}),offline({cachePrefix:'publishing-fixture-',workerFile:'sw.js',globPatterns:['**/*.{html,js,css,md,json}'],maxResources:100,maxBytes:5000000,maxFileBytes:2000000,maxHtmlBytes:256000,worker:{navigationFallback:'/offline/'}})]});\n`,
+    `import {defineConfig} from 'astro/config';\nimport publication from 'astromache/static-publication';\nimport offline from 'astromache/static-offline';\nexport default defineConfig({site:'https://publication.example',output:'static',trailingSlash:'always',redirects:{'/old/':'/notes/public/'},integrations:[publication({origin:'https://publication.example',markdown:process.env.NO_MARKDOWN!=='1',sitemap:'sitemap.xml'}),offline({cachePrefix:'publishing-fixture-',workerFile:'sw.js',globPatterns:['**/*.{html,js,css,md,json}'],maxResources:100,maxBytes:5000000,maxFileBytes:2000000,maxHtmlBytes:256000,worker:{navigationFallback:'/offline/'}})]});\n`,
   );
   await put(
     "src/content.config.ts",
@@ -87,9 +87,15 @@ try {
     "public/sitemap.xml",
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://publication.example/notes/public/</loc></url></urlset>',
   );
+  await put("public/verification.html", "<html><head></head><body>Verification</body></html>");
   run(["exec", "astro", "build"]);
   const html = await readFile(join(root, "dist/notes/public/index.html"), "utf8");
   assert.match(html, /og:type.*article/);
+  assert.match(await readFile(join(root, "dist/old/index.html"), "utf8"), /noindex/);
+  assert.equal(
+    await readFile(join(root, "dist/verification.html"), "utf8"),
+    "<html><head></head><body>Verification</body></html>",
+  );
   assert.match(html, /text\/markdown/);
   const md = await readFile(join(root, "dist/_markdown/notes/public.md"), "utf8");
   assert.match(md, /Exact \*\*prose\*\*/);

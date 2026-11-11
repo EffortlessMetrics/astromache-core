@@ -52,7 +52,10 @@ export async function negotiateMarkdown(request, fetchAsset) {
   let response;
   try {
     if (prefersMarkdown(request.headers.get("accept") ?? "")) {
-      const target = markdownURL(new URL(original.pathname, original.origin));
+      const canonical = new URL(original);
+      canonical.search = "";
+      canonical.hash = "";
+      const target = markdownURL(canonical);
       target.search = original.search;
       const headers = new Headers(request.headers);
       // An HTML validator must never produce a Markdown 304 (or an HTML byte range).

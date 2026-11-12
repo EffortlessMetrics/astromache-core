@@ -2,9 +2,17 @@
 
 The core repository owns the public npm package `astromache`. The additive publication and static-publishing API is prepared as version `0.3.0`; the intended stable npm channel is `latest`. Preparation and dry runs do not establish registry publication. Previously published versions and historical candidate archives are immutable.
 
+This branch adds the unpublished `0.4.0-profile.1` candidate with the profile
+landing-page export. It is for exact-archive staging qualification, not an npm
+release. A stable 0.4 version or release channel requires a separate accepted
+release decision; do not publish this prerelease under `latest`.
+
 ## Supported contract
 
 Version 0.3.0 has 22 explicit source subpaths. Components and TypeScript modules remain source for the consumer compiler/bundler; no root export or precompiled JavaScript entry is promised. Astro ^7.3.5 is the peer range, with exact 7.3.5 qualified on Node 24.19.x. The optional offline peer is independently owned and released. The package does not include private content, starter branding, deployment configuration or automatic hosting changes. See the shipped README and static publishing guide for the supported contracts.
+
+The 0.4 profile candidate has 23 source subpaths. `astromache/profile` is additive;
+all 22 preceding export mappings and their runtime/style bytes remain unchanged.
 
 ## Immutable release archive
 

@@ -72,6 +72,7 @@ const subpaths = [
   "fonts.css",
   "portfolio",
   "publication",
+  "profile",
   "header",
   "footer",
   "article",
@@ -127,6 +128,15 @@ assert.match(
   await readFile(join(consumer, "dist/portfolio/index.html"), "utf8"),
   /<title>Portfolio<\/title>/,
 );
+const profile = await readFile(join(consumer, "dist/profile/index.html"), "utf8");
+assert.match(profile, /id="profile-title"[^>]*>Example author<\/h1>/);
+assert.match(profile, /id="about"[^>]*aria-labelledby="profile-title"/);
+assert.match(profile, /id="speaking"[^>]*aria-labelledby="profile-speaking-title"/);
+assert.match(profile, /id="follow"[^>]*aria-labelledby="profile-follow-title"/);
+assert.match(profile, /href="https:\/\/profiles\.example\/person\/" rel="me"/);
+const minimalProfile = await readFile(join(consumer, "dist/profile-minimal/index.html"), "utf8");
+assert.match(minimalProfile, /Example &amp; author/);
+assert.doesNotMatch(minimalProfile, /id="speaking"|id="follow"|class="profile-portrait"|<script\b/);
 const stylesheets = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)];
 assert.ok(stylesheets.length, "Consumer must emit linked stylesheets");
 const css = (

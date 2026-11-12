@@ -1,0 +1,13 @@
+---
+import Publication from "astromache/publication";
+import Profile from "astromache/profile";
+import "astromache/publication.css";
+---
+
+<Publication title="Packed profile" description="Profile composition from a clean installed archive" canonical={new URL("https://consumer.example/profile/")} language="en">
+  <Profile title="Example author" links={[{label:"Example profile", href:"https://profiles.example/person/", rel:"me"}, {label:"Publication", href:"/"}]}>
+    <p>Consumer-owned biography.</p>
+    <Fragment slot="portrait"><span>Consumer-owned portrait</span></Fragment>
+    <Fragment slot="speaking"><a href="/talk/">Example talk</a></Fragment>
+  </Profile>
+</Publication>

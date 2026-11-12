@@ -1,8 +1,12 @@
-# astromache 0.3.0
+# astromache 0.4.0-profile.1 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
 This version includes the publication foundation, the optional canonical offline preset, and `astromache/publication-head`, `astromache/static-publication` and `astromache/markdown-negotiation`. The [static publishing guide](STATIC-PUBLICATION.md) covers rendered-content Markdown, social metadata, output reconciliation and the optional host adapter. Static HTML remains independent of request-time compute, and the integration never rewrites emitted HTML.
+
+The 0.4 candidate adds `astromache/profile`, a personal landing-page composition
+using the existing publication style. It does not replace the publication
+homepage or change any existing component, stylesheet or export.
 
 The original npm 0.1.0 release and earlier unpublished archives remain immutable. A source version is not proof of registry publication; verify the release receipt before using a registry pin.
 
@@ -11,6 +15,7 @@ The foundation supplies real publication typography, responsive navigation, arti
 ## Added exports
 
 - `astromache/publication`: document composition; metadata props match `document`; optional htmlAttributes, themeStorageKey (theme), themeToggleId (theme-toggle); head/header/footer/body-end/default slots.
+- `astromache/profile`: page content for an identity/About, optional speaking, and follow-link landing page; title, links[{label,href,rel?}], speakingLabel (Speaking), followLabel (Follow me); portrait/default/speaking slots.
 - `astromache/header`: brand, brandHref, links[{label,href,current?}], navigationLabel, itemsId, overlaySelector; menu-icon/close-icon/controls slots. One header per document.
 - `astromache/footer`: label; social/default slots.
 - `astromache/article`: title, published{datetime,label}, readingTime, lens/tags/related/previous/next links, backHref/backLabel, returnStorageKey, backId/topButtonId; source/actions/reading-tools/back-icon/date-icon/default slots. Consumers derive records; no collection dependency.
@@ -66,9 +71,49 @@ This source package requires Astro ^7.3.5 and an Astro-compatible TypeScript com
 
 See the repository release checklist before proposing a public version.
 
+## Profile landing page
+
+Use `Profile` inside the existing `Publication` or `Document` layout. It supplies
+one H1 in `#about`, an optional H2 section in `#speaking` when that slot exists,
+and an optional H2 section in `#follow` when links are supplied. Omitted portrait,
+speaking and link inputs do not leave empty wrappers or headings. One profile
+instance per document is supported; `profile-title`, `profile-speaking-title`
+and `profile-follow-title` are reserved heading IDs.
+
+```astro
+---
+import Publication from "astromache/publication";
+import Profile from "astromache/profile";
+import "astromache/publication.css";
+---
+<Publication title="Example author" description="About, talks and profile links" canonical={new URL("https://example.com/")} language="en">
+  <Profile title="Example author" links={[{label: "Profile", href: "https://profiles.example/person/", rel: "me"}]}>
+    <img slot="portrait" src="/portrait.jpg" alt="Example author" width="192" height="192" />
+    <p>Consumer-authored biography.</p>
+    <Fragment slot="speaking"><a href="/speaking/">Talks and recordings</a></Fragment>
+  </Profile>
+</Publication>
+```
+
+`title`, labels and link text must contain non-whitespace text. Runtime validation
+rejects malformed link records and ambiguous destinations. Links accept explicit
+HTTP(S) URLs without credentials, root-relative paths and fragments; schemes such
+as `javascript:`, protocol-relative URLs, backslashes and control characters are
+rejected. `rel` is optional and supplied by the consumer: the library does not
+infer identity, add `me`, or open new tabs. Authored strings and valid URLs are
+preserved rather than rewritten. Contact forms or other destinations can be
+composed in the consumer-owned About or speaking slots.
+
+The component adds only scoped layout CSS. Existing publication typography,
+colors, fonts, theme controls and navigation remain in the selected layout.
+The portrait stacks above the biography below 640px; wider layouts use a bounded
+12rem portrait column. Page metadata, Person schema, content collections, records,
+profile links and image rights remain consumer-owned. The component emits no
+JavaScript, tracker, storage, worker or publication/article discovery surface.
+
 ## Install and supported toolchain
 
-After 0.3.0 registry publication is verified, install with `pnpm add --save-exact astromache@0.3.0 astro@7.3.5`. Before that, install the exact reviewed 0.3.0 archive and retain its SHA-256 receipt. Node >=24.19.0 <25 is the supported build runtime; Astro 7.3.5 is the qualified peer version. The broader declared Astro ^7.3.5 range is not exhaustively tested. Ordinary Astro compilation does not require this repository's native-TS7 qualification patch or Vite+ override.
+This 0.4 prerelease is an unpublished candidate: install its exact reviewed archive and retain its SHA-256 receipt. Use a registry pin only after the corresponding publication has been independently verified. Node >=24.19.0 <25 is the supported build runtime; Astro 7.3.5 is the qualified peer version. The broader declared Astro ^7.3.5 range is not exhaustively tested. Ordinary Astro compilation does not require this repository's native-TS7 qualification patch or Vite+ override.
 
 Do not import private paths. Preserve the prior archive and lockfile for consumer rollback. Release candidates are identified by commit and archive SHA-256.
 

@@ -1,3 +1,14 @@
+## 0.4.0-profile.1 — unpublished candidate
+
+- Add `astromache/profile` to compose consumer-owned About, portrait, speaking and
+  follow links within the established publication layout and design.
+- Keep all existing exports and runtime/style files unchanged. The optional
+  profile adds scoped layout CSS and no client-side behavior.
+- Validate runtime labels and follow-link records; preserve explicit identity
+  relationships without inferring `rel=me` or opening new tabs.
+- Exercise full/minimal neutral pages and the installed package export. Private
+  biography, talk records, links, fonts and portraits remain consumer-owned.
+
 ## 0.3.0
 
 - Deliver the expanded publication foundation and the static publishing exports described below, preserving the original 0.1.0 subpaths and historical candidate archives.

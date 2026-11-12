@@ -1,0 +1,84 @@
+---
+import { profileProps, type ProfileProps } from "./profile";
+
+export type Props = ProfileProps;
+
+const { title, links, speakingLabel, followLabel } = profileProps(Astro.props);
+const hasPortrait = Astro.slots.has("portrait");
+const hasSpeaking = Astro.slots.has("speaking");
+---
+
+<div class="profile-home">
+  <section id="about" aria-labelledby="profile-title" class="profile-introduction">
+    <h1 id="profile-title">{title}</h1>
+    <div class:list={["profile-body", { "with-portrait": hasPortrait }]}>
+      {hasPortrait && <div class="profile-portrait"><slot name="portrait" /></div>}
+      <div class="profile-about"><slot /></div>
+    </div>
+  </section>
+  {hasSpeaking && (
+    <section id="speaking" aria-labelledby="profile-speaking-title" class="profile-section">
+      <h2 id="profile-speaking-title">{speakingLabel}</h2>
+      <slot name="speaking" />
+    </section>
+  )}
+  {links.length > 0 && (
+    <section id="follow" aria-labelledby="profile-follow-title" class="profile-section">
+      <h2 id="profile-follow-title">{followLabel}</h2>
+      <ul class="profile-links">
+        {links.map((link) => <li><a href={link.href} rel={link.rel}>{link.label}</a></li>)}
+      </ul>
+    </section>
+  )}
+</div>
+
+<style>
+  .profile-introduction {
+    padding-block: 1.5rem;
+  }
+  .profile-introduction h1 {
+    margin-block: 0 1.5rem;
+  }
+  .profile-body {
+    display: grid;
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+  .profile-portrait,
+  .profile-about {
+    min-width: 0;
+  }
+  .profile-portrait {
+    max-width: 12rem;
+  }
+  .profile-about > :global(:first-child) {
+    margin-top: 0;
+  }
+  .profile-about > :global(:last-child) {
+    margin-bottom: 0;
+  }
+  .profile-section {
+    border-top: 1px solid var(--border, currentColor);
+    padding-block: 2rem;
+  }
+  .profile-section h2 {
+    margin-top: 0;
+  }
+  .profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .profile-links li {
+    min-width: 0;
+    margin: 0;
+  }
+  @media (min-width: 640px) {
+    .profile-body.with-portrait {
+      grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    }
+  }
+</style>

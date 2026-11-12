@@ -6,6 +6,7 @@ import { isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { verifyPackedPortfolioBrowser } from "./verify-packed-portfolio-browser.mjs";
 import { verifyNavigationPrefetchBrowser } from "./verify-navigation-prefetch.mjs";
+import { verifyProfileBrowser } from "./verify-profile-browser.mjs";
 
 // Windows hosted tmpdir can use a DOS alias (RUNNER~1). Astro/Vite CSS module
 // identities must use the same canonical path as the files they resolve.
@@ -52,6 +53,8 @@ const expected = [
   "src/static-offline.mjs",
   "src/static-offline.d.ts",
   "src/Publication.astro",
+  "src/Profile.astro",
+  "src/profile.ts",
   "src/Header.astro",
   "src/Footer.astro",
   "src/Article.astro",
@@ -179,6 +182,7 @@ const receipt = {
   portfolioCanonicalSha256: createHash("sha256").update(canonicalScopes(gallery)).digest("hex"),
 };
 await verifyPackedPortfolioBrowser(dir);
+await verifyProfileBrowser(dir);
 await verifyNavigationPrefetchBrowser(join(installed, "src/navigation.ts"));
 // Runtime data can violate the statically typed props even in a packed consumer.
 await writeFile(

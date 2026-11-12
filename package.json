@@ -25,6 +25,7 @@
     "verify:interaction": "node scripts/verify-return-menu.mjs",
     "verify:taxonomy": "node scripts/verify-taxonomy.mjs",
     "verify:article-actions": "node scripts/verify-article-actions.mjs",
+    "verify:profile": "node scripts/verify-profile-browser.mjs consumers/neutral",
     "verify:offline:snapshots": "node --test scripts/offline-cache-snapshot.test.mjs",
     "verify:publication:preservation": "node --test scripts/publication-preservation.test.mjs scripts/publication-lock-preservation.test.mjs",
     "verify:offline:config": "node --test scripts/static-offline-paths.test.mjs && node scripts/verify-static-offline-config.mjs",

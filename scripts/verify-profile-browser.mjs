@@ -126,6 +126,27 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
           await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
           true,
         );
+        await page.locator(".profile-home").evaluate((element) => {
+          element.style.width = "180px";
+          element.style.fontSize = "200%";
+        });
+        const narrow = await page.locator(".profile-body").evaluate((element) => {
+          const portrait = element.querySelector(".profile-portrait");
+          const box = element.getBoundingClientRect();
+          const image = portrait.getBoundingClientRect();
+          return {
+            width: box.width,
+            portraitWidth: image.width,
+            right: image.right,
+            edge: box.right,
+            overflow: element.scrollWidth > element.clientWidth,
+          };
+        });
+        assert.ok(Math.abs(narrow.portraitWidth - narrow.width * 0.4) < 1);
+        assert.ok(
+          narrow.right <= narrow.edge && !narrow.overflow,
+          "Flow portrait fits a narrow container at enlarged text",
+        );
         checks.push({
           width,
           colorScheme,

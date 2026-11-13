@@ -82,7 +82,7 @@ and `profile-follow-title` are reserved heading IDs.
 
 `portraitLayout="flow"` opts into biography text flowing around a left portrait.
 The default `"grid"` retains the stacked mobile and side-by-side desktop layout.
-The flow portrait is capped at 12rem, with 40% width on viewports up to 380px;
+The flow portrait is capped at 12rem, with 40% width on narrow viewports or containers;
 the consumer supplies the image and its alternative text.
 
 ```astro

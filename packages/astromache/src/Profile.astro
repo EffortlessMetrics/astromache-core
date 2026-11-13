@@ -33,6 +33,9 @@ const hasSpeaking = Astro.slots.has("speaking");
 </div>
 
 <style>
+  .profile-home {
+    container-type: inline-size;
+  }
   .profile-introduction {
     padding-block: 1.5rem;
   }
@@ -60,6 +63,12 @@ const hasSpeaking = Astro.slots.has("speaking");
     margin: 0 2rem 1.5rem 0;
   }
   @media (max-width: 380px) {
+    .portrait-flow .profile-portrait {
+      width: 40%;
+      margin-right: 1rem;
+    }
+  }
+  @container (max-width: 300px) {
     .portrait-flow .profile-portrait {
       width: 40%;
       margin-right: 1rem;

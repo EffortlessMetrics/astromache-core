@@ -10,6 +10,8 @@ export interface ProfileProps {
   links?: ReadonlyArray<ProfileLink>;
   speakingLabel?: string;
   followLabel?: string;
+  /** Flow biography text around the portrait, or use the default responsive grid. */
+  portraitLayout?: "grid" | "flow";
 }
 
 const text = (value: unknown, field: string): string => {
@@ -54,6 +56,10 @@ export function profileProps(input: ProfileProps) {
   const title = text(input.title, "title");
   const speakingLabel = text(input.speakingLabel ?? "Speaking", "speakingLabel");
   const followLabel = text(input.followLabel ?? "Follow me", "followLabel");
+  const portraitLayout = input.portraitLayout ?? "grid";
+  if (portraitLayout !== "grid" && portraitLayout !== "flow") {
+    throw new TypeError("Profile portraitLayout must be grid or flow");
+  }
   if (input.links !== undefined && !Array.isArray(input.links)) {
     throw new TypeError("Profile links must be an array");
   }
@@ -68,5 +74,5 @@ export function profileProps(input: ProfileProps) {
     }
     return { label, href: url, ...(link.rel === undefined ? {} : { rel: link.rel }) };
   });
-  return { title, speakingLabel, followLabel, links };
+  return { title, speakingLabel, followLabel, portraitLayout, links };
 }

@@ -1,3 +1,7 @@
+## 0.4.0-profile.2 — unpublished candidate
+
+- Add an opt-in flowing portrait layout to the profile component; the default grid is unchanged.
+
 ## 0.4.0-profile.1 — unpublished candidate
 
 - Add `astromache/profile` to compose consumer-owned About, portrait, speaking and

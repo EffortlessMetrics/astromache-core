@@ -1,6 +1,6 @@
 # Astromache core
 
-Reusable public machinery for the [astromache starter](https://github.com/EffortlessMetrics/astromache). This repository owns the unchanged npm identity `astromache`. Unpublished candidate **0.4.0-profile.1** adds a profile landing-page composition to the 0.3.0 publication foundation, static Markdown and metadata exports, and reviewed component repairs. Registry availability is established by the release receipt, not this source version; use the exact reviewed archive until publication is verified. Existing published versions and historical candidate archives remain immutable.
+Reusable public machinery for the [astromache starter](https://github.com/EffortlessMetrics/astromache). This repository owns the unchanged npm identity `astromache`. Unpublished candidate **0.4.0-profile.2** adds a profile landing-page composition to the 0.3.0 publication foundation, static Markdown and metadata exports, and reviewed component repairs. Registry availability is established by the release receipt, not this source version; use the exact reviewed archive until publication is verified. Existing published versions and historical candidate archives remain immutable.
 
 The branded repository is the small editable starter. This core retains package source, public regression consumers and historical producer fixtures. Offline and static-search remain independent specialist packages. Private sites consume packages as siblings; no private site source or Git history is imported here.
 

@@ -109,6 +109,52 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
           "Enlarged text must not overflow horizontally",
         );
         assert.deepEqual(errors, []);
+        await page.goto(`${origin}/profile-flow/`);
+        const flow = await page.locator(".profile-body").evaluate((element) => {
+          const portrait = element.querySelector(".profile-portrait");
+          return {
+            display: getComputedStyle(element).display,
+            float: getComputedStyle(portrait).float,
+            width: portrait.getBoundingClientRect().width,
+            container: element.getBoundingClientRect().width,
+          };
+        });
+        assert.equal(flow.display, "flow-root");
+        assert.equal(flow.float, "left");
+        assert.ok(Math.abs(flow.width - (width <= 380 ? flow.container * 0.4 : 192)) < 1);
+        assert.equal(
+          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          true,
+        );
+        await page.locator(".profile-home").evaluate((element) => {
+          element.style.width = "180px";
+          element.style.fontSize = "200%";
+        });
+        const narrow = await page.locator(".profile-body").evaluate((element) => {
+          const portrait = element.querySelector(".profile-portrait");
+          const box = element.getBoundingClientRect();
+          const image = portrait.getBoundingClientRect();
+          return {
+            width: box.width,
+            portraitWidth: image.width,
+            right: image.right,
+            edge: box.right,
+            overflow: element.scrollWidth > element.clientWidth,
+          };
+        });
+        assert.ok(Math.abs(narrow.portraitWidth - narrow.width * 0.4) < 1);
+        assert.ok(
+          narrow.right <= narrow.edge && !narrow.overflow,
+          "Flow portrait fits a narrow container at enlarged text",
+        );
+        for (const route of ["profile", "profile-flow"]) {
+          await page.goto(`${origin}/${route}/`);
+          const intrinsicWidth = await page.locator(".profile-home").evaluate((element) => {
+            element.parentElement.style.display = "flex";
+            return element.getBoundingClientRect().width;
+          });
+          assert.ok(intrinsicWidth > 150, `${route} retains intrinsic width as a flex child`);
+        }
         checks.push({
           width,
           colorScheme,

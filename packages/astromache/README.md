@@ -1,4 +1,4 @@
-# astromache 0.4.0-profile.1 — unpublished candidate
+# astromache 0.4.0-profile.2 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
@@ -80,6 +80,11 @@ speaking and link inputs do not leave empty wrappers or headings. One profile
 instance per document is supported; `profile-title`, `profile-speaking-title`
 and `profile-follow-title` are reserved heading IDs.
 
+`portraitLayout="flow"` opts into biography text flowing around a left portrait.
+The default `"grid"` retains the stacked mobile and side-by-side desktop layout.
+The flow portrait is capped at 12rem, with 40% width on narrow viewports or containers;
+the consumer supplies the image and its alternative text.
+
 ```astro
 ---
 import Publication from "astromache/publication";
@@ -106,8 +111,9 @@ composed in the consumer-owned About or speaking slots.
 
 The component adds only scoped layout CSS. Existing publication typography,
 colors, fonts, theme controls and navigation remain in the selected layout.
-The portrait stacks above the biography below 640px; wider layouts use a bounded
-12rem portrait column. Page metadata, Person schema, content collections, records,
+In the default grid, the portrait stacks above the biography below 640px; wider
+layouts use a bounded 12rem portrait column. The opt-in flow layout wraps the
+biography around the portrait at both narrow and wide viewport sizes. Page metadata, Person schema, content collections, records,
 profile links and image rights remain consumer-owned. The component emits no
 JavaScript, tracker, storage, worker or publication/article discovery surface.
 

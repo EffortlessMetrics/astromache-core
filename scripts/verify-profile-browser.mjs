@@ -147,6 +147,14 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
           narrow.right <= narrow.edge && !narrow.overflow,
           "Flow portrait fits a narrow container at enlarged text",
         );
+        for (const route of ["profile", "profile-flow"]) {
+          await page.goto(`${origin}/${route}/`);
+          const intrinsicWidth = await page.locator(".profile-home").evaluate((element) => {
+            element.parentElement.style.display = "flex";
+            return element.getBoundingClientRect().width;
+          });
+          assert.ok(intrinsicWidth > 150, `${route} retains intrinsic width as a flex child`);
+        }
         checks.push({
           width,
           colorScheme,

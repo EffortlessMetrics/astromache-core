@@ -1,0 +1,24 @@
+---
+import Publication from "astromache/publication";
+import Header from "astromache/header";
+import Footer from "astromache/footer";
+import Profile from "astromache/profile";
+import "astromache/publication.css";
+const links = [
+  { label: "Example profile", href: "https://profiles.example/person/", rel: "me" },
+  { label: "Publication", href: "/" },
+];
+---
+
+<Publication title="Example profile" description="Neutral profile landing-page fixture" canonical={new URL("https://neutral.example/profile-flow/")} language="en">
+  <Header slot="header" brand="Neutral publication" links={[{ label: "About", href: "#about" }, { label: "Speaking", href: "#speaking" }, { label: "Follow me", href: "#follow" }]}>
+    <button slot="controls" class="icon-button" id="theme-toggle" type="button">Theme</button>
+  </Header>
+  <Profile title="Example author" portraitLayout="flow" links={links}>
+    <img slot="portrait" src="/portfolio-placeholder.svg" alt="Neutral geometric portrait placeholder" width="192" height="192" />
+    <p>This page keeps biography, speaking, and profile links in one place.</p>
+    <p>Authored content, identity, and the destination URLs belong to the consumer.</p>
+    <Fragment slot="speaking"><p>Talks and recordings.</p><a href="/talk/">Example recorded talk</a></Fragment>
+  </Profile>
+  <Footer slot="footer" label="Neutral consumer" />
+</Publication>

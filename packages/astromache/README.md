@@ -1,4 +1,4 @@
-# astromache 0.4.0-profile.1 — unpublished candidate
+# astromache 0.4.0-profile.2 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
@@ -79,6 +79,11 @@ and an optional H2 section in `#follow` when links are supplied. Omitted portrai
 speaking and link inputs do not leave empty wrappers or headings. One profile
 instance per document is supported; `profile-title`, `profile-speaking-title`
 and `profile-follow-title` are reserved heading IDs.
+
+`portraitLayout="flow"` opts into biography text flowing around a left portrait.
+The default `"grid"` retains the stacked mobile and side-by-side desktop layout.
+The flow portrait is capped at 12rem, with 40% width on viewports up to 380px;
+the consumer supplies the image and its alternative text.
 
 ```astro
 ---

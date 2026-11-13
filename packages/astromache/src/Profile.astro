@@ -3,7 +3,7 @@ import { profileProps, type ProfileProps } from "./profile";
 
 export type Props = ProfileProps;
 
-const { title, links, speakingLabel, followLabel } = profileProps(Astro.props);
+const { title, links, speakingLabel, followLabel, portraitLayout } = profileProps(Astro.props);
 const hasPortrait = Astro.slots.has("portrait");
 const hasSpeaking = Astro.slots.has("speaking");
 ---
@@ -11,7 +11,7 @@ const hasSpeaking = Astro.slots.has("speaking");
 <div class="profile-home">
   <section id="about" aria-labelledby="profile-title" class="profile-introduction">
     <h1 id="profile-title">{title}</h1>
-    <div class:list={["profile-body", { "with-portrait": hasPortrait }]}>
+    <div class:list={["profile-body", { "with-portrait": hasPortrait, "portrait-flow": hasPortrait && portraitLayout === "flow" }]}>
       {hasPortrait && <div class="profile-portrait"><slot name="portrait" /></div>}
       <div class="profile-about"><slot /></div>
     </div>
@@ -50,6 +50,20 @@ const hasSpeaking = Astro.slots.has("speaking");
   }
   .profile-portrait {
     max-width: 12rem;
+  }
+  .profile-body.portrait-flow {
+    display: flow-root;
+  }
+  .portrait-flow .profile-portrait {
+    float: left;
+    width: 12rem;
+    margin: 0 2rem 1.5rem 0;
+  }
+  @media (max-width: 380px) {
+    .portrait-flow .profile-portrait {
+      width: 40%;
+      margin-right: 1rem;
+    }
   }
   .profile-about > :global(:first-child) {
     margin-top: 0;

@@ -12,7 +12,7 @@ test("keeps authored wording and supplied relationships unchanged", () => {
       { label: "About", href: "#about" },
     ],
   };
-  expect(profileProps(input)).toEqual(input);
+  expect(profileProps(input)).toEqual({ ...input, portraitLayout: "grid" });
 });
 
 test("has no implicit social links or relationships", () => {
@@ -20,6 +20,7 @@ test("has no implicit social links or relationships", () => {
     title: "Example author",
     speakingLabel: "Speaking",
     followLabel: "Follow me",
+    portraitLayout: "grid",
     links: [],
   });
   const output = profileProps({
@@ -27,6 +28,13 @@ test("has no implicit social links or relationships", () => {
     links: [{ label: "Publication", href: "https://publication.example/" }],
   });
   expect(output.links[0]).not.toHaveProperty("rel");
+});
+
+test("accepts the optional flow portrait layout and rejects unknown layouts", () => {
+  expect(profileProps({ title: "Example", portraitLayout: "flow" }).portraitLayout).toBe("flow");
+  expect(() =>
+    profileProps({ title: "Example", portraitLayout: "other" } as unknown as ProfileProps),
+  ).toThrow("Profile portraitLayout");
 });
 
 test.each([undefined, null, 0, "", "   "])("rejects an unreadable title: %j", (title) => {

@@ -109,6 +109,23 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
           "Enlarged text must not overflow horizontally",
         );
         assert.deepEqual(errors, []);
+        await page.goto(`${origin}/profile-flow/`);
+        const flow = await page.locator(".profile-body").evaluate((element) => {
+          const portrait = element.querySelector(".profile-portrait");
+          return {
+            display: getComputedStyle(element).display,
+            float: getComputedStyle(portrait).float,
+            width: portrait.getBoundingClientRect().width,
+            container: element.getBoundingClientRect().width,
+          };
+        });
+        assert.equal(flow.display, "flow-root");
+        assert.equal(flow.float, "left");
+        assert.ok(Math.abs(flow.width - (width <= 380 ? flow.container * 0.4 : 192)) < 1);
+        assert.equal(
+          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          true,
+        );
         checks.push({
           width,
           colorScheme,

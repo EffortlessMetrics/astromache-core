@@ -111,8 +111,9 @@ composed in the consumer-owned About or speaking slots.
 
 The component adds only scoped layout CSS. Existing publication typography,
 colors, fonts, theme controls and navigation remain in the selected layout.
-The portrait stacks above the biography below 640px; wider layouts use a bounded
-12rem portrait column. Page metadata, Person schema, content collections, records,
+In the default grid, the portrait stacks above the biography below 640px; wider
+layouts use a bounded 12rem portrait column. The opt-in flow layout wraps the
+biography around the portrait at both narrow and wide viewport sizes. Page metadata, Person schema, content collections, records,
 profile links and image rights remain consumer-owned. The component emits no
 JavaScript, tracker, storage, worker or publication/article discovery surface.
 

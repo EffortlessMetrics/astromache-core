@@ -38,7 +38,7 @@ test("accepts stack layout and an independent generic content heading", () => {
   ).toBe("stack");
 });
 
-test.each(["", "two words", "quoted\"id", "bad#id"])("rejects an invalid section id: %s", (id) => {
+test.each(["", "two words", 'quoted"id', "bad#id"])("rejects an invalid section id: %s", (id) => {
   expect(() => sectionProps({ id, title: "Example" })).toThrow("section id");
 });
 

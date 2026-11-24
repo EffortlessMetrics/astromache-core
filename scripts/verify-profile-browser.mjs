@@ -188,9 +188,9 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
         for (const name of ["Example contact", "Publication Writing", "Projects", "All work"]) {
           await page.keyboard.press("Tab");
           assert.equal(
-            await page.getByRole("link", { name, exact: true }).evaluate(
-              (element) => element === document.activeElement,
-            ),
+            await page
+              .getByRole("link", { name, exact: true })
+              .evaluate((element) => element === document.activeElement),
             true,
           );
         }

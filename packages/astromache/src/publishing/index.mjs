@@ -1,4 +1,5 @@
 import { lstat, mkdir, readFile, readdir, writeFile, realpath } from "node:fs/promises";
+import { createReadStream } from "node:fs";
 import { relative, resolve, dirname, sep, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
@@ -6,9 +7,32 @@ import { SaxesParser } from "saxes";
 import { readDocument, renderedPublication, publicationText, elements } from "./rendered.mjs";
 import { httpURL } from "./metadata.mjs";
 export { publicationHead, markdownURL, jsonForHTML } from "./metadata.mjs";
+import {
+  assertDiscoverySitemap,
+  createDiscoveryManifest,
+  discoveryPage,
+  readDiscoverySitemap,
+  verifyDiscoveryRobots,
+} from "./discovery.mjs";
+export {
+  sitemapLastmod,
+  diffDiscoveryManifests,
+  verifyHostedDiscovery,
+  submitIndexNow,
+} from "./discovery.mjs";
+export {
+  discoveryManifestSha256,
+  createNotificationLedger,
+  observeNotificationDeployment,
+  beginNotificationBatch,
+  settleNotificationBatch,
+  recoverNotificationBatch,
+  resetRejectedNotifications,
+} from "./notification-ledger.mjs";
 
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const receipt = "_meta/astromache-publication.json";
+const discoveryReceipt = "_meta/discovery.json";
 async function files(root, prefix = "") {
   const result = [];
   for (const item of await readdir(resolve(root, prefix), { withFileTypes: true })) {
@@ -163,6 +187,79 @@ export async function auditPublication(rootDirectory, options = {}) {
     };
     await visit(options.sitemap);
   }
+  let discovery;
+  if (options.discovery) {
+    if (!options.sitemap) throw new Error("Discovery requires a configured sitemap");
+    const sitemap = new URL(options.sitemap, origin + "/").href;
+    const routeSet = (paths, label) => {
+      if (!Array.isArray(paths)) throw new TypeError(label + " requires an array of exact routes");
+      const result = new Set();
+      for (const path of paths) {
+        const url = new URL(path, origin);
+        if (
+          typeof path !== "string" ||
+          !path.startsWith("/") ||
+          path.startsWith("//") ||
+          url.origin !== origin ||
+          url.pathname !== path ||
+          url.search ||
+          url.hash ||
+          result.has(path)
+        )
+          throw new Error("Invalid or duplicate " + label + " route: " + path);
+        result.add(path);
+      }
+      return result;
+    };
+    const excluded = routeSet(options.discovery.excludePaths ?? [], "excluded");
+    const configured = options.discovery.expectedRoutes;
+    const inventoryFile = options.discovery.expectedRoutesFile;
+    if ((configured === undefined) === (inventoryFile === undefined))
+      throw new Error("Discovery requires exactly one expected route inventory");
+    const expected = routeSet(
+      inventoryFile === undefined ? configured : JSON.parse(await readLocal(inventoryFile)),
+      "expected",
+    );
+    for (const path of excluded)
+      if (expected.has(path)) throw new Error("Expected route is also excluded: " + path);
+    const pages = [];
+    const media = new Map();
+    const readMedia = (url) => {
+      if (!media.has(url)) {
+        media.set(
+          url,
+          (async () => {
+            const path = localPath(url, origin);
+            if (!inventory.includes(path)) throw new Error("Missing discovery media: " + url);
+            const hash = createHash("sha256");
+            for await (const chunk of createReadStream(await contained(root, path)))
+              hash.update(chunk);
+            return hash.digest("hex");
+          })(),
+        );
+      }
+      return media.get(url);
+    };
+    for (const [url] of canonicals) {
+      const parsed = new URL(url);
+      if (parsed.origin !== origin || excluded.has(parsed.pathname)) continue;
+      const target = targetPath(url);
+      const document = htmlDocuments.get(target);
+      if (document?.canonical?.href !== url || document.noindex)
+        throw new Error("Discovery requires an indexable canonical destination: " + url);
+      if (!expected.delete(parsed.pathname))
+        throw new Error("Unexpected indexable canonical: " + url);
+      pages.push(await discoveryPage(document, readMedia));
+    }
+    if (expected.size)
+      throw new Error("Missing expected indexable canonical: " + [...expected].join(", "));
+    discovery = createDiscoveryManifest({ origin, sitemap, pages });
+    verifyDiscoveryRobots(await readLocal("robots.txt"), sitemap);
+    assertDiscoverySitemap(
+      discovery,
+      await readDiscoverySitemap(origin, sitemap, (url) => readLocal(localPath(url, origin))),
+    );
+  }
   if (options.feed) {
     for (const url of xmlValues(
       await readLocal(options.feed),
@@ -247,8 +344,11 @@ export async function auditPublication(rootDirectory, options = {}) {
       sha256: digest(rendered.markdown),
     });
   }
+  if (discovery && inventory.includes(discoveryReceipt))
+    throw new Error("Stale or consumer-owned discovery output; use a clean build");
   if (inventory.some((name) => name.startsWith("_markdown/")) || inventory.includes(receipt))
     throw new Error("Stale or consumer-owned publication output; use a clean build");
+  if (discovery) planned.set(discoveryReceipt, JSON.stringify(discovery, null, 2) + "\n");
   for (const path of [...planned.keys(), receipt]) await contained(root, path);
   return {
     root,
@@ -256,6 +356,7 @@ export async function auditPublication(rootDirectory, options = {}) {
     generated,
     planned,
     searchOutput,
+    discovery,
     html: documents.map(({ path, hash }) => ({ path, sha256: hash })),
   };
 }
@@ -272,6 +373,7 @@ export async function buildPublication(directory, options) {
     schemaVersion: 1,
     html: result.html,
     documents: result.generated,
+    ...(result.discovery === undefined ? {} : { discovery: result.discovery }),
     ...(result.searchOutput === undefined ? {} : { searchSha256: digest(result.searchOutput) }),
   };
   const target = await contained(result.root, receipt);

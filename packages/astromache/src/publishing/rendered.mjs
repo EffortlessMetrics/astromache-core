@@ -114,7 +114,9 @@ export function readDocument(html) {
     published: meta(head, "article:published_time"),
     modified: meta(head, "article:modified_time"),
     bodyMode: meta(head, "astromache:body") ?? "marked",
-    noindex: /(?:^|[\s,])noindex(?:$|[\s,])/i.test(meta(head, "robots") ?? ""),
+    noindex: ["robots", "googlebot", "bingbot"].some((agent) =>
+      /(?:^|[\s,])(?:noindex|none)(?:$|[\s,])/i.test(meta(head, agent) ?? ""),
+    ),
   };
 }
 function absolute(value, canonical, asset) {
@@ -343,4 +345,128 @@ function renderedText(body) {
     return block ? " " + content + " " : content;
   };
   return walk(body).replace(/\s+/g, " ").trim();
+}
+
+function discoveryBody(document) {
+  return document.hasBody
+    ? selectedBody({ ...document, bodyMode: "marked" })
+    : one(
+        visibleElements(document.tree, (node) => node.tagName === "main"),
+        "discovery main",
+      );
+}
+
+/** Primary static media references, independently verified from the rendered HTML. */
+export function discoveryMedia(document) {
+  const main = discoveryBody(document);
+  const contained = new Set(elements(main, () => true));
+  const sources = visibleElements(document.tree, (node) =>
+    has(node, "dataPublicationSource"),
+  ).filter((node) => !contained.has(node));
+  const urls = new Set();
+  const add = (candidate) => {
+    if (!candidate) return;
+    const url = new URL(candidate, document.canonical);
+    if (url.origin !== document.canonical.origin) return;
+    if (url.username || url.password) throw new Error("Discovery media URL has credentials");
+    url.search = "";
+    url.hash = "";
+    urls.add(url.href);
+  };
+  const srcset = (input) => {
+    // The URL token may itself contain a comma (notably data URLs).
+    // Follow the URL-token/descriptor boundary rather than splitting on commas.
+    let remaining = String(input ?? "");
+    while (remaining.length) {
+      remaining = remaining.replace(/^[\s,]+/, "");
+      if (!remaining) break;
+      const token = /^\S+/.exec(remaining)[0];
+      remaining = remaining.slice(token.length);
+      add(token.replace(/,+$/, ""));
+      if (token.endsWith(",")) continue;
+      let depth = 0,
+        end = 0;
+      while (end < remaining.length) {
+        const char = remaining[end++];
+        if (char === "(") depth++;
+        else if (char === ")" && depth) depth--;
+        else if (char === "," && depth === 0) break;
+      }
+      remaining = remaining.slice(end);
+    }
+  };
+  for (const region of [main, ...sources]) {
+    for (const node of visibleElements(region, (n) =>
+      ["img", "source", "video", "audio"].includes(n.tagName),
+    )) {
+      add(value(node, "src"));
+      add(value(node, "poster"));
+      srcset(value(node, "srcSet"));
+    }
+  }
+  add(meta(document.head, "og:image"));
+  return [...urls].sort();
+}
+
+/** Bounded content projection, independent of Markdown and bundled presentation. */
+export function discoveryContent(document) {
+  const tree = document.tree;
+  const main = discoveryBody(document);
+  const semantic = (node) => {
+    if (node.type === "text") return [node.value];
+    if (node.type !== "element" || hidden(node)) return [];
+    if (
+      ["script", "style", "template", "button", "input", "select", "textarea"].includes(
+        node.tagName,
+      )
+    )
+      return [];
+    if (has(node, "dataPublicationText")) return [String(value(node, "dataPublicationText"))];
+    const properties = Object.fromEntries(
+      Object.entries(node.properties ?? {})
+        .filter(
+          ([key]) =>
+            !/^(?:className$|style$|on|dataAstro|dataVite|tabIndex$|width$|height$|loading$|decoding$|fetchPriority$)/i.test(
+              key,
+            ),
+        )
+        .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
+    );
+    const children = [];
+    for (const child of (node.children ?? []).flatMap(semantic)) {
+      if (typeof child === "string" && typeof children.at(-1) === "string")
+        children[children.length - 1] += child;
+      else children.push(child);
+    }
+    // Syntax highlighting and styling-only inline wrappers are not content.
+    if (node.tagName === "span" && Object.keys(properties).length === 0) return children;
+    return [[node.tagName, properties, children]];
+  };
+  const normalizeStructured = (node) => {
+    if (Array.isArray(node)) return node.map(normalizeStructured);
+    if (node === null || typeof node !== "object") return node;
+    return Object.fromEntries(
+      Object.keys(node)
+        .sort()
+        .filter((key) => !["dateModified", "datePublished"].includes(key))
+        .map((key) => [key, normalizeStructured(node[key])]),
+    );
+  };
+  const contained = new Set(elements(main, () => true));
+  const sources = visibleElements(tree, (node) => has(node, "dataPublicationSource")).filter(
+    (node) => !contained.has(node),
+  );
+  return {
+    title: document.title,
+    description: document.description,
+    author: document.author,
+    headings: visibleElements(tree, (node) => node.tagName === "h1").map(renderedText),
+    content: semantic(main),
+    sources: sources.map(semantic),
+    socialImage: meta(document.head, "og:image"),
+    structured: elements(
+      document.head,
+      (node) => node.tagName === "script" && value(node, "type") === "application/ld+json",
+    ).map((node) => normalizeStructured(JSON.parse(text(node)))),
+  };
 }

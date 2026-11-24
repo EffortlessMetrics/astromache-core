@@ -1,3 +1,16 @@
+## 0.4.0-site.3 — unpublished candidate
+
+- Add versioned media-aware discovery fingerprints, normalize styling-only inline wrappers, and verify stable same-origin media bytes.
+- Support independently emitted route inventories and a dedicated deterministic discovery manifest.
+- Add a pure durable notification ledger contract for partial acknowledgement, retries, interruption and rollback.
+
+## 0.4.0-site.2 — unpublished candidate
+
+- Add opt-in discovery qualification against an independent expected-route inventory and rendered canonicals.
+- Reconcile sitemap membership and authored dates, retain deterministic content fingerprints, and support read-only hosted checks.
+- Provide explicit IndexNow delta submission with bounded response evidence. Production scheduling and durable state remain consumer release operations.
+- Retain previous version identities, public export mappings and default build behavior.
+
 ## 0.4.0-site.1 — unpublished candidate
 
 - Support opt-in follow-first profile composition in actual DOM and keyboard order.

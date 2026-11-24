@@ -171,3 +171,95 @@ fidelity/exclusions/HTML hashes/offline inventory, and rebuilds with Markdown of
 Existing core qualification, packed-file allowlists and consumer-preservation
 checks remain mandatory. A successful test is scoped to its recorded commit and
 runtime; it does not prove the hosting configuration or authorize release.
+
+## Opt-in search discovery
+
+Set `discovery: { expectedRoutes: ["/", "/notes/example/"], excludePaths: ["/search/", "/offline/"] }`
+alongside an existing `sitemap` option. The independent, consumer-owned expected
+route inventory is required and must be derived before inspecting rendered HTML
+or the sitemap. This prevents simultaneous omission from both outputs from
+passing qualification. For dynamically selected content, alternatively set
+`expectedRoutesFile: "routes.json"` to a build-emitted JSON array from the same
+content selectors used by the routes (not a scan of sitemap or HTML output).
+The two inventory inputs are mutually exclusive. Exclusions are consumer policy, not inferred SEO advice.
+All other self-canonical HTML must be present, with no duplicate, foreign, redirected
+or noindex destination. Supply an exact exclusion for utility pages that retain
+indexable HTML intentionally; use noindex separately if they should not be indexed.
+The initial robots profile is deliberately restricted to an unrestricted public
+site with a wildcard user agent and its canonical Sitemap directive; restricted
+crawl policies need a future policy adapter, not a silently incomplete parser.
+
+Use `sitemapLastmod(entry.data.published, entry.data.modified)` to generate per-page
+lastmod values. Existing consumers may pass their own field names. Emit the same
+authored dates through the page's article:published_time and article:modified_time
+metadata (including non-article dated content). Omit lastmod for undated pages.
+Dates must carry a timezone or be date-only. Deployment time is not content time.
+
+The receipt gains an optional `discovery` object, also emitted as `_meta/discovery.json`, containing the origin, sitemap and
+sorted URL/date/content hash records. The fingerprint covers the marked rendered
+body (or single main), headings, description, explicit attribution, social image
+URL and JSON-LD excluding publication/modification dates. It omits styles and scripts
+outside structured metadata. It is a bounded structural change detector, not a
+semantic judgment: presentation markup can still change a fingerprint. Styling-only
+inline wrappers and media dimensions/loading hints are normalized; code text,
+authored links and semantic structure remain. Fingerprint version 2 includes
+same-origin media bytes from primary source URLs, responsive sources, posters and
+the social image. External assets are referenced but not fetched. Media served
+through host-only transforms or non-file routes requires a separate adapter.
+Build and hosted verification deduplicate reads of shared media. No private source
+files are read. A changed fingerprint version requires explicit baseline migration.
+
+After qualification, retain the discovery object from the exact artifact as the
+candidate. Compare it against the last fully notified production manifest using
+`diffDiscoveryManifests(previous, current)`; review `dateWarnings` before promotion.
+These warnings do not mutate editorial dates. Pass null only for an intentional
+first submission. Retain the previous manifest until notification is complete.
+
+Call `verifyHostedDiscovery(current)` to verify public robots, XML, canonical HTML,
+metadata and fingerprints. This is read-only and intentionally requires the
+actual origin, not a preview alias. The separate `submitIndexNow({ previous, current,
+key })` operation rechecks that production state, verifies retired URLs and the
+root key file, and submits only deltas to the shared IndexNow endpoint in batches.
+It never runs from the Astro build hook. HTTP 200 is acknowledged; HTTP 202 is
+key-validation pending, 429/5xx or transport failure are retryable, and other
+responses are rejected. Only fully acknowledged batches complete the operation.
+Retry-After is retained if supplied. Receipt is not indexing. A retired URL may
+redirect directly to another accepted same-origin canonical; unaccepted targets
+(including cross-origin migrations) require a future release-acceptance adapter.
+The release operator must retain receipts and retry without advancing the baseline
+for unacknowledged URLs.
+Do not enable a production notification trigger until the site's actual deployment
+identity and durable baseline storage are configured. No Worker or account setting
+is installed by this package.
+
+## Durable notification reconciliation
+
+The opt-in notification ledger is a pure, serializable state machine. It does
+not call Cloudflare, write a repository branch, schedule a workflow or send HTTP.
+The release controller must independently establish and authenticate the accepted
+production deployment and hosted receipt, including source SHA, deployment ID and
+manifest SHA-256. `discoveryManifestSha256(manifest)` hashes the canonical
+pretty-printed JSON plus final newline emitted as `_meta/discovery.json`.
+
+- `createNotificationLedger(origin, retiredUrls?)` bootstraps a single production
+  origin. Seed old same-origin URLs only from accepted migration inventory.
+- `observeNotificationDeployment(ledger, acceptance)` reconciles desired URL
+  state against acknowledged and pending state, including URLs observed during an
+  intermediate deployment. A rollback cannot discard ambiguous pending work.
+- `beginNotificationBatch(ledger, { now, limit })` creates a bounded intent
+  bound to the exact accepted deployment and manifest. Persist it before sending.
+- `settleNotificationBatch(ledger, { attemptId, status, retryAfter, now })`
+  returns the revised state and receipt. Only HTTP 200 advances acknowledged URL
+  state. 202 remains pending; 429 and transient failures schedule a retry;
+  permanent rejection requires operator intervention.
+- `recoverNotificationBatch(ledger, now)` treats an interrupted intent as an
+  ambiguous delivery, never as success. Duplicate notification is preferable to
+  dropping an unacknowledged change.
+- `resetRejectedNotifications(ledger, urls)` is an explicit operator action
+  after resolving the rejected request.
+
+Use an atomic compare-and-swap store and serialize per origin. Re-read actual
+production identity immediately before sending, and reconcile if it changes.
+The ledger does not authenticate a caller-provided receipt or implement the HTTP
+adapter, deployment observer, durable store or workflow. Retain intent and receipt
+history outside production main; do not make the build depend on notification state.

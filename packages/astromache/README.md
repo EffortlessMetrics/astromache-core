@@ -80,6 +80,8 @@ speaking and link inputs do not leave empty wrappers or headings. One profile
 instance per document is supported; `profile-title`, `profile-speaking-title`
 and `profile-follow-title` are reserved heading IDs.
 
+`sectionOrder="follow-first"` renders Follow before Speaking in actual document and keyboard order. The default `"speaking-first"` preserves previous consumers.
+
 `portraitLayout="flow"` opts into biography text flowing around a left portrait.
 The default `"grid"` retains the stacked mobile and side-by-side desktop layout.
 The flow portrait is capped at 12rem, with 40% width on narrow viewports or containers;

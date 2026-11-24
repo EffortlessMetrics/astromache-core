@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { verifyPublicationLockPreservation } from "./publication-lock-preservation.mjs";
+import {
+  restoreFrozenDeprecationAnnotations,
+  verifyPublicationLockPreservation,
+} from "./publication-lock-preservation.mjs";
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cp, mkdir, readFile, readdir, realpath, rm, writeFile } from "node:fs/promises";
@@ -201,7 +204,15 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
   // Resolve the new pin, then delete the entire installation and prove that the
   // saved lockfile alone can recreate the exact candidate without scripts.
   run(["install", "--lockfile-only", "--ignore-scripts"]);
-  const lock = await readFile(join(directory, "pnpm-lock.yaml"));
+  const lockPath = join(directory, "pnpm-lock.yaml");
+  const generated = await readFile(lockPath, "utf8");
+  const reconciled = restoreFrozenDeprecationAnnotations(originalLock, generated);
+  verifyPublicationLockPreservation(originalLock, reconciled.lock, candidate.manifest);
+  if (reconciled.restored.length) {
+    console.log("Restored frozen registry annotations", JSON.stringify(reconciled.restored));
+    await writeFile(lockPath, reconciled.lock);
+  }
+  const lock = await readFile(lockPath);
   assert.notEqual(sha256(lock), before["pnpm-lock.yaml"], "Upgrade must update lockfile");
   verifyPublicationLockPreservation(originalLock, lock.toString(), candidate.manifest);
 
@@ -310,6 +321,7 @@ export async function upgradePublication(directory, candidate, run, { recipe }) 
       installed,
       frozenLockSha256: sha256(lock),
       unrelatedLockEntriesUnchanged: true,
+      restoredRegistryAnnotations: reconciled.restored,
       unchangedFiles: Object.keys(before).filter(
         (file) => !publicationDeliveryFiles(recipe).has(file),
       ).length,

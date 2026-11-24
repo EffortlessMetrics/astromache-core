@@ -3,9 +3,10 @@ import { profileProps, type ProfileProps } from "./profile";
 
 export type Props = ProfileProps;
 
-const { title, links, speakingLabel, followLabel, portraitLayout } = profileProps(Astro.props);
+const { title, links, speakingLabel, followLabel, portraitLayout, sectionOrder } = profileProps(Astro.props);
 const hasPortrait = Astro.slots.has("portrait");
 const hasSpeaking = Astro.slots.has("speaking");
+const sections = sectionOrder === "follow-first" ? ["follow", "speaking"] : ["speaking", "follow"];
 ---
 
 <div class="profile-home">
@@ -16,20 +17,19 @@ const hasSpeaking = Astro.slots.has("speaking");
       <div class="profile-about"><slot /></div>
     </div>
   </section>
-  {hasSpeaking && (
+  {sections.map((section) => section === "speaking" ? (hasSpeaking && (
     <section id="speaking" aria-labelledby="profile-speaking-title" class="profile-section">
       <h2 id="profile-speaking-title">{speakingLabel}</h2>
       <slot name="speaking" />
     </section>
-  )}
-  {links.length > 0 && (
+  )) : (links.length > 0 && (
     <section id="follow" aria-labelledby="profile-follow-title" class="profile-section">
       <h2 id="profile-follow-title">{followLabel}</h2>
       <ul class="profile-links">
         {links.map((link) => <li><a href={link.href} rel={link.rel}>{link.label}</a></li>)}
       </ul>
     </section>
-  )}
+  )))}
 </div>
 
 <style>

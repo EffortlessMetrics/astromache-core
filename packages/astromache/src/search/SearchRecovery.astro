@@ -1,0 +1,37 @@
+---
+interface Props {
+  kind: "404" | "offline";
+  version: string;
+  label: string;
+  placeholder?: string;
+  idleMessage?: string;
+}
+const { kind, version, label, placeholder = label + "...", idleMessage = "Start typing to search" } = Astro.props;
+---
+<section class="error-search-shell" data-error-kind={kind} data-search-surface="recovery" data-index-version={version} data-idle-message={idleMessage}>
+  <h1>{kind === "404" ? "404" : "Offline"}</h1>
+  <div class="inline-search" role="search" aria-label={label}>
+    <label class="sr-only" for="recovery-query">{label}</label>
+    <input id="recovery-query" data-search-input type="search" {placeholder} autocomplete="off" aria-describedby="recovery-keyboard-help" />
+    <p class="search-status" data-search-status role="status" aria-live="polite">{idleMessage}</p>
+    <button data-search-retry type="button" hidden>Retry search</button>
+    <ul class="recovery-results" data-search-results aria-label="Search results"></ul>
+    <p class="keyboard-help" id="recovery-keyboard-help">Use ↑↓ to navigate, Enter to select</p>
+  </div>
+  <slot name="suggestions" />
+  <nav class="recovery-exits" aria-label="Recovery navigation"><slot><a href="/">Go back home</a></slot></nav>
+</section>
+<style>
+  .error-search-shell { min-height: calc(100vh - 8rem); padding: 8rem 0 4rem; text-align: center; box-sizing: border-box; }
+  h1 { font-size: clamp(3.75rem, 8vw, 6rem); font-weight: 700; letter-spacing: -0.05em; margin: 0 0 2rem; }
+  .inline-search { max-width: 42rem; margin: auto; }
+  input { width: 100%; box-sizing: border-box; padding: .75rem 1rem; border: 1px solid var(--border); border-radius: .5rem; background: var(--background); color: var(--foreground); font: inherit; }
+  .search-status { padding: 2.5rem 0 .5rem; color: var(--secondary); }
+  .keyboard-help { font-size: .875rem; color: var(--secondary); }
+  .recovery-results { list-style: none; text-align: left; padding: 0; margin: 0; }
+  .recovery-results :global(li) { margin: 0; }
+  .recovery-results :global(a) { display: block; padding: 1rem; border-radius: .5rem; text-decoration: none; }
+  .recovery-results :global(a[data-selected]), .recovery-results :global(a:hover) { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .recovery-results :global(small) { display: block; color: var(--secondary); margin-top: .25rem; }
+  .recovery-exits { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem; font-size: .875rem; }
+</style>

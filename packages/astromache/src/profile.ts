@@ -12,6 +12,8 @@ export interface ProfileProps {
   followLabel?: string;
   /** Flow biography text around the portrait, or use the default responsive grid. */
   portraitLayout?: "grid" | "flow";
+  /** Choose the actual document order of the optional sections. */
+  sectionOrder?: "speaking-first" | "follow-first";
 }
 
 const text = (value: unknown, field: string): string => {
@@ -60,6 +62,10 @@ export function profileProps(input: ProfileProps) {
   if (portraitLayout !== "grid" && portraitLayout !== "flow") {
     throw new TypeError("Profile portraitLayout must be grid or flow");
   }
+  const sectionOrder = input.sectionOrder ?? "speaking-first";
+  if (sectionOrder !== "speaking-first" && sectionOrder !== "follow-first") {
+    throw new TypeError("Profile sectionOrder must be speaking-first or follow-first");
+  }
   if (input.links !== undefined && !Array.isArray(input.links)) {
     throw new TypeError("Profile links must be an array");
   }
@@ -74,5 +80,5 @@ export function profileProps(input: ProfileProps) {
     }
     return { label, href: url, ...(link.rel === undefined ? {} : { rel: link.rel }) };
   });
-  return { title, speakingLabel, followLabel, portraitLayout, links };
+  return { title, speakingLabel, followLabel, portraitLayout, sectionOrder, links };
 }

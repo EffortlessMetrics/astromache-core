@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { parse } from "yaml";
+import { isDeepStrictEqual } from "node:util";
+import { parse, parseDocument } from "yaml";
 
 const message = "Only the root astromache delivery and its newly reachable lock entries may change";
 const packageKey = (snapshot) => snapshot.split("(")[0];
@@ -134,4 +135,30 @@ export function verifyPublicationLockPreservation(original, current, manifest) {
     for (const key of Object.keys(after[section] ?? {}))
       if (!Object.hasOwn(before[section] ?? {}, key)) assert.ok(allowed.has(key), message);
   }
+}
+
+// Registry deprecation annotations may change even for byte-identical packages.
+// Keep the frozen metadata rather than weakening the dependency-graph guard.
+export function restoreFrozenDeprecationAnnotations(original, current) {
+  const before = parse(original);
+  const document = parseDocument(current);
+  const after = document.toJS();
+  const restored = [];
+  for (const [key, value] of Object.entries(before.packages ?? {})) {
+    const candidate = after.packages?.[key];
+    if (!candidate || candidate.deprecated === value.deprecated) continue;
+    if (
+      (value.deprecated !== undefined && typeof value.deprecated !== "string") ||
+      (candidate.deprecated !== undefined && typeof candidate.deprecated !== "string")
+    )
+      continue;
+    const { deprecated: previous, ...beforeIdentity } = value;
+    const { deprecated: next, ...afterIdentity } = candidate;
+    if (!isDeepStrictEqual(beforeIdentity, afterIdentity)) continue;
+    const path = ["packages", key, "deprecated"];
+    if (previous === undefined) document.deleteIn(path);
+    else document.setIn(path, previous);
+    restored.push({ package: key, previous: previous ?? null, observed: next ?? null });
+  }
+  return { lock: restored.length ? document.toString() : current, restored };
 }

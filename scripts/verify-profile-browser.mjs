@@ -167,11 +167,57 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
           });
           assert.ok(intrinsicWidth > 150, `${route} retains intrinsic width as a flex child`);
         }
+        await page.goto(`${origin}/directory/`);
+        assert.equal(await page.getByRole("heading", { level: 1 }).textContent(), "Example author");
+        assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
+          "Follow Me",
+          "Websites",
+          "Work",
+        ]);
+        assert.equal(await page.locator(".profile-portrait").count(), 0);
+        assert.equal(await page.locator("html").getAttribute("data-theme"), colorScheme);
+        const follow = await page.locator("#follow").boundingBox();
+        const websites = await page.locator("#websites").boundingBox();
+        assert.ok(follow && websites);
+        if (width < 640) assert.ok(websites.y >= follow.y + follow.height);
+        else assert.ok(websites.x >= follow.x + follow.width);
+        const profileLink = page.getByRole("link", { name: "Example profile", exact: true });
+        assert.equal(await profileLink.getAttribute("rel"), "me");
+        assert.equal(await profileLink.getAttribute("target"), null);
+        await profileLink.focus();
+        for (const name of ["Example contact", "Publication Writing", "Projects", "All work"]) {
+          await page.keyboard.press("Tab");
+          assert.equal(
+            await page.getByRole("link", { name, exact: true }).evaluate(
+              (element) => element === document.activeElement,
+            ),
+            true,
+          );
+        }
+        assert.equal(
+          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          true,
+        );
+        if (evidenceDirectory)
+          await page.screenshot({
+            path: join(evidenceDirectory, `directory-${width}-${colorScheme}.png`),
+            fullPage: true,
+          });
+        await page.evaluate(() => {
+          document.documentElement.style.fontSize = "32px";
+        });
+        assert.equal(
+          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          true,
+          "Enlarged directory text must not overflow horizontally",
+        );
+        assert.deepEqual(errors, []);
         checks.push({
           width,
           colorScheme,
           headings: true,
           portraitLayout: true,
+          directoryLayout: true,
           keyboard: true,
           anchors: true,
           enlargedText: true,
@@ -204,6 +250,14 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
     );
     assert.equal(await page.getByRole("heading", { level: 2 }).count(), 0);
     assert.equal(await page.locator(".profile-portrait").count(), 0);
+    await page.goto(`${origin}/directory/`);
+    assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
+      "Follow Me",
+      "Websites",
+      "Work",
+    ]);
+    assert.equal(await page.getByRole("link", { name: "Example recorded talk" }).isVisible(), true);
+    assert.equal(await page.getByRole("link", { name: "Example profile" }).isVisible(), true);
     await context.close();
     const receipt = {
       browserVersion: browser.version(),

@@ -1,3 +1,9 @@
+## 0.4.0-directory.1 — unpublished candidate
+
+- Add optional, static Directory, LinkGroup and ContentSection compositions using existing publication tokens.
+- Retain the original publication and Profile composition; consumer owns identity, links and content collections.
+- Exercise the directory in neutral source and installed archive consumers, including no-JavaScript and responsive keyboard evidence.
+
 ## 0.4.0-site.1 — unpublished candidate
 
 - Support opt-in follow-first profile composition in actual DOM and keyboard order.

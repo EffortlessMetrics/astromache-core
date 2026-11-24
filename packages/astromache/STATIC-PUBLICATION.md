@@ -171,3 +171,47 @@ fidelity/exclusions/HTML hashes/offline inventory, and rebuilds with Markdown of
 Existing core qualification, packed-file allowlists and consumer-preservation
 checks remain mandatory. A successful test is scoped to its recorded commit and
 runtime; it does not prove the hosting configuration or authorize release.
+
+## Opt-in search discovery
+
+Set `discovery: { excludePaths: ["/search/", "/offline/"] }` alongside an existing
+`sitemap` option to require exact sitemap membership against emitted same-origin,
+indexable canonical HTML. Exclusions are consumer policy, not inferred SEO advice.
+All other self-canonical HTML must be present, with no duplicate, foreign, redirected
+or noindex destination. Supply an exact exclusion for utility pages that retain
+indexable HTML intentionally; use noindex separately if they should not be indexed.
+The initial robots profile is deliberately restricted to an unrestricted public
+site with a wildcard user agent and its canonical Sitemap directive; restricted
+crawl policies need a future policy adapter, not a silently incomplete parser.
+
+Use `sitemapLastmod(entry.data.published, entry.data.modified)` to generate per-page
+lastmod values. Existing consumers may pass their own field names. Emit the same
+authored dates through the page's article:published_time and article:modified_time
+metadata (including non-article dated content). Omit lastmod for undated pages.
+Dates must carry a timezone or be date-only. Deployment time is not content time.
+
+The receipt gains an optional `discovery` object containing the origin, sitemap and
+sorted URL/date/content hash records. The fingerprint covers the marked rendered
+body (or single main), headings, description, explicit attribution, social image
+URL and JSON-LD excluding publication/modification dates. It omits styles and scripts
+outside structured metadata. It is a bounded structural change detector, not a
+semantic judgment: presentation markup can still change a fingerprint and stable
+asset URL bytes are not independently hashed. No private source files are read.
+
+After qualification, retain the discovery object from the exact artifact as the
+candidate. Compare it against the last fully notified production manifest using
+`diffDiscoveryManifests(previous, current)`; review `dateWarnings` before promotion.
+These warnings do not mutate editorial dates. Pass null only for an intentional
+first submission. Retain the previous manifest until notification is complete.
+
+Call `verifyHostedDiscovery(current)` to verify public robots, XML, canonical HTML,
+metadata and fingerprints. This is read-only and intentionally requires the
+actual origin, not a preview alias. The separate `submitIndexNow({ previous, current,
+key })` operation rechecks that production state, verifies retired URLs and the
+root key file, and submits only deltas to the shared IndexNow endpoint in batches.
+It never runs from the Astro build hook. 200/202 acknowledge receipt (not indexing);
+any other status yields an incomplete result. The release operator must retain
+receipts, handle network failures and retry without advancing the baseline.
+Do not enable a production notification trigger until the site's actual deployment
+identity and durable baseline storage are configured. No Worker or account setting
+is installed by this package.

@@ -22,6 +22,8 @@ export interface StaticPublicationOptions {
   renderedSearch?: boolean;
   /** Exact same-origin routes served by the host rather than emitted as files. */
   externalRoutes?: readonly string[];
+  /** Opt-in discovery audit; excludes exact same-origin utility paths from sitemap membership. */
+  discovery?: { excludePaths?: readonly string[] };
 }
 export interface PublicationReport {
   schemaVersion: number;
@@ -29,6 +31,7 @@ export interface PublicationReport {
   documents: Array<{ html: string; canonical: string; markdown: string; sha256: string }>;
   /** Present when renderedSearch rewrote the search index. */
   searchSha256?: string;
+  discovery?: DiscoveryManifest;
 }
 export function markdownURL(canonical: URL | string): URL;
 export function publicationHead(input: PublicationHeadOptions): {
@@ -54,3 +57,37 @@ export function auditPublication(
   options: StaticPublicationOptions,
 ): Promise<unknown>;
 export default function staticPublication(options: StaticPublicationOptions): AstroIntegration;
+
+export interface DiscoveryPage {
+  url: string;
+  lastmod?: string;
+  contentSha256: string;
+}
+export interface DiscoveryManifest {
+  schemaVersion: 1;
+  origin: string;
+  sitemap: string;
+  pages: DiscoveryPage[];
+}
+export interface DiscoveryDelta {
+  added: string[];
+  modified: string[];
+  removed: string[];
+  dateWarnings: string[];
+}
+export function sitemapLastmod(
+  published?: Date | string | null,
+  modified?: Date | string | null,
+): string | undefined;
+export function diffDiscoveryManifests(
+  previous: DiscoveryManifest | null,
+  current: DiscoveryManifest,
+): DiscoveryDelta;
+export function verifyHostedDiscovery(
+  manifest: DiscoveryManifest,
+  fetcher?: typeof fetch,
+): Promise<{ origin: string; pages: number; sitemap: string }>;
+export function submitIndexNow(
+  input: { previous: DiscoveryManifest | null; current: DiscoveryManifest; key: string },
+  fetcher?: typeof fetch,
+): Promise<DiscoveryDelta & { complete: boolean; batches: { urls: string[]; status: number }[] }>;

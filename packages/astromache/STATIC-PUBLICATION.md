@@ -178,7 +178,10 @@ Set `discovery: { expectedRoutes: ["/", "/notes/example/"], excludePaths: ["/sea
 alongside an existing `sitemap` option. The independent, consumer-owned expected
 route inventory is required and must be derived before inspecting rendered HTML
 or the sitemap. This prevents simultaneous omission from both outputs from
-passing qualification. Exclusions are consumer policy, not inferred SEO advice.
+passing qualification. For dynamically selected content, alternatively set
+`expectedRoutesFile: "routes.json"` to a build-emitted JSON array from the same
+content selectors used by the routes (not a scan of sitemap or HTML output).
+The two inventory inputs are mutually exclusive. Exclusions are consumer policy, not inferred SEO advice.
 All other self-canonical HTML must be present, with no duplicate, foreign, redirected
 or noindex destination. Supply an exact exclusion for utility pages that retain
 indexable HTML intentionally; use noindex separately if they should not be indexed.
@@ -192,13 +195,19 @@ authored dates through the page's article:published_time and article:modified_ti
 metadata (including non-article dated content). Omit lastmod for undated pages.
 Dates must carry a timezone or be date-only. Deployment time is not content time.
 
-The receipt gains an optional `discovery` object containing the origin, sitemap and
+The receipt gains an optional `discovery` object, also emitted as `_meta/discovery.json`, containing the origin, sitemap and
 sorted URL/date/content hash records. The fingerprint covers the marked rendered
 body (or single main), headings, description, explicit attribution, social image
 URL and JSON-LD excluding publication/modification dates. It omits styles and scripts
 outside structured metadata. It is a bounded structural change detector, not a
-semantic judgment: presentation markup can still change a fingerprint and stable
-asset URL bytes are not independently hashed. No private source files are read.
+semantic judgment: presentation markup can still change a fingerprint. Styling-only
+inline wrappers and media dimensions/loading hints are normalized; code text,
+authored links and semantic structure remain. Fingerprint version 2 includes
+same-origin media bytes from primary source URLs, responsive sources, posters and
+the social image. External assets are referenced but not fetched. Media served
+through host-only transforms or non-file routes requires a separate adapter.
+Build and hosted verification deduplicate reads of shared media. No private source
+files are read. A changed fingerprint version requires explicit baseline migration.
 
 After qualification, retain the discovery object from the exact artifact as the
 candidate. Compare it against the last fully notified production manifest using

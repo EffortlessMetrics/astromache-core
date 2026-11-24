@@ -23,10 +23,10 @@ export interface StaticPublicationOptions {
   /** Exact same-origin routes served by the host rather than emitted as files. */
   externalRoutes?: readonly string[];
   /** Opt-in discovery audit with an independent consumer-owned route inventory. */
-  discovery?: {
-    expectedRoutes: readonly string[];
-    excludePaths?: readonly string[];
-  };
+  discovery?: (
+    | { expectedRoutes: readonly string[]; expectedRoutesFile?: never }
+    | { expectedRoutesFile: string; expectedRoutes?: never }
+  ) & { excludePaths?: readonly string[] };
 }
 export interface PublicationReport {
   schemaVersion: number;
@@ -68,6 +68,7 @@ export interface DiscoveryPage {
 }
 export interface DiscoveryManifest {
   schemaVersion: 1;
+  fingerprintVersion: 2;
   origin: string;
   sitemap: string;
   pages: DiscoveryPage[];

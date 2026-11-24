@@ -1,4 +1,5 @@
 import { lstat, mkdir, readFile, readdir, writeFile, realpath } from "node:fs/promises";
+import { createReadStream } from "node:fs";
 import { relative, resolve, dirname, sep, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
@@ -22,6 +23,7 @@ export {
 
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const receipt = "_meta/astromache-publication.json";
+const discoveryReceipt = "_meta/discovery.json";
 async function files(root, prefix = "") {
   const result = [];
   for (const item of await readdir(resolve(root, prefix), { withFileTypes: true })) {
@@ -201,10 +203,31 @@ export async function auditPublication(rootDirectory, options = {}) {
       return result;
     };
     const excluded = routeSet(options.discovery.excludePaths ?? [], "excluded");
-    const expected = routeSet(options.discovery.expectedRoutes, "expected");
+    const configured = options.discovery.expectedRoutes;
+    const inventoryFile = options.discovery.expectedRoutesFile;
+    if ((configured === undefined) === (inventoryFile === undefined))
+      throw new Error("Discovery requires exactly one expected route inventory");
+    const expected = routeSet(
+      inventoryFile === undefined ? configured : JSON.parse(await readLocal(inventoryFile)),
+      "expected",
+    );
     for (const path of excluded)
       if (expected.has(path)) throw new Error("Expected route is also excluded: " + path);
     const pages = [];
+    const media = new Map();
+    const readMedia = (url) => {
+      if (!media.has(url)) {
+        media.set(url, (async () => {
+          const path = localPath(url, origin);
+          if (!inventory.includes(path)) throw new Error("Missing discovery media: " + url);
+          const hash = createHash("sha256");
+          for await (const chunk of createReadStream(await contained(root, path)))
+            hash.update(chunk);
+          return hash.digest("hex");
+        })());
+      }
+      return media.get(url);
+    };
     for (const [url] of canonicals) {
       const parsed = new URL(url);
       if (parsed.origin !== origin || excluded.has(parsed.pathname)) continue;
@@ -214,7 +237,7 @@ export async function auditPublication(rootDirectory, options = {}) {
         throw new Error("Discovery requires an indexable canonical destination: " + url);
       if (!expected.delete(parsed.pathname))
         throw new Error("Unexpected indexable canonical: " + url);
-      pages.push(discoveryPage(document));
+      pages.push(await discoveryPage(document, readMedia));
     }
     if (expected.size)
       throw new Error("Missing expected indexable canonical: " + [...expected].join(", "));
@@ -309,8 +332,11 @@ export async function auditPublication(rootDirectory, options = {}) {
       sha256: digest(rendered.markdown),
     });
   }
+  if (discovery && inventory.includes(discoveryReceipt))
+    throw new Error("Stale or consumer-owned discovery output; use a clean build");
   if (inventory.some((name) => name.startsWith("_markdown/")) || inventory.includes(receipt))
     throw new Error("Stale or consumer-owned publication output; use a clean build");
+  if (discovery) planned.set(discoveryReceipt, JSON.stringify(discovery, null, 2) + "\n");
   for (const path of [...planned.keys(), receipt]) await contained(root, path);
   return {
     root,

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { SaxesParser } from "saxes";
 import { httpURL } from "./metadata.mjs";
-import { discoveryContent, readDocument } from "./rendered.mjs";
+import { discoveryContent, discoveryMedia, readDocument } from "./rendered.mjs";
 
 const namespace = "http://www.sitemaps.org/schemas/sitemap/0.9";
 const sha = (value) => createHash("sha256").update(value).digest("hex");
@@ -141,14 +141,20 @@ export function verifyDiscoveryRobots(text, sitemap) {
     throw new Error("robots.txt must declare wildcard access and the canonical sitemap");
 }
 
-export function discoveryPage(document) {
+export async function discoveryPage(document, readMedia) {
   if (!document.canonical || document.noindex)
     throw new Error("Discovery page must be an indexable canonical");
   const content = discoveryContent(document);
+  const media = [];
+  for (const url of discoveryMedia(document)) {
+    const hash = await readMedia(url);
+    if (!/^[0-9a-f]{64}$/.test(hash)) throw new Error("Invalid media digest: " + url);
+    media.push({ url, sha256: hash });
+  }
   return {
     url: document.canonical.href,
     lastmod: sitemapLastmod(document.published, document.modified),
-    contentSha256: sha(JSON.stringify(content)),
+    contentSha256: sha(JSON.stringify({ content, media })),
   };
 }
 
@@ -171,7 +177,7 @@ export function createDiscoveryManifest({ origin, sitemap, pages }) {
       };
     })
     .sort((a, b) => order(a.url, b.url));
-  return { schemaVersion: 1, origin, sitemap, pages: sorted };
+  return { schemaVersion: 1, fingerprintVersion: 2, origin, sitemap, pages: sorted };
 }
 
 export function assertDiscoverySitemap(manifest, rows) {
@@ -187,6 +193,8 @@ export function assertDiscoverySitemap(manifest, rows) {
 export function diffDiscoveryManifests(previous, current) {
   if (current?.schemaVersion !== 1 || (previous !== null && previous?.schemaVersion !== 1))
     throw new Error("Discovery requires versioned manifests (null for explicit bootstrap)");
+  if (current.fingerprintVersion !== 2 || (previous && previous.fingerprintVersion !== 2))
+    throw new Error("Discovery fingerprint version changed; require an explicit baseline migration");
   const next = createDiscoveryManifest(current);
   const old = previous === null ? null : createDiscoveryManifest(previous);
   if (old && old.origin !== next.origin) throw new Error("Discovery origins differ");
@@ -237,7 +245,8 @@ async function body(fetcher, url, types) {
 
 /** Read-only production check. Fetch is injectable for deterministic qualification. */
 export async function verifyHostedDiscovery(input, fetcher = fetch) {
-  if (input?.schemaVersion !== 1) throw new Error("Unsupported discovery manifest schema");
+  if (input?.schemaVersion !== 1 || input.fingerprintVersion !== 2)
+    throw new Error("Unsupported discovery manifest or fingerprint version");
   const manifest = createDiscoveryManifest(input);
   const read = (url) => body(fetcher, url, ["application/xml", "text/xml"]);
   const robots = await body(fetcher, manifest.origin + "/robots.txt", ["text/plain"]);
@@ -246,12 +255,28 @@ export async function verifyHostedDiscovery(input, fetcher = fetch) {
     manifest,
     await readDiscoverySitemap(manifest.origin, manifest.sitemap, read),
   );
+  const media = new Map();
+  const readMedia = (url) => {
+    if (!media.has(url)) {
+      media.set(url, (async () => {
+        const response = await get(fetcher, url);
+        if (response.status !== 200 || !response.body)
+          throw new Error("Hosted discovery media unavailable: " + url);
+        const hash = createHash("sha256");
+        for await (const chunk of response.body) hash.update(chunk);
+        return hash.digest("hex");
+      })());
+    }
+    return media.get(url);
+  };
   let cursor = 0;
   await Promise.all(
     Array.from({ length: Math.min(4, manifest.pages.length) }, async () => {
       while (cursor < manifest.pages.length) {
         const page = manifest.pages[cursor++];
-        const actual = discoveryPage(readDocument(await body(fetcher, page.url, ["text/html"])));
+        const actual = await discoveryPage(
+          readDocument(await body(fetcher, page.url, ["text/html"])), readMedia,
+        );
         if (
           actual.url !== page.url ||
           actual.lastmod !== page.lastmod ||

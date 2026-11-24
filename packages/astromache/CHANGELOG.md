@@ -1,3 +1,8 @@
+## 0.4.0-site.3 — unpublished candidate
+
+- Add versioned media-aware discovery fingerprints, normalize styling-only inline wrappers, and verify stable same-origin media bytes.
+- Support independently emitted route inventories and a dedicated deterministic discovery manifest.
+
 ## 0.4.0-site.2 — unpublished candidate
 
 - Add opt-in discovery qualification against an independent expected-route inventory and rendered canonicals.

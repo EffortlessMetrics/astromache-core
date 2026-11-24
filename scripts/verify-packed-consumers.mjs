@@ -77,6 +77,7 @@ const expected = [
   "src/search/SearchRecovery.astro",
   "src/search/surface.ts",
   "src/PublicationHead.astro",
+  "src/publishing/discovery.mjs",
   "src/publishing/index.d.ts",
   "src/publishing/index.mjs",
   "src/publishing/metadata.d.mts",

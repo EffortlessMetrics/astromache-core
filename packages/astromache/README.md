@@ -1,8 +1,8 @@
-# astromache 0.4.0-site.1 — unpublished candidate
+# astromache 0.4.0-site.2 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
-This version includes the publication foundation, the optional canonical offline preset, and `astromache/publication-head`, `astromache/static-publication` and `astromache/markdown-negotiation`. The [static publishing guide](STATIC-PUBLICATION.md) covers rendered-content Markdown, social metadata, output reconciliation and the optional host adapter. Static HTML remains independent of request-time compute, and the integration never rewrites emitted HTML.
+This version includes the publication foundation, the optional canonical offline preset, and `astromache/publication-head`, `astromache/static-publication` and `astromache/markdown-negotiation`. The [static publishing guide](STATIC-PUBLICATION.md) covers rendered-content Markdown, social metadata, output reconciliation and the optional host adapter. Opt-in discovery qualification and explicit notification primitives are documented in that guide. Static HTML remains independent of request-time compute, and the integration never rewrites emitted HTML.
 
 The 0.4 candidate adds `astromache/profile`, a personal landing-page composition
 using the existing publication style. It preserves the publication homepage and existing exports; section order and search integration are opt-in.

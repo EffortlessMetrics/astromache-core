@@ -114,7 +114,9 @@ export function readDocument(html) {
     published: meta(head, "article:published_time"),
     modified: meta(head, "article:modified_time"),
     bodyMode: meta(head, "astromache:body") ?? "marked",
-    noindex: /(?:^|[\s,])noindex(?:$|[\s,])/i.test(meta(head, "robots") ?? ""),
+    noindex: ["robots", "googlebot", "bingbot"].some((agent) =>
+      /(?:^|[\s,])(?:noindex|none)(?:$|[\s,])/i.test(meta(head, agent) ?? ""),
+    ),
   };
 }
 function absolute(value, canonical, asset) {
@@ -343,4 +345,62 @@ function renderedText(body) {
     return block ? " " + content + " " : content;
   };
   return walk(body).replace(/\s+/g, " ").trim();
+}
+
+/** Bounded content projection, independent of Markdown and bundled presentation. */
+export function discoveryContent(document) {
+  const tree = document.tree;
+  const main = document.hasBody
+    ? selectedBody({ ...document, bodyMode: "marked" })
+    : one(
+        visibleElements(tree, (node) => node.tagName === "main"),
+        "discovery main",
+      );
+  const semantic = (node) => {
+    if (node.type === "text") return node.value;
+    if (node.type !== "element" || hidden(node)) return undefined;
+    if (
+      ["script", "style", "template", "button", "input", "select", "textarea"].includes(
+        node.tagName,
+      )
+    )
+      return undefined;
+    const properties = Object.fromEntries(
+      Object.entries(node.properties ?? {})
+        .filter(([key]) => !/^(?:className$|style$|on|dataAstro|dataVite|tabIndex$)/i.test(key))
+        .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
+    );
+    return [
+      node.tagName,
+      properties,
+      (node.children ?? []).map(semantic).filter((n) => n !== undefined),
+    ];
+  };
+  const normalizeStructured = (node) => {
+    if (Array.isArray(node)) return node.map(normalizeStructured);
+    if (node === null || typeof node !== "object") return node;
+    return Object.fromEntries(
+      Object.keys(node)
+        .sort()
+        .filter((key) => !["dateModified", "datePublished"].includes(key))
+        .map((key) => [key, normalizeStructured(node[key])]),
+    );
+  };
+  const contained = new Set(elements(main, () => true));
+  const sources = visibleElements(tree, (node) => has(node, "dataPublicationSource")).filter(
+    (node) => !contained.has(node),
+  );
+  return {
+    title: document.title,
+    description: document.description,
+    author: document.author,
+    headings: visibleElements(tree, (node) => node.tagName === "h1").map(renderedText),
+    content: semantic(main),
+    sources: sources.map(semantic),
+    socialImage: meta(document.head, "og:image"),
+    structured: elements(
+      document.head,
+      (node) => node.tagName === "script" && value(node, "type") === "application/ld+json",
+    ).map((node) => normalizeStructured(JSON.parse(text(node)))),
+  };
 }

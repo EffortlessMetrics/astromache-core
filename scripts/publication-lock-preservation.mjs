@@ -137,7 +137,6 @@ export function verifyPublicationLockPreservation(original, current, manifest) {
   }
 }
 
-
 // Registry deprecation annotations may change even for byte-identical packages.
 // Keep the frozen metadata rather than weakening the dependency-graph guard.
 export function restoreFrozenDeprecationAnnotations(original, current) {

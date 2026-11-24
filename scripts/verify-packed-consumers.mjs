@@ -220,3 +220,14 @@ assert.match(
 );
 await writeFile(join(run, "receipt.json"), JSON.stringify(receipt, null, 2));
 console.log("Independent packed native consumer receipt", JSON.stringify(receipt));
+const delivery = resolve(".qualification/delivery");
+await mkdir(delivery, { recursive: true });
+await cp(tarball, join(delivery, archive));
+const deliveryReceipt = {
+  sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+  archive,
+  sha256: receipt.packageSha256,
+  integrity: "sha512-" + createHash("sha512").update(await readFile(tarball)).digest("base64"),
+  bytes: (await readFile(tarball)).length,
+};
+await writeFile(join(delivery, "receipt.json"), JSON.stringify(deliveryReceipt, null, 2) + "\n");

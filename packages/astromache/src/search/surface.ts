@@ -45,7 +45,14 @@ export function bindSearchSurface(root: HTMLElement, options: SearchSurfaceOptio
   const retry = root.querySelector<HTMLButtonElement>("[data-search-retry]");
   const results = root.querySelector<HTMLElement>("[data-search-results]");
   const kind = root.dataset.searchSurface;
-  if (!view || !input || !status || !retry || !results || !["page", "recovery"].includes(kind ?? ""))
+  if (
+    !view ||
+    !input ||
+    !status ||
+    !retry ||
+    !results ||
+    !["page", "recovery"].includes(kind ?? "")
+  )
     throw new Error("Invalid search surface");
   const recovery = kind === "recovery";
   const limit = recovery ? 5 : 50;

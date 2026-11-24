@@ -56,7 +56,9 @@ export async function verifySearchBrowser(directory) {
     await recoveryInput.press("Enter");
     await expect(page).toHaveURL(origin + "/profile/");
     assert.deepEqual(errors, []);
-    console.log("Packed search surfaces passed: trigger, query ownership, stale results, retry and recovery navigation");
+    console.log(
+      "Packed search surfaces passed: trigger, query ownership, stale results, retry and recovery navigation",
+    );
   } finally {
     await browser?.close();
     await new Promise((resolve) => server.close(resolve));

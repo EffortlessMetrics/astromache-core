@@ -56,7 +56,7 @@ try {
     assert.ok(pkg.exports[name]);
   await put(
     "astro.config.mjs",
-    `import {defineConfig} from 'astro/config';\nimport publication from 'astromache/static-publication';\nimport offline from 'astromache/static-offline';\nexport default defineConfig({site:'https://publication.example',output:'static',trailingSlash:'always',redirects:{'/old/':'/notes/public/'},integrations:[publication({origin:'https://publication.example',markdown:process.env.NO_MARKDOWN!=='1',sitemap:'sitemap.xml'}),offline({cachePrefix:'publishing-fixture-',workerFile:'sw.js',globPatterns:['**/*.{html,js,css,md,json}'],maxResources:100,maxBytes:5000000,maxFileBytes:2000000,maxHtmlBytes:256000,worker:{navigationFallback:'/offline/'}})]});\n`,
+    `import {defineConfig} from 'astro/config';\nimport publication from 'astromache/static-publication';\nimport offline from 'astromache/static-offline';\nexport default defineConfig({site:'https://publication.example',output:'static',trailingSlash:'always',redirects:{'/old/':'/notes/public/'},integrations:[publication({origin:'https://publication.example',markdown:process.env.NO_MARKDOWN!=='1',sitemap:'sitemap.xml',discovery:{expectedRoutes:['/notes/public/'],excludePaths:['/','/offline/','/custom/']}}),offline({cachePrefix:'publishing-fixture-',workerFile:'sw.js',globPatterns:['**/*.{html,js,css,md,json}'],maxResources:100,maxBytes:5000000,maxFileBytes:2000000,maxHtmlBytes:256000,worker:{navigationFallback:'/offline/'}})]});\n`,
   );
   await put(
     "src/content.config.ts",
@@ -89,7 +89,11 @@ try {
   );
   await put(
     "public/sitemap.xml",
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://publication.example/notes/public/</loc></url></urlset>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://publication.example/notes/public/</loc><lastmod>2020-01-01</lastmod></url></urlset>',
+  );
+  await put(
+    "public/robots.txt",
+    "User-agent: *\nAllow: /\nSitemap: https://publication.example/sitemap.xml\n",
   );
   await put("public/recording.mp4", "Fixture media bytes");
   await put(
@@ -115,6 +119,12 @@ try {
     await readFile(join(root, "dist/_meta/astromache-publication.json"), "utf8"),
   );
   assert.equal(report.documents.length, 2);
+  assert.equal(report.discovery.schemaVersion, 1);
+  assert.deepEqual(
+    report.discovery.pages.map(({ url, lastmod }) => ({ url, lastmod })),
+    [{ url: "https://publication.example/notes/public/", lastmod: "2020-01-01T00:00:00.000Z" }],
+  );
+  assert.match(report.discovery.pages[0].contentSha256, /^[0-9a-f]{64}$/);
   const customMarkdown = await readFile(join(root, "dist/_markdown/custom.md"), "utf8");
   assert.match(customMarkdown, /Case-preserved custom text/);
   assert.match(
@@ -175,6 +185,7 @@ try {
     checks: [
       "installed archive",
       "real Astro content rendering",
+      "installed discovery audit reconciles an independent route inventory and authored dates",
       "draft and future exclusion",
       "real GFM conversion",
       "metadata component compilation",

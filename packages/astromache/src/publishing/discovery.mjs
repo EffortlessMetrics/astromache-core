@@ -66,7 +66,12 @@ function sitemapEntries(xml) {
         throw new Error("Invalid sitemap entry");
       row = {};
     }
-    if (stack.length === 3 && row && node.uri === namespace && ["loc", "lastmod"].includes(node.local)) {
+    if (
+      stack.length === 3 &&
+      row &&
+      node.uri === namespace &&
+      ["loc", "lastmod"].includes(node.local)
+    ) {
       if (Object.hasOwn(row, node.local)) throw new Error("Duplicate sitemap field");
       field = node.local;
       row[field] = "";

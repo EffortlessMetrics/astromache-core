@@ -37,7 +37,12 @@ const xml = (date = lastmod) =>
   "</loc>" +
   (date ? "<lastmod>" + date + "</lastmod>" : "") +
   "</url></urlset>";
-const opts = { origin, sitemap: "sitemap.xml", markdown: false, discovery: { expectedRoutes: ["/article/"] } };
+const opts = {
+  origin,
+  sitemap: "sitemap.xml",
+  markdown: false,
+  discovery: { expectedRoutes: ["/article/"] },
+};
 
 async function fixture(fn) {
   const root = await mkdtemp(join(tmpdir(), "discovery-"));
@@ -86,7 +91,10 @@ test("build receipt reconciles sitemap membership, dates and robots", async () =
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>',
     );
     await assert.rejects(auditPublication(root, opts), /Missing sitemap URL/);
-    await writeFile(join(root, "article/index.html"), html().replace(/<link rel="canonical"[^>]+>/, ""));
+    await writeFile(
+      join(root, "article/index.html"),
+      html().replace(/<link rel="canonical"[^>]+>/, ""),
+    );
     await assert.rejects(auditPublication(root, opts), /Missing expected indexable canonical/);
     await writeFile(join(root, "article/index.html"), html("Changed text"));
     await writeFile(join(root, "sitemap.xml"), xml());
@@ -152,16 +160,36 @@ test("discovery rejects malformed namespace and nested sitemap fields", async ()
   await fixture(async (root) => {
     await writeFile(join(root, "sitemap.xml"), xml().replace("<url>", '<url xmlns="urn:wrong">'));
     await assert.rejects(auditPublication(root, opts), /Invalid sitemap entry/);
-    await writeFile(join(root, "sitemap.xml"), xml().replace("<loc>", "<loc><nested>").replace("</loc>", "</nested></loc>"));
+    await writeFile(
+      join(root, "sitemap.xml"),
+      xml().replace("<loc>", "<loc><nested>").replace("</loc>", "</nested></loc>"),
+    );
     await assert.rejects(auditPublication(root, opts), /Sitemap field must contain text only/);
   });
 });
 
 test("discovery requires exact, independent and disjoint route policy", async () => {
   await fixture(async (root) => {
-    for (const expectedRoutes of [undefined, ["/article/", "/article/"], ["/article/?q=1"], ["//other.example/article/"]])
-      await assert.rejects(auditPublication(root, { ...opts, discovery: { expectedRoutes } }), /requires an array|Invalid or duplicate/);
-    await assert.rejects(auditPublication(root, { ...opts, discovery: { expectedRoutes: ["/article/"], excludePaths: ["/article/"] } }), /also excluded/);
-    await assert.rejects(auditPublication(root, { ...opts, discovery: { expectedRoutes: ["/missing/"] } }), /Unexpected indexable canonical/);
+    for (const expectedRoutes of [
+      undefined,
+      ["/article/", "/article/"],
+      ["/article/?q=1"],
+      ["//other.example/article/"],
+    ])
+      await assert.rejects(
+        auditPublication(root, { ...opts, discovery: { expectedRoutes } }),
+        /requires an array|Invalid or duplicate/,
+      );
+    await assert.rejects(
+      auditPublication(root, {
+        ...opts,
+        discovery: { expectedRoutes: ["/article/"], excludePaths: ["/article/"] },
+      }),
+      /also excluded/,
+    );
+    await assert.rejects(
+      auditPublication(root, { ...opts, discovery: { expectedRoutes: ["/missing/"] } }),
+      /Unexpected indexable canonical/,
+    );
   });
 });

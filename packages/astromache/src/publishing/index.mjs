@@ -180,7 +180,30 @@ export async function auditPublication(rootDirectory, options = {}) {
   if (options.discovery) {
     if (!options.sitemap) throw new Error("Discovery requires a configured sitemap");
     const sitemap = new URL(options.sitemap, origin + "/").href;
-    const excluded = new Set(options.discovery.excludePaths ?? []);
+    const routeSet = (paths, label) => {
+      if (!Array.isArray(paths)) throw new TypeError(label + " requires an array of exact routes");
+      const result = new Set();
+      for (const path of paths) {
+        const url = new URL(path, origin);
+        if (
+          typeof path !== "string" ||
+          !path.startsWith("/") ||
+          path.startsWith("//") ||
+          url.origin !== origin ||
+          url.pathname !== path ||
+          url.search ||
+          url.hash ||
+          result.has(path)
+        )
+          throw new Error("Invalid or duplicate " + label + " route: " + path);
+        result.add(path);
+      }
+      return result;
+    };
+    const excluded = routeSet(options.discovery.excludePaths ?? [], "excluded");
+    const expected = routeSet(options.discovery.expectedRoutes, "expected");
+    for (const path of excluded)
+      if (expected.has(path)) throw new Error("Expected route is also excluded: " + path);
     const pages = [];
     for (const [url] of canonicals) {
       const parsed = new URL(url);
@@ -189,8 +212,12 @@ export async function auditPublication(rootDirectory, options = {}) {
       const document = htmlDocuments.get(target);
       if (document?.canonical?.href !== url || document.noindex)
         throw new Error("Discovery requires an indexable canonical destination: " + url);
+      if (!expected.delete(parsed.pathname))
+        throw new Error("Unexpected indexable canonical: " + url);
       pages.push(discoveryPage(document));
     }
+    if (expected.size)
+      throw new Error("Missing expected indexable canonical: " + [...expected].join(", "));
     discovery = createDiscoveryManifest({ origin, sitemap, pages });
     verifyDiscoveryRobots(await readLocal("robots.txt"), sitemap);
     assertDiscoverySitemap(

@@ -37,7 +37,7 @@ const xml = (date = lastmod) =>
   "</loc>" +
   (date ? "<lastmod>" + date + "</lastmod>" : "") +
   "</url></urlset>";
-const opts = { origin, sitemap: "sitemap.xml", markdown: false, discovery: {} };
+const opts = { origin, sitemap: "sitemap.xml", markdown: false, discovery: { expectedRoutes: ["/article/"] } };
 
 async function fixture(fn) {
   const root = await mkdtemp(join(tmpdir(), "discovery-"));
@@ -86,6 +86,9 @@ test("build receipt reconciles sitemap membership, dates and robots", async () =
       '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>',
     );
     await assert.rejects(auditPublication(root, opts), /Missing sitemap URL/);
+    await writeFile(join(root, "article/index.html"), html().replace(/<link rel="canonical"[^>]+>/, ""));
+    await assert.rejects(auditPublication(root, opts), /Missing expected indexable canonical/);
+    await writeFile(join(root, "article/index.html"), html("Changed text"));
     await writeFile(join(root, "sitemap.xml"), xml());
     await writeFile(join(root, "robots.txt"), robots + "Disallow: /article/\n");
     await assert.rejects(auditPublication(root, opts), /unrestricted crawling/);
@@ -100,7 +103,7 @@ test("production notifications are gated on exact hosted content and key", async
     const current = (await auditPublication(root, opts)).discovery;
     let post = 0;
     let hosted = html();
-    let apiStatus = 202;
+    let apiStatus = 200;
     const response = (body, type, status = 200) =>
       new Response(body, { status, headers: { "content-type": type } });
     const fetcher = async (target, options) => {
@@ -111,7 +114,8 @@ test("production notifications are gated on exact hosted content and key", async
       if (target === "https://api.indexnow.org/indexnow") {
         post++;
         assert.deepEqual(JSON.parse(options.body).urlList, [url]);
-        return response("", "text/plain", apiStatus);
+        if (apiStatus === 0) throw new Error("network failure");
+        return new Response("", { status: apiStatus, headers: { "retry-after": "30" } });
       }
       throw new Error("Unexpected request: " + target);
     };
@@ -125,10 +129,39 @@ test("production notifications are gated on exact hosted content and key", async
     hosted = html();
     const input = { previous: null, current, key: "abcdef12" };
     assert.equal((await submitIndexNow(input, fetcher)).complete, true);
+    apiStatus = 202;
+    const pending = await submitIndexNow(input, fetcher);
+    assert.equal(pending.complete, false);
+    assert.equal(pending.batches[0].outcome, "key-pending");
     apiStatus = 429;
-    assert.equal((await submitIndexNow(input, fetcher)).complete, false);
+    const retry = await submitIndexNow(input, fetcher);
+    assert.equal(retry.complete, false);
+    assert.equal(retry.batches[0].outcome, "retryable");
+    assert.equal(retry.batches[0].retryAfter, "30");
+    apiStatus = 0;
+    const interrupted = await submitIndexNow(input, fetcher);
+    assert.equal(interrupted.complete, false);
+    assert.equal(interrupted.batches[0].status, null);
     const noop = await submitIndexNow({ ...input, previous: current }, fetcher);
     assert.deepEqual(noop.batches, []);
-    assert.equal(post, 2);
+    assert.equal(post, 4);
+  });
+});
+
+test("discovery rejects malformed namespace and nested sitemap fields", async () => {
+  await fixture(async (root) => {
+    await writeFile(join(root, "sitemap.xml"), xml().replace("<url>", '<url xmlns="urn:wrong">'));
+    await assert.rejects(auditPublication(root, opts), /Invalid sitemap entry/);
+    await writeFile(join(root, "sitemap.xml"), xml().replace("<loc>", "<loc><nested>").replace("</loc>", "</nested></loc>"));
+    await assert.rejects(auditPublication(root, opts), /Sitemap field must contain text only/);
+  });
+});
+
+test("discovery requires exact, independent and disjoint route policy", async () => {
+  await fixture(async (root) => {
+    for (const expectedRoutes of [undefined, ["/article/", "/article/"], ["/article/?q=1"], ["//other.example/article/"]])
+      await assert.rejects(auditPublication(root, { ...opts, discovery: { expectedRoutes } }), /requires an array|Invalid or duplicate/);
+    await assert.rejects(auditPublication(root, { ...opts, discovery: { expectedRoutes: ["/article/"], excludePaths: ["/article/"] } }), /also excluded/);
+    await assert.rejects(auditPublication(root, { ...opts, discovery: { expectedRoutes: ["/missing/"] } }), /Unexpected indexable canonical/);
   });
 });

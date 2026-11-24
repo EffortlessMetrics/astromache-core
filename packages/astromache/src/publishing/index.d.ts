@@ -22,8 +22,11 @@ export interface StaticPublicationOptions {
   renderedSearch?: boolean;
   /** Exact same-origin routes served by the host rather than emitted as files. */
   externalRoutes?: readonly string[];
-  /** Opt-in discovery audit; excludes exact same-origin utility paths from sitemap membership. */
-  discovery?: { excludePaths?: readonly string[] };
+  /** Opt-in discovery audit with an independent consumer-owned route inventory. */
+  discovery?: {
+    expectedRoutes: readonly string[];
+    excludePaths?: readonly string[];
+  };
 }
 export interface PublicationReport {
   schemaVersion: number;
@@ -90,4 +93,14 @@ export function verifyHostedDiscovery(
 export function submitIndexNow(
   input: { previous: DiscoveryManifest | null; current: DiscoveryManifest; key: string },
   fetcher?: typeof fetch,
-): Promise<DiscoveryDelta & { complete: boolean; batches: { urls: string[]; status: number }[] }>;
+): Promise<
+  DiscoveryDelta & {
+    complete: boolean;
+    batches: {
+      urls: string[];
+      status: number | null;
+      outcome: "acknowledged" | "key-pending" | "retryable" | "rejected";
+      retryAfter?: string;
+    }[];
+  }
+>;

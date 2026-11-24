@@ -60,13 +60,13 @@ function sitemapEntries(xml) {
         throw new Error("Invalid sitemap root or namespace");
       root = node.local;
     }
-    if (node.uri !== namespace) return;
+    if (field) throw new Error("Sitemap field must contain text only");
     if (stack.length === 2) {
-      if (node.local !== (root === "urlset" ? "url" : "sitemap"))
+      if (node.uri !== namespace || node.local !== (root === "urlset" ? "url" : "sitemap"))
         throw new Error("Invalid sitemap entry");
       row = {};
     }
-    if (stack.length === 3 && row && ["loc", "lastmod"].includes(node.local)) {
+    if (stack.length === 3 && row && node.uri === namespace && ["loc", "lastmod"].includes(node.local)) {
       if (Object.hasOwn(row, node.local)) throw new Error("Duplicate sitemap field");
       field = node.local;
       row[field] = "";
@@ -232,6 +232,7 @@ async function body(fetcher, url, types) {
 
 /** Read-only production check. Fetch is injectable for deterministic qualification. */
 export async function verifyHostedDiscovery(input, fetcher = fetch) {
+  if (input?.schemaVersion !== 1) throw new Error("Unsupported discovery manifest schema");
   const manifest = createDiscoveryManifest(input);
   const read = (url) => body(fetcher, url, ["application/xml", "text/xml"]);
   const robots = await body(fetcher, manifest.origin + "/robots.txt", ["text/plain"]);
@@ -240,15 +241,21 @@ export async function verifyHostedDiscovery(input, fetcher = fetch) {
     manifest,
     await readDiscoverySitemap(manifest.origin, manifest.sitemap, read),
   );
-  for (const page of manifest.pages) {
-    const actual = discoveryPage(readDocument(await body(fetcher, page.url, ["text/html"])));
-    if (
-      actual.url !== page.url ||
-      actual.lastmod !== page.lastmod ||
-      actual.contentSha256 !== page.contentSha256
-    )
-      throw new Error("Hosted discovery document differs from qualified manifest: " + page.url);
-  }
+  let cursor = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(4, manifest.pages.length) }, async () => {
+      while (cursor < manifest.pages.length) {
+        const page = manifest.pages[cursor++];
+        const actual = discoveryPage(readDocument(await body(fetcher, page.url, ["text/html"])));
+        if (
+          actual.url !== page.url ||
+          actual.lastmod !== page.lastmod ||
+          actual.contentSha256 !== page.contentSha256
+        )
+          throw new Error("Hosted discovery document differs from qualified manifest: " + page.url);
+      }
+    }),
+  );
   return { origin: manifest.origin, pages: manifest.pages.length, sitemap: manifest.sitemap };
 }
 
@@ -267,8 +274,14 @@ export async function submitIndexNow({ previous, current, key }, fetcher = fetch
   await verifyHostedDiscovery(manifest, fetcher);
   for (const url of delta.removed) {
     const response = await get(fetcher, url);
-    const redirected = [301, 308].includes(response.status) && response.headers.has("location");
-    if (redirected || [404, 410].includes(response.status)) continue;
+    if ([404, 410].includes(response.status)) continue;
+    if ([301, 308].includes(response.status) && response.headers.has("location")) {
+      const target = new URL(response.headers.get("location"), url).href;
+      // Only follow targets already accepted in this manifest. Cross-origin
+      // migration targets require a separate deployment acceptance contract.
+      if (target !== url && manifest.pages.some((page) => page.url === target)) continue;
+      throw new Error("Removed URL has an unaccepted redirect destination: " + url);
+    }
     if (response.status === 200) {
       const header = response.headers.get("x-robots-tag") ?? "";
       if (/\b(?:noindex|none)\b/i.test(header) || readDocument(await response.text()).noindex)
@@ -282,15 +295,31 @@ export async function submitIndexNow({ previous, current, key }, fetcher = fetch
   const batches = [];
   for (let offset = 0; offset < urls.length; offset += 10000) {
     const urlList = urls.slice(offset, offset + 10000);
-    const response = await fetcher("https://api.indexnow.org/indexnow", {
-      method: "POST",
-      redirect: "error",
-      headers: { "Content-Type": "application/json; charset=utf-8" },
-      body: JSON.stringify({ host: new URL(manifest.origin).host, key, keyLocation, urlList }),
-      signal: AbortSignal.timeout(15000),
-    });
-    batches.push({ urls: urlList, status: response.status });
-    if (![200, 202].includes(response.status)) return { ...delta, complete: false, batches };
+    let response;
+    try {
+      response = await fetcher("https://api.indexnow.org/indexnow", {
+        method: "POST",
+        redirect: "error",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({ host: new URL(manifest.origin).host, key, keyLocation, urlList }),
+        signal: AbortSignal.timeout(15000),
+      });
+    } catch {
+      batches.push({ urls: urlList, status: null, outcome: "retryable" });
+      return { ...delta, complete: false, batches };
+    }
+    const status = response.status;
+    const outcome =
+      status === 200
+        ? "acknowledged"
+        : status === 202
+          ? "key-pending"
+          : status === 429 || status >= 500
+            ? "retryable"
+            : "rejected";
+    const retryAfter = response.headers.get("retry-after");
+    batches.push({ urls: urlList, status, outcome, ...(retryAfter ? { retryAfter } : {}) });
+    if (outcome !== "acknowledged") return { ...delta, complete: false, batches };
   }
   return { ...delta, complete: true, batches };
 }

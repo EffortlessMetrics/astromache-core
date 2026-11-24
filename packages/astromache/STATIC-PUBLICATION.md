@@ -174,9 +174,11 @@ runtime; it does not prove the hosting configuration or authorize release.
 
 ## Opt-in search discovery
 
-Set `discovery: { excludePaths: ["/search/", "/offline/"] }` alongside an existing
-`sitemap` option to require exact sitemap membership against emitted same-origin,
-indexable canonical HTML. Exclusions are consumer policy, not inferred SEO advice.
+Set `discovery: { expectedRoutes: ["/", "/notes/example/"], excludePaths: ["/search/", "/offline/"] }`
+alongside an existing `sitemap` option. The independent, consumer-owned expected
+route inventory is required and must be derived before inspecting rendered HTML
+or the sitemap. This prevents simultaneous omission from both outputs from
+passing qualification. Exclusions are consumer policy, not inferred SEO advice.
 All other self-canonical HTML must be present, with no duplicate, foreign, redirected
 or noindex destination. Supply an exact exclusion for utility pages that retain
 indexable HTML intentionally; use noindex separately if they should not be indexed.
@@ -209,9 +211,14 @@ metadata and fingerprints. This is read-only and intentionally requires the
 actual origin, not a preview alias. The separate `submitIndexNow({ previous, current,
 key })` operation rechecks that production state, verifies retired URLs and the
 root key file, and submits only deltas to the shared IndexNow endpoint in batches.
-It never runs from the Astro build hook. 200/202 acknowledge receipt (not indexing);
-any other status yields an incomplete result. The release operator must retain
-receipts, handle network failures and retry without advancing the baseline.
+It never runs from the Astro build hook. HTTP 200 is acknowledged; HTTP 202 is
+key-validation pending, 429/5xx or transport failure are retryable, and other
+responses are rejected. Only fully acknowledged batches complete the operation.
+Retry-After is retained if supplied. Receipt is not indexing. A retired URL may
+redirect directly to another accepted same-origin canonical; unaccepted targets
+(including cross-origin migrations) require a future release-acceptance adapter.
+The release operator must retain receipts and retry without advancing the baseline
+for unacknowledged URLs.
 Do not enable a production notification trigger until the site's actual deployment
 identity and durable baseline storage are configured. No Worker or account setting
 is installed by this package.

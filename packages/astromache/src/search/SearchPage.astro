@@ -1,0 +1,37 @@
+---
+interface Props {
+  version: string;
+  label: string;
+  placeholder?: string;
+  heading?: string;
+  hideChrome?: boolean;
+}
+const { version, label, placeholder = label + "...", heading = "Search", hideChrome = true } = Astro.props;
+---
+<slot name="before" />
+<h1 class="page-search-heading">{heading}</h1>
+<section class="page-search" data-search-surface="page" data-index-version={version} data-hide-chrome={hideChrome || undefined} role="search" aria-label={label}>
+  <label class="sr-only" for="page-search-input">{label}</label>
+  <input id="page-search-input" data-search-input type="search" {placeholder} aria-describedby="search-instructions" />
+  <div id="page-search-status" data-search-status role="status" aria-live="polite"></div>
+  <button id="page-search-retry" data-search-retry type="button" hidden>Retry search</button>
+  <div id="page-search-results" data-search-results></div>
+</section>
+<p id="search-instructions"><slot name="instructions">Press <kbd>Ctrl+K</kbd> to open the command palette, or <kbd>/</kbd> for type-anywhere search.</slot></p>
+<style>
+  :global(body:has(.page-search[data-hide-chrome]) > .publication-header),
+  :global(body:has(.page-search[data-hide-chrome]) > .publication-footer) { display: none; }
+  :global(body:has(.page-search[data-hide-chrome]) > main) { box-sizing: border-box; width: 100%; max-width: 40rem; margin: 0 auto; padding: 2rem 1rem; }
+  .page-search-heading { margin: 0 0 2rem; }
+  .page-search { margin: 0; }
+  .page-search input { box-sizing: border-box; width: 100%; border: 1px solid var(--border); border-radius: .5rem; padding: .75rem 1rem; background: transparent; color: inherit; font: inherit; }
+  #page-search-status { margin-top: 1.5rem; }
+  #page-search-status:empty { display: none; }
+  #search-instructions { margin: 2rem 0; color: var(--secondary); }
+  #search-instructions :global(kbd) { border-radius: .25rem; background: var(--muted); padding: .25rem .5rem; font-size: .75rem; }
+  #page-search-results :global(article) { margin-top: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: .25rem; }
+  #page-search-results :global(h2) { margin: 0; font-size: 1rem; }
+  #page-search-results :global(p) { margin: .25rem 0 0; font-size: .875rem; }
+  #page-search-results :global(.result-tags) { display: flex; flex-wrap: wrap; gap: .25rem; list-style: none; padding: 0; margin: .5rem 0 0; }
+  #page-search-results :global(.result-tags li) { margin: 0; border-radius: .25rem; background: var(--muted); padding: .125rem .5rem; color: var(--secondary); font-size: .75rem; }
+</style>

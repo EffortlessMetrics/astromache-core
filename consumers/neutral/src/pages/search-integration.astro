@@ -1,17 +1,35 @@
 ---
 import SearchTrigger from "astromache/search-trigger";
+import SearchPage from "astromache/search-page";
+import SearchRecovery from "astromache/search-recovery";
 import { serializeSearchIndex } from "astromache/search-index";
 import { versionedSearchIndexPath } from "astromache/search-index-path";
+import "astromache/publication.css";
 const { version } = serializeSearchIndex([{ title: "Neutral talk" }]);
 ---
 <SearchTrigger label="Search example content" />
 <div id="search-mount"></div>
 <output id="index-path">{versionedSearchIndexPath("/search-index", version)}</output>
+<SearchPage {version} label="Search notes" hideChrome={false} />
+<SearchRecovery {version} kind="404" label="Recover notes" />
 <script>
   import { mountSearchPalette } from "astromache/search-client";
+  import { bindSearchSurface } from "astromache/search-surface";
   const target = document.getElementById("search-mount");
   if (target) mountSearchPalette(target, (element) => {
     element.dataset.mounted = "true";
     return () => { delete element.dataset.mounted; };
   }, document.getElementById("search-toggle"));
+  document.addEventListener("openSearch", () => { if (target) target.textContent = "Palette opened"; });
+  for (const surface of document.querySelectorAll<HTMLElement>("[data-search-surface]")) {
+    let failed = false;
+    bindSearchSurface(surface, { delayMs: 0, async execute(query) {
+      if (query === "slow") await new Promise(resolve => setTimeout(resolve, 400));
+      if (query === "retry" && !failed) { failed = true; throw new Error("Unavailable"); }
+      return [
+        { href: "/profile/", title: query + " result", summary: "Neutral result", tags: ["note"] },
+        { href: "//example.test", title: "Unsafe result", summary: "Must not render" },
+      ];
+    } });
+  }
 </script>

@@ -158,3 +158,12 @@ without overwriting conflicting historical bytes.
 `astromache/search-index-path` provides the matching browser-safe URL helpers.
 Use distinct namespaces for different corpora when migrating an existing origin.
 No search packages are required by consumers of the foundation alone.
+
+`astromache/search-page` and `astromache/search-recovery` provide server-rendered
+markup and scoped styles. Supply a version, accessible label and optional slots
+for navigation or instructions. `bindSearchSurface` from
+`astromache/search-surface` connects either surface to a consumer callback that
+returns local result links. It owns safe DOM rendering, retry, stale-response
+rejection, input composition, keyboard recovery navigation and page lifecycle.
+The consumer supplies its actual backend and decides whether recovery autofocus
+is appropriate. One instance of each surface per document is supported.

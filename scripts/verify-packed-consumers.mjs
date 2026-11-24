@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { verifyPackedPortfolioBrowser } from "./verify-packed-portfolio-browser.mjs";
 import { verifyNavigationPrefetchBrowser } from "./verify-navigation-prefetch.mjs";
 import { verifyProfileBrowser } from "./verify-profile-browser.mjs";
+import { verifySearchBrowser } from "./verify-search-browser.mjs";
 
 // Windows hosted tmpdir can use a DOS alias (RUNNER~1). Astro/Vite CSS module
 // identities must use the same canonical path as the files they resolve.
@@ -72,6 +73,9 @@ const expected = [
   "src/search/index-delivery.ts",
   "src/search/index-path.ts",
   "src/search/SearchTrigger.astro",
+  "src/search/SearchPage.astro",
+  "src/search/SearchRecovery.astro",
+  "src/search/surface.ts",
   "src/PublicationHead.astro",
   "src/publishing/index.d.ts",
   "src/publishing/index.mjs",
@@ -190,6 +194,7 @@ const receipt = {
 };
 await verifyPackedPortfolioBrowser(dir);
 await verifyProfileBrowser(dir);
+await verifySearchBrowser(dir);
 await verifyNavigationPrefetchBrowser(join(installed, "src/navigation.ts"));
 // Runtime data can violate the statically typed props even in a packed consumer.
 await writeFile(

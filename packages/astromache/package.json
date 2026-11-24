@@ -49,7 +49,10 @@
     "src/search/client.ts",
     "src/search/index-delivery.ts",
     "src/search/index-path.ts",
-    "src/search/SearchTrigger.astro"
+    "src/search/SearchTrigger.astro",
+    "src/search/SearchPage.astro",
+    "src/search/SearchRecovery.astro",
+    "src/search/surface.ts"
   ],
   "type": "module",
   "exports": {
@@ -88,7 +91,10 @@
     "./search-client": "./src/search/client.ts",
     "./search-index": "./src/search/index-delivery.ts",
     "./search-index-path": "./src/search/index-path.ts",
-    "./search-trigger": "./src/search/SearchTrigger.astro"
+    "./search-trigger": "./src/search/SearchTrigger.astro",
+    "./search-page": "./src/search/SearchPage.astro",
+    "./search-recovery": "./src/search/SearchRecovery.astro",
+    "./search-surface": "./src/search/surface.ts"
   },
   "publishConfig": {
     "access": "public",

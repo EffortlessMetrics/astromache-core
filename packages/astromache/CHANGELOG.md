@@ -2,6 +2,7 @@
 
 - Support opt-in follow-first profile composition in actual DOM and keyboard order.
 - Add optional search trigger, palette wiring, results controller and version-bound index delivery without adding engine or frontend dependencies.
+- Add dedicated and recovery search surfaces with safe result rendering, retry and page lifecycle.
 - Preserve frozen dependency identity when registry-only deprecation annotations drift during consumer qualification.
 
 ## 0.4.0-profile.2 — unpublished candidate

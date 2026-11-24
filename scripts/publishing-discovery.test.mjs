@@ -19,13 +19,24 @@ const lastmod = "2026-11-01T00:00:00.000Z";
 const robots = "User-agent: *\nAllow: /\nSitemap: " + sitemap + "\n";
 const html = (content = "Exact text", date = lastmod, css = "a") =>
   '<html><head><title>Article</title><meta name="description" content="Exact">' +
-  '<link rel="canonical" href="' + url + '"><meta property="article:published_time" content="' +
-  date + '"><link rel="stylesheet" href="/' + css + '.css"></head><body><main>' +
-  '<article data-article-body><p class="' + css + '">' + content +
+  '<link rel="canonical" href="' +
+  url +
+  '"><meta property="article:published_time" content="' +
+  date +
+  '"><link rel="stylesheet" href="/' +
+  css +
+  '.css"></head><body><main>' +
+  '<article data-article-body><p class="' +
+  css +
+  '">' +
+  content +
   "</p></article></main></body></html>";
 const xml = (date = lastmod) =>
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>' +
-  url + "</loc>" + (date ? "<lastmod>" + date + "</lastmod>" : "") + "</url></urlset>";
+  url +
+  "</loc>" +
+  (date ? "<lastmod>" + date + "</lastmod>" : "") +
+  "</url></urlset>";
 const opts = { origin, sitemap: "sitemap.xml", markdown: false, discovery: {} };
 
 async function fixture(fn) {
@@ -44,7 +55,10 @@ async function fixture(fn) {
 test("authored dates are normalized; invalid or reversed dates fail", () => {
   assert.equal(sitemapLastmod("2026-11-01"), lastmod);
   assert.equal(sitemapLastmod(undefined, undefined), undefined);
-  assert.equal(sitemapLastmod("2026-11-01", "2026-11-02T00:00:00+00:00"), "2026-11-02T00:00:00.000Z");
+  assert.equal(
+    sitemapLastmod("2026-11-01", "2026-11-02T00:00:00+00:00"),
+    "2026-11-02T00:00:00.000Z",
+  );
   for (const invalid of ["2026-02-30", "2026-11-01T12:00", "nonsense"])
     assert.throws(() => sitemapLastmod(invalid));
   assert.throws(() => sitemapLastmod("2026-11-02", "2026-11-01"));
@@ -60,11 +74,17 @@ test("build receipt reconciles sitemap membership, dates and robots", async () =
     await writeFile(join(root, "article/index.html"), html("Changed text"));
     const changed = (await auditPublication(root, opts)).discovery;
     assert.deepEqual(diffDiscoveryManifests(initial, changed), {
-      added: [], modified: [url], removed: [], dateWarnings: [url],
+      added: [],
+      modified: [url],
+      removed: [],
+      dateWarnings: [url],
     });
     await writeFile(join(root, "sitemap.xml"), xml(""));
     await assert.rejects(auditPublication(root, opts), /lastmod mismatch/);
-    await writeFile(join(root, "sitemap.xml"), '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');
+    await writeFile(
+      join(root, "sitemap.xml"),
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>',
+    );
     await assert.rejects(auditPublication(root, opts), /Missing sitemap URL/);
     await writeFile(join(root, "sitemap.xml"), xml());
     await writeFile(join(root, "robots.txt"), robots + "Disallow: /article/\n");
@@ -97,7 +117,10 @@ test("production notifications are gated on exact hosted content and key", async
     };
     assert.equal((await verifyHostedDiscovery(current, fetcher)).pages, 1);
     hosted = html("stale");
-    await assert.rejects(submitIndexNow({ previous: null, current, key: "abcdef12" }, fetcher), /differs/);
+    await assert.rejects(
+      submitIndexNow({ previous: null, current, key: "abcdef12" }, fetcher),
+      /differs/,
+    );
     assert.equal(post, 0);
     hosted = html();
     const input = { previous: null, current, key: "abcdef12" };

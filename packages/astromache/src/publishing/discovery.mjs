@@ -81,7 +81,10 @@ function sitemapEntries(xml) {
     if (stack.length === 3) field = undefined;
     if (stack.length === 2 && row) {
       if (!row.loc?.trim()) throw new Error("Sitemap entry requires a location");
-      rows.push({ url: row.loc.trim(), lastmod: row.lastmod === undefined ? undefined : date(row.lastmod.trim()) });
+      rows.push({
+        url: row.loc.trim(),
+        lastmod: row.lastmod === undefined ? undefined : date(row.lastmod.trim()),
+      });
       row = undefined;
     }
     stack.pop();
@@ -124,10 +127,13 @@ export function verifyDiscoveryRobots(text, sitemap) {
     const value = match[2];
     if (name === "user-agent" && value === "*") wildcard = true;
     if (name === "disallow" && value)
-      throw new Error("Discovery public-site profile requires unrestricted crawling; review robots rules");
+      throw new Error(
+        "Discovery public-site profile requires unrestricted crawling; review robots rules",
+      );
     if (name === "sitemap" && value === sitemap) advertised = true;
   }
-  if (!wildcard || !advertised) throw new Error("robots.txt must declare wildcard access and the canonical sitemap");
+  if (!wildcard || !advertised)
+    throw new Error("robots.txt must declare wildcard access and the canonical sitemap");
 }
 
 export function discoveryPage(document) {
@@ -145,14 +151,21 @@ export function createDiscoveryManifest({ origin, sitemap, pages }) {
   origin = siteOrigin(origin);
   canonical(sitemap, origin);
   const seen = new Set();
-  const sorted = pages.map((page) => {
-    const url = canonical(page.url, origin);
-    if (seen.has(url)) throw new Error("Duplicate discovery page: " + url);
-    seen.add(url);
-    if (!/^[0-9a-f]{64}$/.test(page.contentSha256)) throw new Error("Invalid content hash: " + url);
-    const lastmod = page.lastmod === undefined ? undefined : date(page.lastmod);
-    return { url, ...(lastmod === undefined ? {} : { lastmod }), contentSha256: page.contentSha256 };
-  }).sort((a, b) => order(a.url, b.url));
+  const sorted = pages
+    .map((page) => {
+      const url = canonical(page.url, origin);
+      if (seen.has(url)) throw new Error("Duplicate discovery page: " + url);
+      seen.add(url);
+      if (!/^[0-9a-f]{64}$/.test(page.contentSha256))
+        throw new Error("Invalid content hash: " + url);
+      const lastmod = page.lastmod === undefined ? undefined : date(page.lastmod);
+      return {
+        url,
+        ...(lastmod === undefined ? {} : { lastmod }),
+        contentSha256: page.contentSha256,
+      };
+    })
+    .sort((a, b) => order(a.url, b.url));
   return { schemaVersion: 1, origin, sitemap, pages: sorted };
 }
 
@@ -173,7 +186,10 @@ export function diffDiscoveryManifests(previous, current) {
   const old = previous === null ? null : createDiscoveryManifest(previous);
   if (old && old.origin !== next.origin) throw new Error("Discovery origins differ");
   const before = new Map((old?.pages ?? []).map((page) => [page.url, page]));
-  const added = [], modified = [], removed = [], dateWarnings = [];
+  const added = [],
+    modified = [],
+    removed = [],
+    dateWarnings = [];
   for (const page of next.pages) {
     const prior = before.get(page.url);
     if (!prior) added.push(page.url);
@@ -206,7 +222,10 @@ async function body(fetcher, url, types) {
   const mime = response.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
   if (response.status !== 200 || !types.includes(mime))
     throw new Error("Hosted discovery response mismatch: " + url + " (" + response.status + ")");
-  if (/\b(?:noindex|none)\b/i.test(response.headers.get("x-robots-tag") ?? "") && mime === "text/html")
+  if (
+    /\b(?:noindex|none)\b/i.test(response.headers.get("x-robots-tag") ?? "") &&
+    mime === "text/html"
+  )
     throw new Error("Hosted canonical is noindex: " + url);
   return response.text();
 }
@@ -217,7 +236,10 @@ export async function verifyHostedDiscovery(input, fetcher = fetch) {
   const read = (url) => body(fetcher, url, ["application/xml", "text/xml"]);
   const robots = await body(fetcher, manifest.origin + "/robots.txt", ["text/plain"]);
   verifyDiscoveryRobots(robots, manifest.sitemap);
-  assertDiscoverySitemap(manifest, await readDiscoverySitemap(manifest.origin, manifest.sitemap, read));
+  assertDiscoverySitemap(
+    manifest,
+    await readDiscoverySitemap(manifest.origin, manifest.sitemap, read),
+  );
   for (const page of manifest.pages) {
     const actual = discoveryPage(readDocument(await body(fetcher, page.url, ["text/html"])));
     if (
@@ -237,7 +259,10 @@ export async function submitIndexNow({ previous, current, key }, fetcher = fetch
   const urls = [...delta.added, ...delta.modified, ...delta.removed].sort(order);
   if (!urls.length) return { ...delta, complete: true, batches: [] };
   if (!/^[A-Za-z0-9-]{8,128}$/.test(key ?? "")) throw new Error("Invalid IndexNow key");
-  if (!manifest.origin.startsWith("https://") || new URL(manifest.origin).hostname.endsWith(".pages.dev"))
+  if (
+    !manifest.origin.startsWith("https://") ||
+    new URL(manifest.origin).hostname.endsWith(".pages.dev")
+  )
     throw new Error("IndexNow requires a production HTTPS origin, not a Pages preview");
   await verifyHostedDiscovery(manifest, fetcher);
   for (const url of delta.removed) {
@@ -246,7 +271,8 @@ export async function submitIndexNow({ previous, current, key }, fetcher = fetch
     if (redirected || [404, 410].includes(response.status)) continue;
     if (response.status === 200) {
       const header = response.headers.get("x-robots-tag") ?? "";
-      if (/\b(?:noindex|none)\b/i.test(header) || readDocument(await response.text()).noindex) continue;
+      if (/\b(?:noindex|none)\b/i.test(header) || readDocument(await response.text()).noindex)
+        continue;
     }
     throw new Error("Removed URL has not been retired in production: " + url);
   }

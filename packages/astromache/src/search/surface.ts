@@ -25,7 +25,8 @@ export function safeSearchLinks(rows: readonly SearchLink[]): SearchLink[] {
       typeof row.summary !== "string" ||
       !row.href.startsWith("/") ||
       row.href.startsWith("//") ||
-      /[\\\u0000-\u0020\u007f]/u.test(row.href)
+      row.href.includes("\\") ||
+      [...row.href].some((character) => character.charCodeAt(0) <= 32 || character.charCodeAt(0) === 127)
     ) {
       return false;
     }
@@ -85,7 +86,9 @@ export function bindSearchSurface(root: HTMLElement, options: SearchSurfaceOptio
           const noun = rows.length === 1 ? "result" : "results";
           status.textContent = `${rows.length} ${noun}${recovery ? "" : " found"}`;
         } else {
-          status.textContent = recovery ? "No results found" : `No results found for “${state.query}”.`;
+          status.textContent = recovery
+            ? "No results found"
+            : `No results found for “${state.query}”.`;
         }
         for (const row of rows) {
           const card = owner.createElement(recovery ? "li" : "article");

@@ -41,6 +41,11 @@ jobs:
       - run: pnpm exec vp --version
       - name: Required native and compatibility compilers, template diagnostics, lint, tests and output
         run: pnpm qualify
+      - name: Report formatter differences on failed source qualification
+        if: failure()
+        run: |
+          pnpm exec vp fmt .
+          git diff -- .
       - name: Install checkout-scoped Chromium
         run: pnpm exec playwright install chromium
         env:

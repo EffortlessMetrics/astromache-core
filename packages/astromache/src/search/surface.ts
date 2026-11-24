@@ -26,8 +26,9 @@ export function safeSearchLinks(rows: readonly SearchLink[]): SearchLink[] {
       !row.href.startsWith("/") ||
       row.href.startsWith("//") ||
       /[\\\u0000-\u0020\u007f]/u.test(row.href)
-    )
+    ) {
       return false;
+    }
     try {
       return new URL(row.href, "https://search.invalid").origin === "https://search.invalid";
     } catch {
@@ -45,15 +46,10 @@ export function bindSearchSurface(root: HTMLElement, options: SearchSurfaceOptio
   const retry = root.querySelector<HTMLButtonElement>("[data-search-retry]");
   const results = root.querySelector<HTMLElement>("[data-search-results]");
   const kind = root.dataset.searchSurface;
-  if (
-    !view ||
-    !input ||
-    !status ||
-    !retry ||
-    !results ||
-    !["page", "recovery"].includes(kind ?? "")
-  )
+  const validKind = kind === "page" || kind === "recovery";
+  if (!view || !input || !status || !retry || !results || !validKind) {
     throw new Error("Invalid search surface");
+  }
   const recovery = kind === "recovery";
   const limit = recovery ? 5 : 50;
   const listeners = new AbortController();
@@ -77,22 +73,20 @@ export function bindSearchSurface(root: HTMLElement, options: SearchSurfaceOptio
       results.replaceChildren();
       retry.hidden = state.status !== "failed";
       if (state.status === "idle") {
-        status.textContent = recovery
-          ? root.dataset.idleMessage ?? ""
-          : state.query
-            ? "Type at least 2 characters."
-            : "";
+        status.textContent = root.dataset.idleMessage ?? "";
+        if (!recovery && state.query) status.textContent = "Type at least 2 characters.";
       } else if (state.status === "pending") {
         status.textContent = "Searching...";
       } else if (state.status === "failed") {
         status.textContent = options.failureMessage ?? "Search is currently unavailable.";
       } else if (state.status === "ready") {
         const rows = safeSearchLinks(state.results).slice(0, limit);
-        status.textContent = rows.length
-          ? rows.length + (rows.length === 1 ? " result" : " results") + (recovery ? "" : " found")
-          : recovery
-            ? "No results found"
-            : "No results found for “" + state.query + "”.";
+        if (rows.length) {
+          const noun = rows.length === 1 ? "result" : "results";
+          status.textContent = `${rows.length} ${noun}${recovery ? "" : " found"}`;
+        } else {
+          status.textContent = recovery ? "No results found" : `No results found for “${state.query}”.`;
+        }
         for (const row of rows) {
           const card = owner.createElement(recovery ? "li" : "article");
           const link = owner.createElement("a");

@@ -227,7 +227,9 @@ const deliveryReceipt = {
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
   archive,
   sha256: receipt.packageSha256,
-  integrity: "sha512-" + createHash("sha512").update(await readFile(tarball)).digest("base64"),
+  integrity: `sha512-${createHash("sha512")
+    .update(await readFile(tarball))
+    .digest("base64")}`,
   bytes: (await readFile(tarball)).length,
 };
 await writeFile(join(delivery, "receipt.json"), JSON.stringify(deliveryReceipt, null, 2) + "\n");

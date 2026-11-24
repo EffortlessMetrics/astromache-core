@@ -84,6 +84,7 @@ const expected = [
   "src/publishing/metadata.mjs",
   "src/publishing/negotiation.d.ts",
   "src/publishing/negotiation.mjs",
+  "src/publishing/notification-ledger.mjs",
   "src/publishing/rendered.mjs",
 ];
 assert.deepEqual(

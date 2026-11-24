@@ -2,6 +2,7 @@
 
 - Add versioned media-aware discovery fingerprints, normalize styling-only inline wrappers, and verify stable same-origin media bytes.
 - Support independently emitted route inventories and a dedicated deterministic discovery manifest.
+- Add a pure durable notification ledger contract for partial acknowledgement, retries, interruption and rollback.
 
 ## 0.4.0-site.2 — unpublished candidate
 

@@ -20,6 +20,15 @@ export {
   verifyHostedDiscovery,
   submitIndexNow,
 } from "./discovery.mjs";
+export {
+  discoveryManifestSha256,
+  createNotificationLedger,
+  observeNotificationDeployment,
+  beginNotificationBatch,
+  settleNotificationBatch,
+  recoverNotificationBatch,
+  resetRejectedNotifications,
+} from "./notification-ledger.mjs";
 
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const receipt = "_meta/astromache-publication.json";

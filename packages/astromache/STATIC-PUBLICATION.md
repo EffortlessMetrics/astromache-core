@@ -231,3 +231,35 @@ for unacknowledged URLs.
 Do not enable a production notification trigger until the site's actual deployment
 identity and durable baseline storage are configured. No Worker or account setting
 is installed by this package.
+
+## Durable notification reconciliation
+
+The opt-in notification ledger is a pure, serializable state machine. It does
+not call Cloudflare, write a repository branch, schedule a workflow or send HTTP.
+The release controller must independently establish and authenticate the accepted
+production deployment and hosted receipt, including source SHA, deployment ID and
+manifest SHA-256. `discoveryManifestSha256(manifest)` hashes the canonical
+pretty-printed JSON plus final newline emitted as `_meta/discovery.json`.
+
+- `createNotificationLedger(origin, retiredUrls?)` bootstraps a single production
+  origin. Seed old same-origin URLs only from accepted migration inventory.
+- `observeNotificationDeployment(ledger, acceptance)` reconciles desired URL
+  state against acknowledged and pending state, including URLs observed during an
+  intermediate deployment. A rollback cannot discard ambiguous pending work.
+- `beginNotificationBatch(ledger, { now, limit })` creates a bounded intent
+  bound to the exact accepted deployment and manifest. Persist it before sending.
+- `settleNotificationBatch(ledger, { attemptId, status, retryAfter, now })`
+  returns the revised state and receipt. Only HTTP 200 advances acknowledged URL
+  state. 202 remains pending; 429 and transient failures schedule a retry;
+  permanent rejection requires operator intervention.
+- `recoverNotificationBatch(ledger, now)` treats an interrupted intent as an
+  ambiguous delivery, never as success. Duplicate notification is preferable to
+  dropping an unacknowledged change.
+- `resetRejectedNotifications(ledger, urls)` is an explicit operator action
+  after resolving the rejected request.
+
+Use an atomic compare-and-swap store and serialize per origin. Re-read actual
+production identity immediately before sending, and reconcile if it changes.
+The ledger does not authenticate a caller-provided receipt or implement the HTTP
+adapter, deployment observer, durable store or workflow. Retain intent and receipt
+history outside production main; do not make the build depend on notification state.

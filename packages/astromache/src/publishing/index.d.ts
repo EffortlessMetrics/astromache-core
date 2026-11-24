@@ -105,3 +105,72 @@ export function submitIndexNow(
     }[];
   }
 >;
+
+export type NotificationPageState = Pick<DiscoveryPage, "contentSha256" | "lastmod"> | null;
+export interface AcceptedDiscoveryDeployment {
+  environment: "production";
+  deploymentId: string;
+  sourceSha: string;
+  manifestSha256: string;
+  hostedReceiptSha256: string;
+  manifest: DiscoveryManifest;
+}
+export interface NotificationRow {
+  url: string;
+  state: NotificationPageState;
+}
+export interface PendingNotification extends NotificationRow {
+  status: "ready" | "retryable" | "key-pending" | "rejected";
+  attempts: number;
+  notBefore: number | null;
+  lastStatus: number | null;
+}
+export interface NotificationIntent {
+  attemptId: string;
+  deploymentId: string;
+  manifestSha256: string;
+  startedAt: number;
+  rows: NotificationRow[];
+}
+export interface NotificationLedger {
+  schemaVersion: 1;
+  origin: string;
+  revision: number;
+  deployed: AcceptedDiscoveryDeployment | null;
+  acknowledged: NotificationRow[];
+  pending: PendingNotification[];
+  inFlight: NotificationIntent | null;
+}
+export interface NotificationReceipt {
+  attemptId: string;
+  deploymentId: string;
+  manifestSha256: string;
+  startedAt: number;
+  finishedAt: number;
+  status: number | null;
+  outcome: "acknowledged" | "key-pending" | "retryable" | "rejected";
+  retryAfter?: string;
+  urls: string[];
+}
+export function discoveryManifestSha256(manifest: DiscoveryManifest): string;
+export function createNotificationLedger(origin: string, retiredUrls?: readonly string[]): NotificationLedger;
+export function observeNotificationDeployment(
+  ledger: NotificationLedger,
+  acceptance: AcceptedDiscoveryDeployment,
+): NotificationLedger;
+export function beginNotificationBatch(
+  ledger: NotificationLedger,
+  options: { now: number; limit?: number },
+): { ledger: NotificationLedger; intent: NotificationIntent | null };
+export function settleNotificationBatch(
+  ledger: NotificationLedger,
+  response: { attemptId: string; status: number | null; retryAfter?: string; now: number },
+): { ledger: NotificationLedger; receipt: NotificationReceipt };
+export function recoverNotificationBatch(
+  ledger: NotificationLedger,
+  now: number,
+): { ledger: NotificationLedger; receipt: NotificationReceipt | null };
+export function resetRejectedNotifications(
+  ledger: NotificationLedger,
+  urls: readonly string[],
+): NotificationLedger;

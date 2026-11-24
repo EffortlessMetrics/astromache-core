@@ -141,7 +141,10 @@ assert.match(profile, /href="https:\/\/profiles\.example\/person\/" rel="me"/);
 const minimalProfile = await readFile(join(consumer, "dist/profile-minimal/index.html"), "utf8");
 assert.match(minimalProfile, /Example &amp; author/);
 assert.doesNotMatch(minimalProfile, /id="speaking"|id="follow"|class="profile-portrait"|<script\b/);
-const searchIntegration = await readFile(join(consumer, "dist/search-integration/index.html"), "utf8");
+const searchIntegration = await readFile(
+  join(consumer, "dist/search-integration/index.html"),
+  "utf8",
+);
 assert.match(searchIntegration, /aria-label="Search example content"/);
 assert.match(searchIntegration, /\/search-index\/[a-f0-9]{64}\/search-index\.json/);
 const stylesheets = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)];

@@ -135,7 +135,6 @@ For a fallback present in the generated directory corpus, `/offline`, `/offline/
 
 Canonical page discovery uses the host filesystem separator. On POSIX, directory names containing a literal backslash are rejected before preset writes because browsers normalize backslashes in URLs. Rename those directories before building. A file named `asset\index.html` on POSIX is an ordinary file, not a directory page. Native Windows nested directories continue to use canonical slash-separated URLs.
 
-
 ## Optional search integration
 
 The search helpers do not install a search engine or frontend library. A consumer

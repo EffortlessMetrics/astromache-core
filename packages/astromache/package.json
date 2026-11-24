@@ -45,7 +45,11 @@
     "src/static-offline.d.ts",
     "src/PublicationHead.astro",
     "src/publishing",
-    "STATIC-PUBLICATION.md"
+    "STATIC-PUBLICATION.md",
+    "src/search/client.ts",
+    "src/search/index-delivery.ts",
+    "src/search/index-path.ts",
+    "src/search/SearchTrigger.astro"
   ],
   "type": "module",
   "exports": {
@@ -80,7 +84,11 @@
     "./markdown-negotiation": {
       "types": "./src/publishing/negotiation.d.ts",
       "import": "./src/publishing/negotiation.mjs"
-    }
+    },
+    "./search-client": "./src/search/client.ts",
+    "./search-index": "./src/search/index-delivery.ts",
+    "./search-index-path": "./src/search/index-path.ts",
+    "./search-trigger": "./src/search/SearchTrigger.astro"
   },
   "publishConfig": {
     "access": "public",

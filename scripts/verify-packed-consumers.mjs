@@ -68,6 +68,10 @@ const expected = [
   "src/reading-time.ts",
   "src/publication.css",
   "src/search.css",
+  "src/search/client.ts",
+  "src/search/index-delivery.ts",
+  "src/search/index-path.ts",
+  "src/search/SearchTrigger.astro",
   "src/PublicationHead.astro",
   "src/publishing/index.d.ts",
   "src/publishing/index.mjs",
@@ -148,6 +152,9 @@ execFileSync(process.execPath, [manager, "build"], { cwd: dir, stdio: "inherit" 
 const html = await readFile(join(dir, "dist/index.html"));
 const workspace = await readFile("consumers/neutral/dist/index.html");
 assert.deepEqual(html, workspace, "Packed and workspace outputs must match");
+const searchIntegration = await readFile(join(dir, "dist/search-integration/index.html"), "utf8");
+assert.match(searchIntegration, /aria-label="Search example content"/);
+assert.match(searchIntegration, /\/search-index\/[a-f0-9]{64}\/search-index\.json/);
 const gallery = await readFile(join(dir, "dist/portfolio/index.html"), "utf8");
 // Styled Astro components hash their compilation paths into scope identifiers.
 // Preserve every structure/style/script byte except consistently renaming those

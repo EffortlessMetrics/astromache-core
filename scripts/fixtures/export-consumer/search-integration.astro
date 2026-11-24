@@ -1,0 +1,17 @@
+---
+import SearchTrigger from "astromache/search-trigger";
+import { serializeSearchIndex } from "astromache/search-index";
+import { versionedSearchIndexPath } from "astromache/search-index-path";
+const { version } = serializeSearchIndex([{ title: "Neutral talk" }]);
+---
+<SearchTrigger label="Search example content" />
+<div id="search-mount"></div>
+<output id="index-path">{versionedSearchIndexPath("/search-index", version)}</output>
+<script>
+  import { mountSearchPalette } from "astromache/search-client";
+  const target = document.getElementById("search-mount");
+  if (target) mountSearchPalette(target, (element) => {
+    element.dataset.mounted = "true";
+    return () => { delete element.dataset.mounted; };
+  }, document.getElementById("search-toggle"));
+</script>

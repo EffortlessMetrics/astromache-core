@@ -134,3 +134,27 @@ The optional offline peer is independently owned and released. Use its exact qua
 For a fallback present in the generated directory corpus, `/offline`, `/offline/` and `/offline/index.html` resolve to the same `/offline/` cache entry. Other fallback values remain literal, including filenames such as `/myindex.html`, external URLs and query-bearing values. This preset does not expand the specialist worker's fallback/query or exclusion policy.
 
 Canonical page discovery uses the host filesystem separator. On POSIX, directory names containing a literal backslash are rejected before preset writes because browsers normalize backslashes in URLs. Rename those directories before building. A file named `asset\index.html` on POSIX is an ordinary file, not a directory page. Native Windows nested directories continue to use canonical slash-separated URLs.
+
+
+## Optional search integration
+
+The search helpers do not install a search engine or frontend library. A consumer
+supplies its existing TypeAnywhereSearch renderer and Static Search backend.
+Use `astromache/search-trigger` for the accessible control and
+`mountSearchPalette` from `astromache/search-client` to wire the existing
+`openSearch` event and teardown. Mount the palette in the publication layout's
+`body-end` slot, outside the potentially inert main content.
+
+`createSearchResultsController` shares debounce, latest-query admission,
+failure, retry, cancellation and disposal for dedicated and recovery search.
+The caller supplies an async execution function and rendering callback. The
+palette retains its own interaction and ranking behavior.
+
+`serializeSearchIndex` from `astromache/search-index` returns exact JSON
+and its SHA-256 version; the consumer owns ordering and document admission.
+`emitVersionedSearchIndex(outputDirectory, namespace)` verifies or copies
+canonical JSON to its hash-addressed path before offline manifest generation,
+without overwriting conflicting historical bytes.
+`astromache/search-index-path` provides the matching browser-safe URL helpers.
+Use distinct namespaces for different corpora when migrating an existing origin.
+No search packages are required by consumers of the foundation alone.

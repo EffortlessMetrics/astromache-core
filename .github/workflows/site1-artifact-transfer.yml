@@ -1,0 +1,25 @@
+name: Verified site.1 archive transfer
+on:
+  push:
+    branches: [delivery/site1-artifact-transfer]
+permissions:
+  actions: read
+  contents: read
+jobs:
+  transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Transfer the exact qualified public archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/EffortlessMetrics/astromache-core/actions/artifacts/14914977719/zip > delivery.zip
+          echo 'bf844ea373ecc51d0e521288898013ac0da0731c69174b7bb011a1a1dd852db3  delivery.zip' | sha256sum -c -
+          unzip -q delivery.zip
+          echo '3336d3bc72efa69552eb817c33e016e3a488b76ce7d8aa06cec8fe36068782a3  astromache-0.4.0-site.1.tgz' | sha256sum -c -
+          test "$(wc -c < astromache-0.4.0-site.1.tgz)" -eq 168888
+          echo "ASTROMACHE_DELIVERY_BEGIN"
+          base64 -w 512 astromache-0.4.0-site.1.tgz | sed 's/^/ARCHIVE_B64:/'
+          echo "ASTROMACHE_DELIVERY_END"

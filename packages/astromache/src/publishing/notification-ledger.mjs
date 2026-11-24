@@ -3,13 +3,18 @@ import { createDiscoveryManifest } from "./discovery.mjs";
 import { httpURL } from "./metadata.mjs";
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
-const hex = (value, length) => typeof value === "string" && new RegExp("^[0-9a-f]{" + length + "}$").test(value);
+const hex = (value, length) =>
+  typeof value === "string" && new RegExp("^[0-9a-f]{" + length + "}$").test(value);
 const byUrl = (a, b) => (a.url < b.url ? -1 : a.url > b.url ? 1 : 0);
 const statuses = ["ready", "retryable", "key-pending", "rejected"];
 
 function originOf(value) {
   const url = httpURL(value, "Notification origin");
-  if (url.protocol !== "https:" || url.href !== url.origin + "/" || url.hostname.endsWith(".pages.dev"))
+  if (
+    url.protocol !== "https:" ||
+    url.href !== url.origin + "/" ||
+    url.hostname.endsWith(".pages.dev")
+  )
     throw new Error("Notification ledger requires an exact production HTTPS origin");
   return url.origin;
 }
@@ -29,7 +34,8 @@ function nowValue(value) {
 
 function pageState(page) {
   if (page === null) return null;
-  if (!page || !hex(page.contentSha256, 64)) throw new Error("Invalid notification page fingerprint");
+  if (!page || !hex(page.contentSha256, 64))
+    throw new Error("Invalid notification page fingerprint");
   const result = { contentSha256: page.contentSha256 };
   if (page.lastmod !== undefined) {
     if (typeof page.lastmod !== "string" || new Date(page.lastmod).toISOString() !== page.lastmod)
@@ -64,7 +70,9 @@ function deploymentOf(input, origin) {
     !hex(input.manifestSha256, 64) ||
     !hex(input.hostedReceiptSha256, 64)
   )
-    throw new Error("Notification requires a production acceptance receipt with exact source and artifact identities");
+    throw new Error(
+      "Notification requires a production acceptance receipt with exact source and artifact identities",
+    );
   const manifest = normalizeManifest(input.manifest, origin);
   if (input.manifestSha256 !== discoveryManifestSha256(manifest))
     throw new Error("Accepted deployment manifest hash mismatch");
@@ -89,7 +97,10 @@ function rowsMap(rows, origin, pending = false) {
       if (!statuses.includes(row.status) || !Number.isSafeInteger(row.attempts) || row.attempts < 0)
         throw new Error("Invalid notification pending state: " + url);
       if (row.notBefore !== null) nowValue(row.notBefore);
-      if (row.lastStatus !== null && (!Number.isInteger(row.lastStatus) || row.lastStatus < 100 || row.lastStatus > 599))
+      if (
+        row.lastStatus !== null &&
+        (!Number.isInteger(row.lastStatus) || row.lastStatus < 100 || row.lastStatus > 599)
+      )
         throw new Error("Invalid notification response status: " + url);
     }
     map.set(url, { ...row, url, state });
@@ -156,7 +167,10 @@ export function observeNotificationDeployment(ledger, acceptance) {
   const { origin, acknowledged, pending, deployed } = verifyLedger(ledger);
   const current = deploymentOf(acceptance, origin);
   if (deployed?.deploymentId === current.deploymentId) {
-    if (deployed.sourceSha !== current.sourceSha || deployed.manifestSha256 !== current.manifestSha256)
+    if (
+      deployed.sourceSha !== current.sourceSha ||
+      deployed.manifestSha256 !== current.manifestSha256
+    )
       throw new Error("Deployment identity reused with different source or manifest");
     return ledger;
   }
@@ -202,7 +216,9 @@ export function beginNotificationBatch(ledger, { now, limit = 10000 }) {
   if (!rows.length) return { ledger, intent: null };
   const revision = ledger.revision + 1;
   const intent = {
-    attemptId: hash(JSON.stringify([revision, deployed.deploymentId, deployed.manifestSha256, now, rows])),
+    attemptId: hash(
+      JSON.stringify([revision, deployed.deploymentId, deployed.manifestSha256, now, rows]),
+    ),
     deploymentId: deployed.deploymentId,
     manifestSha256: deployed.manifestSha256,
     startedAt: now,
@@ -227,14 +243,19 @@ export function settleNotificationBatch(ledger, { attemptId, status, retryAfter,
   const { acknowledged, pending } = verifyLedger(ledger);
   const intent = ledger.inFlight;
   nowValue(now);
-  if (!intent || intent.attemptId !== attemptId) throw new Error("Stale or unknown notification attempt");
+  if (!intent || intent.attemptId !== attemptId)
+    throw new Error("Stale or unknown notification attempt");
   if (now < intent.startedAt) throw new Error("Notification response predates intent");
   if (status !== null && (!Number.isInteger(status) || status < 100 || status > 599))
     throw new Error("Invalid notification response status");
   const outcome =
-    status === 200 ? "acknowledged" :
-    status === 202 ? "key-pending" :
-    status === null || status === 429 || status >= 500 ? "retryable" : "rejected";
+    status === 200
+      ? "acknowledged"
+      : status === 202
+        ? "key-pending"
+        : status === null || status === 429 || status >= 500
+          ? "retryable"
+          : "rejected";
   for (const row of intent.rows) {
     const prior = pending.get(row.url);
     if (outcome === "acknowledged") {
@@ -291,7 +312,8 @@ export function resetRejectedNotifications(ledger, urls) {
   for (const value of urls) {
     const url = canonical(value, origin);
     const row = pending.get(url);
-    if (row?.status !== "rejected") throw new Error("URL does not have a rejected notification: " + url);
+    if (row?.status !== "rejected")
+      throw new Error("URL does not have a rejected notification: " + url);
     pending.set(url, fresh(url, row.state));
   }
   return { ...ledger, revision: ledger.revision + 1, pending: [...pending.values()].sort(byUrl) };

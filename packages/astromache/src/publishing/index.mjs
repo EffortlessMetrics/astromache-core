@@ -226,14 +226,17 @@ export async function auditPublication(rootDirectory, options = {}) {
     const media = new Map();
     const readMedia = (url) => {
       if (!media.has(url)) {
-        media.set(url, (async () => {
-          const path = localPath(url, origin);
-          if (!inventory.includes(path)) throw new Error("Missing discovery media: " + url);
-          const hash = createHash("sha256");
-          for await (const chunk of createReadStream(await contained(root, path)))
-            hash.update(chunk);
-          return hash.digest("hex");
-        })());
+        media.set(
+          url,
+          (async () => {
+            const path = localPath(url, origin);
+            if (!inventory.includes(path)) throw new Error("Missing discovery media: " + url);
+            const hash = createHash("sha256");
+            for await (const chunk of createReadStream(await contained(root, path)))
+              hash.update(chunk);
+            return hash.digest("hex");
+          })(),
+        );
       }
       return media.get(url);
     };

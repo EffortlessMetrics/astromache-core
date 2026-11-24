@@ -48,29 +48,58 @@ test("initial delivery, partial acknowledgement and identical redeployment", () 
   let state = bootstrap([page("a"), page("b")]);
   assert.equal(state.pending.length, 2);
   state = submit(state, 200, 1000, 1).ledger;
-  assert.deepEqual(state.acknowledged.map((row) => row.url), [url("a")]);
-  assert.deepEqual(state.pending.map((row) => row.url), [url("b")]);
+  assert.deepEqual(
+    state.acknowledged.map((row) => row.url),
+    [url("a")],
+  );
+  assert.deepEqual(
+    state.pending.map((row) => row.url),
+    [url("b")],
+  );
   state = submit(state).ledger;
   assert.equal(state.pending.length, 0);
   const next = observeNotificationDeployment(state, deployment("B", [page("b"), page("a")]));
   assert.equal(next.pending.length, 0);
   assert.equal(beginNotificationBatch(next, { now: 2000 }).intent, null);
-  assert.deepEqual(observeNotificationDeployment(next, deployment("B", [page("a"), page("b")])), next);
+  assert.deepEqual(
+    observeNotificationDeployment(next, deployment("B", [page("a"), page("b")])),
+    next,
+  );
 });
 
 test("rename, removal, intermediate failed change and rollback preserve latest desired state", () => {
   const original = deployment("A", [page("a"), page("old")]);
-  let state = submit(observeNotificationDeployment(createNotificationLedger(origin), original)).ledger;
+  let state = submit(
+    observeNotificationDeployment(createNotificationLedger(origin), original),
+  ).ledger;
   state = observeNotificationDeployment(state, deployment("B", [page("a", "b"), page("new")]));
-  assert.deepEqual(state.pending.map((row) => [row.url, row.state === null]), [
-    [url("a"), false], [url("new"), false], [url("old"), true],
-  ]);
+  assert.deepEqual(
+    state.pending.map((row) => [row.url, row.state === null]),
+    [
+      [url("a"), false],
+      [url("new"), false],
+      [url("old"), true],
+    ],
+  );
   const attempt = beginNotificationBatch(state, { now: 2000 });
   const rollback = observeNotificationDeployment(attempt.ledger, original);
-  assert.deepEqual(rollback.pending.map((row) => [row.url, row.state === null]), [
-    [url("a"), false], [url("new"), true], [url("old"), false],
-  ]);
-  assert.throws(() => settleNotificationBatch(rollback, { attemptId: attempt.intent.attemptId, status: 200, now: 3000 }), /Stale/);
+  assert.deepEqual(
+    rollback.pending.map((row) => [row.url, row.state === null]),
+    [
+      [url("a"), false],
+      [url("new"), true],
+      [url("old"), false],
+    ],
+  );
+  assert.throws(
+    () =>
+      settleNotificationBatch(rollback, {
+        attemptId: attempt.intent.attemptId,
+        status: 200,
+        now: 3000,
+      }),
+    /Stale/,
+  );
   state = submit(rollback, 200, 3000).ledger;
   assert.equal(state.pending.length, 0);
   assert.equal(state.acknowledged.find((row) => row.url === url("new")).state, null);
@@ -101,29 +130,58 @@ test("pending key, rate limiting, interruption and permanent rejection", () => {
 
 test("seed historical migration URLs and reject cross-origin or mismatched acceptance", () => {
   let state = bootstrap([page("new")], [url("legacy")]);
-  assert.deepEqual(state.pending.map((row) => [row.url, row.state === null]), [
-    [url("legacy"), true], [url("new"), false],
-  ]);
+  assert.deepEqual(
+    state.pending.map((row) => [row.url, row.state === null]),
+    [
+      [url("legacy"), true],
+      [url("new"), false],
+    ],
+  );
   state = submit(state).ledger;
   assert.equal(state.acknowledged.length, 2);
   assert.throws(() => createNotificationLedger("https://preview.pages.dev"), /production/);
-  assert.throws(() => createNotificationLedger(origin, ["https://elsewhere.example/"]), /same-origin/);
+  assert.throws(
+    () => createNotificationLedger(origin, ["https://elsewhere.example/"]),
+    /same-origin/,
+  );
   const accepted = deployment("B", [page("new")]);
   for (const altered of [
     { ...accepted, environment: "preview" },
     { ...accepted, manifestSha256: "0".repeat(64) },
     { ...accepted, sourceSha: "short" },
-  ]) assert.throws(() => observeNotificationDeployment(state, altered));
-  assert.throws(() => observeNotificationDeployment(state, deployment("A", [page("other")])), /reused/);
+  ])
+    assert.throws(() => observeNotificationDeployment(state, altered));
+  assert.throws(
+    () => observeNotificationDeployment(state, deployment("A", [page("other")])),
+    /reused/,
+  );
 });
 
 test("durable state rejects duplicate rows and stale or mismatched intents", () => {
   const state = bootstrap([page("a")]);
-  assert.throws(() => beginNotificationBatch({ ...state, pending: [...state.pending, ...state.pending] }, { now: 1000 }), /Duplicate/);
+  assert.throws(
+    () =>
+      beginNotificationBatch(
+        { ...state, pending: [...state.pending, ...state.pending] },
+        { now: 1000 },
+      ),
+    /Duplicate/,
+  );
   const begun = beginNotificationBatch(state, { now: 1000 });
   assert.throws(() => beginNotificationBatch(begun.ledger, { now: 1000 }), /Recover or settle/);
-  assert.throws(() => settleNotificationBatch(begun.ledger, { attemptId: "bad", status: 200, now: 1000 }), /Stale/);
-  assert.throws(() => settleNotificationBatch(begun.ledger, { attemptId: begun.intent.attemptId, status: 200, now: 999 }), /predates/);
+  assert.throws(
+    () => settleNotificationBatch(begun.ledger, { attemptId: "bad", status: 200, now: 1000 }),
+    /Stale/,
+  );
+  assert.throws(
+    () =>
+      settleNotificationBatch(begun.ledger, {
+        attemptId: begun.intent.attemptId,
+        status: 200,
+        now: 999,
+      }),
+    /predates/,
+  );
   const next = submit(recoverNotificationBatch(roundTrip(begun.ledger), 2000).ledger, 200, 62000);
   assert.equal(next.ledger.pending.length, 0);
 });

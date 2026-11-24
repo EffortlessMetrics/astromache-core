@@ -194,7 +194,9 @@ export function diffDiscoveryManifests(previous, current) {
   if (current?.schemaVersion !== 1 || (previous !== null && previous?.schemaVersion !== 1))
     throw new Error("Discovery requires versioned manifests (null for explicit bootstrap)");
   if (current.fingerprintVersion !== 2 || (previous && previous.fingerprintVersion !== 2))
-    throw new Error("Discovery fingerprint version changed; require an explicit baseline migration");
+    throw new Error(
+      "Discovery fingerprint version changed; require an explicit baseline migration",
+    );
   const next = createDiscoveryManifest(current);
   const old = previous === null ? null : createDiscoveryManifest(previous);
   if (old && old.origin !== next.origin) throw new Error("Discovery origins differ");
@@ -258,14 +260,17 @@ export async function verifyHostedDiscovery(input, fetcher = fetch) {
   const media = new Map();
   const readMedia = (url) => {
     if (!media.has(url)) {
-      media.set(url, (async () => {
-        const response = await get(fetcher, url);
-        if (response.status !== 200 || !response.body)
-          throw new Error("Hosted discovery media unavailable: " + url);
-        const hash = createHash("sha256");
-        for await (const chunk of response.body) hash.update(chunk);
-        return hash.digest("hex");
-      })());
+      media.set(
+        url,
+        (async () => {
+          const response = await get(fetcher, url);
+          if (response.status !== 200 || !response.body)
+            throw new Error("Hosted discovery media unavailable: " + url);
+          const hash = createHash("sha256");
+          for await (const chunk of response.body) hash.update(chunk);
+          return hash.digest("hex");
+        })(),
+      );
     }
     return media.get(url);
   };
@@ -275,7 +280,8 @@ export async function verifyHostedDiscovery(input, fetcher = fetch) {
       while (cursor < manifest.pages.length) {
         const page = manifest.pages[cursor++];
         const actual = await discoveryPage(
-          readDocument(await body(fetcher, page.url, ["text/html"])), readMedia,
+          readDocument(await body(fetcher, page.url, ["text/html"])),
+          readMedia,
         );
         if (
           actual.url !== page.url ||

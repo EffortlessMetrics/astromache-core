@@ -103,7 +103,10 @@ test("build receipt reconciles sitemap membership, dates and robots", async () =
     await writeFile(join(root, "robots.txt"), robots);
     const report = await buildPublication(root, opts);
     assert.deepEqual(report.discovery, changed);
-    assert.deepEqual(JSON.parse(await readFile(join(root, "_meta/discovery.json"), "utf8")), changed);
+    assert.deepEqual(
+      JSON.parse(await readFile(join(root, "_meta/discovery.json"), "utf8")),
+      changed,
+    );
   });
 });
 
@@ -202,26 +205,50 @@ test("stable primary and responsive media bytes affect the fingerprint, not pres
     await writeFile(join(root, "figure2.png"), "first responsive");
     await writeFile(join(root, "article/index.html"), html("Exact text" + asset));
     const before = (await auditPublication(root, opts)).discovery;
-    await writeFile(join(root, "article/index.html"), html("<span class='highlight'>Exact</span> text" + asset));
+    await writeFile(
+      join(root, "article/index.html"),
+      html("<span class='highlight'>Exact</span> text" + asset),
+    );
     assert.deepEqual((await auditPublication(root, opts)).discovery, before);
     await writeFile(join(root, "figure2.png"), "revised responsive");
     const after = (await auditPublication(root, opts)).discovery;
     assert.deepEqual(diffDiscoveryManifests(before, after).modified, [url]);
     const fetcher = async (target) => {
-      if (target === sitemap) return new Response(xml(), { headers: { "content-type": "application/xml" } });
-      if (target === origin + "/robots.txt") return new Response(robots, { headers: { "content-type": "text/plain" } });
-      if (target === url) return new Response(html("Exact text" + asset), { headers: { "content-type": "text/html" } });
+      if (target === sitemap)
+        return new Response(xml(), { headers: { "content-type": "application/xml" } });
+      if (target === origin + "/robots.txt")
+        return new Response(robots, { headers: { "content-type": "text/plain" } });
+      if (target === url)
+        return new Response(html("Exact text" + asset), {
+          headers: { "content-type": "text/html" },
+        });
       if (target === origin + "/figure.png") return new Response("first");
       if (target === origin + "/figure2.png") return new Response("revised responsive");
       throw new Error("Unexpected fetch: " + target);
     };
     await verifyHostedDiscovery(after, fetcher);
     await assert.rejects(verifyHostedDiscovery(before, fetcher), /differs/);
-    await assert.rejects(auditPublication(root, { ...opts, discovery: { expectedRoutes: ["/article/"], expectedRoutesFile: "routes.json" } }), /exactly one/);
+    await assert.rejects(
+      auditPublication(root, {
+        ...opts,
+        discovery: { expectedRoutes: ["/article/"], expectedRoutesFile: "routes.json" },
+      }),
+      /exactly one/,
+    );
     await writeFile(join(root, "routes.json"), JSON.stringify(["/article/"]));
-    assert.deepEqual((await auditPublication(root, { ...opts, discovery: { expectedRoutesFile: "routes.json" } })).discovery, after);
-    await writeFile(join(root, "article/index.html"), html("<img src='/missing.png' alt='Missing'>"));
+    assert.deepEqual(
+      (await auditPublication(root, { ...opts, discovery: { expectedRoutesFile: "routes.json" } }))
+        .discovery,
+      after,
+    );
+    await writeFile(
+      join(root, "article/index.html"),
+      html("<img src='/missing.png' alt='Missing'>"),
+    );
     await assert.rejects(auditPublication(root, opts), /Missing discovery media/);
-    assert.throws(() => diffDiscoveryManifests({ ...before, fingerprintVersion: 1 }, after), /baseline migration/);
+    assert.throws(
+      () => diffDiscoveryManifests({ ...before, fingerprintVersion: 1 }, after),
+      /baseline migration/,
+    );
   });
 });

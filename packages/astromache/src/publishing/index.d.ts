@@ -153,7 +153,10 @@ export interface NotificationReceipt {
   urls: string[];
 }
 export function discoveryManifestSha256(manifest: DiscoveryManifest): string;
-export function createNotificationLedger(origin: string, retiredUrls?: readonly string[]): NotificationLedger;
+export function createNotificationLedger(
+  origin: string,
+  retiredUrls?: readonly string[],
+): NotificationLedger;
 export function observeNotificationDeployment(
   ledger: NotificationLedger,
   acceptance: AcceptedDiscoveryDeployment,

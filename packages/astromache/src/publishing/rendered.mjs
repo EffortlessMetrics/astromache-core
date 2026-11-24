@@ -360,8 +360,9 @@ function discoveryBody(document) {
 export function discoveryMedia(document) {
   const main = discoveryBody(document);
   const contained = new Set(elements(main, () => true));
-  const sources = visibleElements(document.tree, (node) => has(node, "dataPublicationSource"))
-    .filter((node) => !contained.has(node));
+  const sources = visibleElements(document.tree, (node) =>
+    has(node, "dataPublicationSource"),
+  ).filter((node) => !contained.has(node));
   const urls = new Set();
   const add = (candidate) => {
     if (!candidate) return;
@@ -383,7 +384,8 @@ export function discoveryMedia(document) {
       remaining = remaining.slice(token.length);
       add(token.replace(/,+$/, ""));
       if (token.endsWith(",")) continue;
-      let depth = 0, end = 0;
+      let depth = 0,
+        end = 0;
       while (end < remaining.length) {
         const char = remaining[end++];
         if (char === "(") depth++;
@@ -422,7 +424,12 @@ export function discoveryContent(document) {
     if (has(node, "dataPublicationText")) return [String(value(node, "dataPublicationText"))];
     const properties = Object.fromEntries(
       Object.entries(node.properties ?? {})
-        .filter(([key]) => !/^(?:className$|style$|on|dataAstro|dataVite|tabIndex$|width$|height$|loading$|decoding$|fetchPriority$)/i.test(key))
+        .filter(
+          ([key]) =>
+            !/^(?:className$|style$|on|dataAstro|dataVite|tabIndex$|width$|height$|loading$|decoding$|fetchPriority$)/i.test(
+              key,
+            ),
+        )
         .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
     );
     const children = [];

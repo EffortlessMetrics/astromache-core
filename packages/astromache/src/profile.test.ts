@@ -12,7 +12,11 @@ test("keeps authored wording and supplied relationships unchanged", () => {
       { label: "About", href: "#about" },
     ],
   };
-  expect(profileProps(input)).toEqual({ ...input, portraitLayout: "grid", sectionOrder: "speaking-first" });
+  expect(profileProps(input)).toEqual({
+    ...input,
+    portraitLayout: "grid",
+    sectionOrder: "speaking-first",
+  });
 });
 
 test("has no implicit social links or relationships", () => {

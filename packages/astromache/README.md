@@ -1,12 +1,11 @@
-# astromache 0.4.0-profile.2 — unpublished candidate
+# astromache 0.4.0-site.1 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
 This version includes the publication foundation, the optional canonical offline preset, and `astromache/publication-head`, `astromache/static-publication` and `astromache/markdown-negotiation`. The [static publishing guide](STATIC-PUBLICATION.md) covers rendered-content Markdown, social metadata, output reconciliation and the optional host adapter. Static HTML remains independent of request-time compute, and the integration never rewrites emitted HTML.
 
 The 0.4 candidate adds `astromache/profile`, a personal landing-page composition
-using the existing publication style. It does not replace the publication
-homepage or change any existing component, stylesheet or export.
+using the existing publication style. It preserves the publication homepage and existing exports; section order and search integration are opt-in.
 
 The original npm 0.1.0 release and earlier unpublished archives remain immutable. A source version is not proof of registry publication; verify the release receipt before using a registry pin.
 
@@ -79,6 +78,8 @@ and an optional H2 section in `#follow` when links are supplied. Omitted portrai
 speaking and link inputs do not leave empty wrappers or headings. One profile
 instance per document is supported; `profile-title`, `profile-speaking-title`
 and `profile-follow-title` are reserved heading IDs.
+
+`sectionOrder="follow-first"` renders Follow before Speaking in actual document and keyboard order. The default `"speaking-first"` preserves previous consumers.
 
 `portraitLayout="flow"` opts into biography text flowing around a left portrait.
 The default `"grid"` retains the stacked mobile and side-by-side desktop layout.

@@ -110,6 +110,18 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
         );
         assert.deepEqual(errors, []);
         await page.goto(`${origin}/profile-flow/`);
+        assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
+          "Follow me",
+          "Speaking",
+        ]);
+        await page.getByRole("link", { name: "Publication", exact: true }).focus();
+        await page.keyboard.press("Tab");
+        assert.equal(
+          await page
+            .getByRole("link", { name: "Example recorded talk" })
+            .evaluate((el) => el === document.activeElement),
+          true,
+        );
         const flow = await page.locator(".profile-body").evaluate((element) => {
           const portrait = element.querySelector(".profile-portrait");
           return {
@@ -180,6 +192,11 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
     );
     assert.equal(await page.getByRole("link", { name: "Example recorded talk" }).isVisible(), true);
     assert.equal(await page.getByRole("link", { name: "Example profile" }).isVisible(), true);
+    await page.goto(`${origin}/profile-flow/`);
+    assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
+      "Follow me",
+      "Speaking",
+    ]);
     await page.goto(`${origin}/profile-minimal/`);
     assert.equal(
       await page.getByRole("heading", { level: 1, name: "Example & author" }).count(),

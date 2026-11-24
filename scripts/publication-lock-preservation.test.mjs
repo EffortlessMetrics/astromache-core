@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { stringify } from "yaml";
-import { verifyPublicationLockPreservation } from "./publication-lock-preservation.mjs";
+import {
+  restoreFrozenDeprecationAnnotations,
+  verifyPublicationLockPreservation,
+} from "./publication-lock-preservation.mjs";
 
 for (const project of ["starters/publication", "recipes/search-offline"]) {
   const original = (
@@ -352,6 +355,24 @@ test("present optional manifest dependencies retain their declared pins", () => 
   optionalManifest.optionalDependencies.parser = "99.0.0";
   assert.throws(
     () => verifyPublicationLockPreservation(stringify(before), stringify(after), optionalManifest),
+    /Only the root astromache delivery/,
+  );
+});
+
+test("registry annotation drift is restored without relaxing the strict lock verifier", () => {
+  const { before, after } = graph();
+  after.packages["stable@1.0.0"].deprecated = "Registry notice";
+  assert.throws(() => verifyGraph(before, after), /Only the root astromache delivery/);
+  const restored = restoreFrozenDeprecationAnnotations(stringify(before), stringify(after));
+  assert.deepEqual(restored.restored, [
+    { package: "stable@1.0.0", previous: null, observed: "Registry notice" },
+  ]);
+  verifyPublicationLockPreservation(stringify(before), restored.lock, manifest);
+  after.packages["stable@1.0.0"].resolution.integrity = "different";
+  const tampered = restoreFrozenDeprecationAnnotations(stringify(before), stringify(after));
+  assert.deepEqual(tampered.restored, []);
+  assert.throws(
+    () => verifyPublicationLockPreservation(stringify(before), tampered.lock, manifest),
     /Only the root astromache delivery/,
   );
 });

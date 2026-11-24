@@ -1,3 +1,9 @@
+## 0.4.0-site.1 — unpublished candidate
+
+- Support opt-in follow-first profile composition in actual DOM and keyboard order.
+- Add optional search trigger, palette wiring, results controller and version-bound index delivery without adding engine or frontend dependencies.
+- Preserve frozen dependency identity when registry-only deprecation annotations drift during consumer qualification.
+
 ## 0.4.0-profile.2 — unpublished candidate
 
 - Add an opt-in flowing portrait layout to the profile component; the default grid is unchanged.

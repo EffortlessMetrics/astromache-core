@@ -12,7 +12,11 @@ test("keeps authored wording and supplied relationships unchanged", () => {
       { label: "About", href: "#about" },
     ],
   };
-  expect(profileProps(input)).toEqual({ ...input, portraitLayout: "grid" });
+  expect(profileProps(input)).toEqual({
+    ...input,
+    portraitLayout: "grid",
+    sectionOrder: "speaking-first",
+  });
 });
 
 test("has no implicit social links or relationships", () => {
@@ -21,6 +25,7 @@ test("has no implicit social links or relationships", () => {
     speakingLabel: "Speaking",
     followLabel: "Follow me",
     portraitLayout: "grid",
+    sectionOrder: "speaking-first",
     links: [],
   });
   const output = profileProps({
@@ -90,4 +95,14 @@ test("rejects sparse link arrays rather than rendering an empty Follow me sectio
   expect(() => profileProps({ title: "Example", links })).toThrow(
     "Profile links must contain label and href records",
   );
+});
+
+test("supports follow-first without changing the default section order", () => {
+  expect(profileProps({ title: "Example" }).sectionOrder).toBe("speaking-first");
+  expect(profileProps({ title: "Example", sectionOrder: "follow-first" }).sectionOrder).toBe(
+    "follow-first",
+  );
+  expect(() =>
+    profileProps({ title: "Example", sectionOrder: "other" } as unknown as ProfileProps),
+  ).toThrow("Profile sectionOrder");
 });

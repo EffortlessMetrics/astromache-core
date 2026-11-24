@@ -26,7 +26,9 @@ export function safeSearchLinks(rows: readonly SearchLink[]): SearchLink[] {
       !row.href.startsWith("/") ||
       row.href.startsWith("//") ||
       row.href.includes("\\") ||
-      [...row.href].some((character) => character.charCodeAt(0) <= 32 || character.charCodeAt(0) === 127)
+      [...row.href].some(
+        (character) => character.charCodeAt(0) <= 32 || character.charCodeAt(0) === 127,
+      )
     ) {
       return false;
     }

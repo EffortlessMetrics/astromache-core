@@ -36,20 +36,30 @@ function measure(font, text, size) {
 }
 
 function wrap(font, text, size, maxWidth) {
-  const lines = [];
-  let line = "";
-  for (const word of text.split(" ")) {
-    const next = line ? `${line} ${word}` : word;
-    if (measure(font, next, size).width <= maxWidth) {
-      line = next;
-    } else {
-      if (!line || measure(font, word, size).width > maxWidth) return undefined;
-      lines.push(measure(font, line, size));
-      line = word;
+  const whole = measure(font, text, size);
+  if (whole.width <= maxWidth) return [whole];
+  const words = text.split(" ");
+  const best = new Array(words.length + 1);
+  best[words.length] = { count: 0, cost: 0, lines: [] };
+  // Minimize line count first, then squared line widths. For a fixed count,
+  // this favors balanced lines over a full line followed by an orphan word.
+  for (let i = words.length - 1; i >= 0; i--) {
+    let lineText = "";
+    for (let j = i; j < words.length; j++) {
+      lineText = lineText ? `${lineText} ${words[j]}` : words[j];
+      const line = measure(font, lineText, size);
+      if (line.width > maxWidth) break;
+      const remainder = best[j + 1];
+      if (!remainder) continue;
+      const count = 1 + remainder.count;
+      const cost = line.width ** 2 + remainder.cost;
+      const current = best[i];
+      if (!current || count < current.count || (count === current.count && cost < current.cost)) {
+        best[i] = { count, cost, lines: [line, ...remainder.lines] };
+      }
     }
   }
-  if (line) lines.push(measure(font, line, size));
-  return lines;
+  return best[0]?.lines;
 }
 
 function placement(line, x, baseline) {

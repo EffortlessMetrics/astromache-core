@@ -73,6 +73,16 @@ test("long titles shrink rather than truncate; all ink stays within the safe are
   }
 });
 
+test("two-line titles balance rather than leave a short final orphan", () => {
+  const render = createArticleCardRenderer(fixture());
+  const result = render("Solving the Halting Problem").receipt;
+  assert.equal(result.fontSize, 80);
+  assert.deepEqual(
+    result.lines.map((line) => line.text),
+    ["Solving the", "Halting Problem"],
+  );
+});
+
 test("missing glyphs and impossible titles fail explicitly", () => {
   const render = createArticleCardRenderer(fixture());
   assert.throws(() => render("Snow ☃"), /Missing sharing-card glyph U\+2603/);

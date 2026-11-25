@@ -1,4 +1,4 @@
-# astromache 0.4.0-og.1 — unpublished candidate
+# astromache 0.4.0-og.2 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 

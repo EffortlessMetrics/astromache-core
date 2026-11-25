@@ -1,0 +1,41 @@
+---
+import { sectionProps, type SectionProps } from "./directory";
+
+export type Props = SectionProps;
+const { id, title } = sectionProps(Astro.props);
+---
+
+<section class="content-section" id={id} aria-labelledby={id + "-title"}>
+  <div class="content-section-heading">
+    <h2 id={id + "-title"}>{title}</h2>
+    {Astro.slots.has("actions") && <div class="content-section-actions"><slot name="actions" /></div>}
+  </div>
+  <slot />
+</section>
+
+<style>
+  .content-section {
+    min-width: 0;
+    margin-block: 2rem;
+  }
+  .content-section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .content-section-heading h2 {
+    margin: 0;
+    color: var(--accent, currentColor);
+  }
+  .content-section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    min-width: 0;
+    font-size: 0.875rem;
+  }
+</style>

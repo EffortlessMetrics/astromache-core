@@ -1,7 +1,20 @@
-## 0.4.0-og.2 — unpublished candidate
+## 0.4.0-og.3 — unpublished candidate
 
-- Add opt-in static article sharing cards with caller-owned fonts, artwork, colors, layout and SVG rasterization.
-- Qualify the neutral geometry contract and installed export without adding runtime dependencies or publication identity.
+- Add static article sharing cards with balanced titles, caller-owned fonts, artwork and rasterization.
+- Preserve directory composition and isolate geometry receipts; qualify incorrect PNG dimensions.
+
+## 0.4.0-directory.2 — unpublished candidate
+
+- Support headingless and icon-only directory link groups with programmatic accessible names and touch targets.
+- Preserve explicit link-list semantics when CSS removes list markers.
+- Reserve derived heading IDs against other directory sections.
+- Qualify real local navigation in the neutral directory fixtures.
+
+## 0.4.0-directory.1 — unpublished candidate
+
+- Add optional, static Directory, LinkGroup and ContentSection compositions using existing publication tokens.
+- Retain the original publication and Profile composition; consumer owns identity, links and content collections.
+- Exercise the directory in neutral source and installed archive consumers, including no-JavaScript and responsive keyboard evidence.
 
 ## 0.4.0-site.1 — unpublished candidate
 

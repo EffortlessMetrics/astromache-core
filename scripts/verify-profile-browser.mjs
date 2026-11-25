@@ -167,11 +167,80 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
           });
           assert.ok(intrinsicWidth > 150, `${route} retains intrinsic width as a flex child`);
         }
+        await page.goto(`${origin}/directory/`);
+        assert.equal(await page.getByRole("heading", { level: 1 }).textContent(), "Example author");
+        assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
+          "Websites",
+          "Work",
+        ]);
+        assert.equal(await page.locator(".profile-portrait").count(), 0);
+        assert.equal(
+          await page.getByRole("region", { name: "Social profiles", exact: true }).count(),
+          1,
+        );
+        assert.equal(await page.locator("#follow h2").count(), 0);
+        assert.equal(await page.locator("html").getAttribute("data-theme"), colorScheme);
+        const follow = await page.locator("#follow").boundingBox();
+        const websites = await page.locator("#websites").boundingBox();
+        assert.ok(follow && websites);
+        if (width < 640) assert.ok(websites.y >= follow.y + follow.height);
+        else assert.ok(websites.x >= follow.x + follow.width);
+        const profileLink = page.getByRole("link", { name: "Example profile", exact: true });
+        assert.equal(await profileLink.getAttribute("rel"), "me");
+        assert.equal(await profileLink.getAttribute("target"), null);
+        assert.equal(await profileLink.getAttribute("aria-label"), "Example profile");
+        assert.equal(await profileLink.locator(".directory-link-copy").count(), 0);
+        assert.equal(await profileLink.locator(".directory-icon").count(), 1);
+        assert.equal((await page.request.get(`${origin}/portfolio-placeholder.svg`)).status(), 200);
+        const hit = await profileLink.boundingBox();
+        assert.ok(hit && hit.width >= 44 && hit.height >= 44);
+        await profileLink.focus();
+        for (const name of [
+          "Example profile page",
+          "Publication Writing",
+          "Projects",
+          "All work",
+        ]) {
+          await page.keyboard.press("Tab");
+          assert.equal(
+            await page
+              .getByRole("link", { name, exact: true })
+              .evaluate((element) => element === document.activeElement),
+            true,
+          );
+        }
+        assert.equal(
+          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          true,
+        );
+        if (evidenceDirectory)
+          await page.screenshot({
+            path: join(evidenceDirectory, `directory-${width}-${colorScheme}.png`),
+            fullPage: true,
+          });
+        await page.evaluate(() => {
+          document.documentElement.style.fontSize = "32px";
+        });
+        assert.equal(
+          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          true,
+          "Enlarged directory text must not overflow horizontally",
+        );
+        assert.equal(await page.locator(".directory-links[role=list]").count(), 2);
+        await page.getByRole("link", { name: "Example profile page", exact: true }).click();
+        assert.equal(new URL(page.url()).pathname, "/profile/");
+        assert.ok(await page.getByRole("heading", { level: 1 }).count());
+        await page.goto(`${origin}/directory/`);
+        await page.getByRole("link", { name: "Example project", exact: true }).click();
+        assert.equal(new URL(page.url()).pathname, "/portfolio/");
+        assert.ok(await page.getByRole("heading", { level: 1 }).count());
+        assert.deepEqual(errors, []);
         checks.push({
           width,
           colorScheme,
           headings: true,
           portraitLayout: true,
+          directoryLayout: true,
           keyboard: true,
           anchors: true,
           enlargedText: true,
@@ -204,6 +273,19 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
     );
     assert.equal(await page.getByRole("heading", { level: 2 }).count(), 0);
     assert.equal(await page.locator(".profile-portrait").count(), 0);
+    await page.goto(`${origin}/directory/`);
+    assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
+      "Websites",
+      "Work",
+    ]);
+    assert.equal(await page.getByRole("link", { name: "Example project" }).isVisible(), true);
+    assert.equal(
+      await page.getByRole("link", { name: "Example profile", exact: true }).isVisible(),
+      true,
+    );
+    const internalProfile = page.getByRole("link", { name: "Example profile page", exact: true });
+    assert.equal(await internalProfile.getAttribute("href"), "/profile/");
+    assert.equal(await internalProfile.isVisible(), true);
     await context.close();
     const receipt = {
       browserVersion: browser.version(),

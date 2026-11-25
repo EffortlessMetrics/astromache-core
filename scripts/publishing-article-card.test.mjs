@@ -108,3 +108,18 @@ test("invalid raster dimensions fail the build", () => {
   const render = createArticleCardRenderer({ ...fixture(), rasterize: () => Buffer.alloc(24) });
   assert.throws(() => render("Short"), /1200x630 PNG/);
 });
+
+test("domain receipts do not share mutable bounds", () => {
+  const render = createArticleCardRenderer(fixture());
+  const first = render("Short").receipt;
+  const left = first.domain.bounds.left;
+  first.domain.bounds.left = 9999;
+  assert.equal(render("Next").receipt.domain.bounds.left, left);
+});
+
+test("valid PNG header with incorrect dimensions is rejected", () => {
+  const wrong = Buffer.from(png);
+  wrong.writeUInt32BE(1199, 16);
+  const render = createArticleCardRenderer({ ...fixture(), rasterize: () => wrong });
+  assert.throws(() => render("Short"), /1200x630 PNG/);
+});

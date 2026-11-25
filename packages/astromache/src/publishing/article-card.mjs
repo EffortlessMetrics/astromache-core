@@ -169,7 +169,7 @@ export function createArticleCardRenderer({ brand, layout, titleFont, domainFont
       )
         continue;
 
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${background}"/>${placed.map((line) => svgPath(line, heading)).join("")}${svgPath(domainPlacement, foreground)}<image x="${logoLeft}" y="${anchor}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid meet" xlink:href="${logoUri}"/></svg>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${background}"/>${placed.map((line) => svgPath(line, heading)).join("")}${svgPath(domainPlacement, foreground)}<image x="${logoLeft}" y="${anchor}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMaxYMin meet" xlink:href="${logoUri}"/></svg>`;
       const png = Buffer.from(rasterize(svg));
       if (
         png.length < 24 ||
@@ -184,7 +184,7 @@ export function createArticleCardRenderer({ brand, layout, titleFont, domainFont
         title,
         fontSize,
         lines: placed.map(({ text, bounds }) => ({ text, bounds })),
-        domain: { text: domain, bounds: domainPlacement.bounds },
+        domain: { text: domain, bounds: { ...domainPlacement.bounds } },
         logo: { left: logoLeft, top: anchor, right: WIDTH - right, bottom: HEIGHT - bottom },
       };
       return { png, receipt };

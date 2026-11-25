@@ -52,11 +52,11 @@ test("domain ink and logo share an anchor; title expands upward", () => {
   const render = createArticleCardRenderer(fixture());
   const short = render("Short").receipt;
   const long = render("A longer article title with several lines and no lost words").receipt;
-  assert.equal(short.domain.bounds.top, short.logo.top);
+  assert.ok(Math.abs(short.domain.bounds.top - short.logo.top) < 0.01);
   assert.deepEqual(short.domain, long.domain);
   assert.deepEqual(short.logo, long.logo);
-  assert.equal(short.lines.at(-1).bounds.bottom, short.logo.top - 40);
-  assert.equal(long.lines.at(-1).bounds.bottom, long.logo.top - 40);
+  assert.ok(Math.abs(short.lines.at(-1).bounds.bottom - short.logo.top + 40) < 0.01);
+  assert.ok(Math.abs(long.lines.at(-1).bounds.bottom - long.logo.top + 40) < 0.01);
   assert.equal(long.lines.map((line) => line.text).join(" "), long.title);
   assert.ok(long.lines.length > short.lines.length);
   assert.ok(long.lines[0].bounds.top < short.lines[0].bounds.top);

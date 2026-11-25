@@ -1,3 +1,8 @@
+## 0.4.0-og.1 — unpublished candidate
+
+- Add opt-in static article sharing cards with caller-owned fonts, artwork, colors, layout and SVG rasterization.
+- Qualify the neutral geometry contract and installed export without adding runtime dependencies or publication identity.
+
 ## 0.4.0-site.1 — unpublished candidate
 
 - Support opt-in follow-first profile composition in actual DOM and keyboard order.

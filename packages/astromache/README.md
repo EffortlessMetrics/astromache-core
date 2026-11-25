@@ -1,4 +1,4 @@
-# astromache 0.4.0-site.1 — unpublished candidate
+# astromache 0.4.0-og.1 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
@@ -12,6 +12,8 @@ The original npm 0.1.0 release and earlier unpublished archives remain immutable
 The foundation supplies real publication typography, responsive navigation, article presentation, cards, taxonomy lists, theme initialization/toggle, reading progress, focus mode, copy-link feedback, and gallery mechanics. The complete neutral starter and optional search/offline recipe consume these same exports. Content collection schemas, routes, dates, related-content selection, metadata policy, branding, font assets, privacy/share behavior, and search ranking remain consumer-owned.
 
 ## Added exports
+
+- `astromache/article-card`: deterministic static sharing-card layout and rendering with complete local font faces, brand inputs and a caller-supplied rasterizer. See [the article sharing-card guide](ARTICLE-SHARING-CARDS.md).
 
 - `astromache/publication`: document composition; metadata props match `document`; optional htmlAttributes, themeStorageKey (theme), themeToggleId (theme-toggle); head/header/footer/body-end/default slots.
 - `astromache/profile`: page content for an identity/About, optional speaking, and follow-link landing page; title, links[{label,href,rel?}], speakingLabel (Speaking), followLabel (Follow me); portrait/default/speaking slots.

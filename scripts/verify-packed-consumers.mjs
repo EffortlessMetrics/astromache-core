@@ -36,6 +36,7 @@ const entries = execFileSync("tar", ["-tzf", tarball], { encoding: "utf8" })
 const expected = [
   "CHANGELOG.md",
   "STATIC-PUBLICATION.md",
+  "ARTICLE-SHARING-CARDS.md",
   "LICENSE",
   "LICENSE-MIT",
   "LICENSE-APACHE",
@@ -84,6 +85,8 @@ const expected = [
   "src/publishing/negotiation.d.ts",
   "src/publishing/negotiation.mjs",
   "src/publishing/rendered.mjs",
+  "src/publishing/article-card.mjs",
+  "src/publishing/article-card.d.mts",
 ];
 assert.deepEqual(
   entries.sort(),

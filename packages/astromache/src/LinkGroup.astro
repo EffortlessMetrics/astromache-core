@@ -1,0 +1,105 @@
+---
+import { linkGroupProps, type LinkGroupProps } from "./directory";
+
+export type Props = LinkGroupProps;
+const { id, title, layout, links, showHeading, iconOnly } = linkGroupProps(Astro.props);
+---
+
+<section id={id} aria-labelledby={showHeading ? id + "-title" : undefined} aria-label={showHeading ? undefined : title} class="directory-link-group">
+  {showHeading && <h2 id={id + "-title"}>{title}</h2>}
+  <ul role="list" class:list={["directory-links", { "directory-links-stack": layout === "stack" }]}>
+    {links.map(link => <li>
+      <a href={link.href} rel={link.rel} aria-label={iconOnly ? link.label : undefined} class:list={{ "directory-icon-only": iconOnly }}>
+        {link.iconSrc && <span class="directory-icon" aria-hidden="true" style={`mask-image:url("${link.iconSrc}")`}></span>}
+        {!iconOnly && <span class="directory-link-copy">
+          <span class="directory-link-label">{link.label}</span>
+          {link.description && <small>{link.description}</small>}
+        </span>}
+        {link.external && <span class="directory-external" aria-hidden="true">↗</span>}
+      </a>
+    </li>)}
+  </ul>
+</section>
+
+<style>
+  .directory-link-group {
+    min-width: 0;
+  }
+  .directory-link-group h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 650;
+    color: var(--accent, currentColor);
+  }
+  .directory-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .directory-links-stack {
+    display: grid;
+    gap: 0.125rem;
+  }
+  .directory-links li {
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+  }
+  .directory-links a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    font-size: 1rem;
+    font-weight: 550;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .directory-links a:hover .directory-link-label,
+  .directory-links a:focus-visible .directory-link-label {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .directory-link-copy {
+    min-width: 0;
+    flex: 1;
+  }
+  .directory-link-copy small {
+    display: inline-block;
+    margin-inline-start: 0.5rem;
+    color: var(--secondary, currentColor);
+    font-size: 0.8125rem;
+    font-weight: 400;
+  }
+  .directory-icon {
+    display: inline-block;
+    flex: 0 0 1.25rem;
+    height: 1.25rem;
+    background: currentColor;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+  }
+  .directory-links a.directory-icon-only {
+    box-sizing: border-box;
+    justify-content: center;
+    inline-size: 2.75rem;
+    min-block-size: 2.75rem;
+  }
+  .directory-icon-only .directory-icon {
+    flex-basis: 1.5rem;
+    height: 1.5rem;
+  }
+  .directory-external {
+    flex: none;
+    font-size: 1.125rem;
+  }
+  @media (max-width: 640px) {
+    .directory-links a {
+      min-height: 2.75rem;
+    }
+  }
+</style>

@@ -1,0 +1,26 @@
+---
+import Publication from "astromache/publication";
+import Directory from "astromache/directory";
+import LinkGroup from "astromache/link-group";
+import ContentSection from "astromache/content-section";
+import "astromache/publication.css";
+const profiles = [
+  { label: "Example profile", href: "https://profiles.example/person/", rel: "me", iconSrc: "/portfolio-placeholder.svg" },
+  { label: "Example profile page", href: "/profile/", iconSrc: "/portfolio-placeholder.svg" },
+];
+const websites = [
+  { label: "Publication", href: "https://notes.example/", description: "Writing", external: true },
+  { label: "Projects", href: "/portfolio/" },
+];
+---
+
+<Publication title="Example directory" description="Neutral directory composition" canonical={new URL("https://neutral.example/directory/")} language="en">
+  <Directory title="Example author">
+    <LinkGroup id="follow" title="Social profiles" links={profiles} showHeading={false} iconOnly />
+    <LinkGroup id="websites" title="Websites" links={websites} layout="stack" />
+  </Directory>
+  <ContentSection id="work" title="Work">
+    <a slot="actions" href="/portfolio/">All work</a>
+    <ul><li><h3><a href="/portfolio/">Example project</a></h3><p>Consumer-owned description.</p></li></ul>
+  </ContentSection>
+</Publication>

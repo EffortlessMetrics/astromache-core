@@ -42,6 +42,11 @@ await cp(archive, join(consumer, "vendor/astromache.tgz"));
 await cp(join(producer, "scripts/fixtures/export-consumer"), join(consumer, "src/pages"), {
   recursive: true,
 });
+await mkdir(join(consumer, "public"), { recursive: true });
+await cp(
+  join(producer, "consumers/neutral/public/portfolio-placeholder.svg"),
+  join(consumer, "public/portfolio-placeholder.svg"),
+);
 await writeFile(
   join(consumer, "package.json"),
   JSON.stringify({
@@ -73,6 +78,9 @@ const subpaths = [
   "portfolio",
   "publication",
   "profile",
+  "directory",
+  "link-group",
+  "content-section",
   "header",
   "footer",
   "article",
@@ -150,6 +158,23 @@ const searchIntegration = await readFile(
 );
 assert.match(searchIntegration, /aria-label="Search example content"/);
 assert.match(searchIntegration, /\/search-index\/[a-f0-9]{64}\/search-index\.json/);
+const directory = await readFile(join(consumer, "dist/directory/index.html"), "utf8");
+assert.equal((directory.match(/class="directory-icon-only[^"]*"/g) ?? []).length, 2);
+assert.match(directory, /aria-label="Example profile"/);
+assert.ok((await readFile(join(consumer, "dist/portfolio-placeholder.svg"))).length);
+assert.match(directory, /class="directory-home/);
+assert.match(directory, /id="follow"[^>]*aria-label="Social profiles"/);
+assert.doesNotMatch(directory, /id="follow-title"/);
+assert.match(directory, /id="websites"[^>]*aria-labelledby="websites-title"/);
+assert.match(directory, /id="work"[^>]*aria-labelledby="work-title"/);
+assert.ok(directory.indexOf('id="follow"') < directory.indexOf('id="work"'));
+assert.match(directory, /href="https:\/\/profiles\.example\/person\/" rel="me"/);
+assert.doesNotMatch(directory, /class="profile-portrait"/);
+assert.equal((directory.match(/<ul[^>]*role="list"[^>]*>/g) ?? []).length, 2);
+for (const route of ["profile", "portfolio"]) {
+  assert.ok(directory.includes(`href="/${route}/"`));
+  assert.ok((await readFile(join(consumer, "dist", route, "index.html"))).length);
+}
 const stylesheets = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)];
 assert.ok(stylesheets.length, "Consumer must emit linked stylesheets");
 const css = (

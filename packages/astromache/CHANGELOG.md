@@ -1,3 +1,16 @@
+## 0.4.0-directory.2 — unpublished candidate
+
+- Support headingless and icon-only directory link groups with programmatic accessible names and touch targets.
+- Preserve explicit link-list semantics when CSS removes list markers.
+- Reserve derived heading IDs against other directory sections.
+- Qualify real local navigation in the neutral directory fixtures.
+
+## 0.4.0-directory.1 — unpublished candidate
+
+- Add optional, static Directory, LinkGroup and ContentSection compositions using existing publication tokens.
+- Retain the original publication and Profile composition; consumer owns identity, links and content collections.
+- Exercise the directory in neutral source and installed archive consumers, including no-JavaScript and responsive keyboard evidence.
+
 ## 0.4.0-site.1 — unpublished candidate
 
 - Support opt-in follow-first profile composition in actual DOM and keyboard order.

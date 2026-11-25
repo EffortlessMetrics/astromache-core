@@ -185,7 +185,12 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
         assert.equal(await profileLink.getAttribute("rel"), "me");
         assert.equal(await profileLink.getAttribute("target"), null);
         await profileLink.focus();
-        for (const name of ["Example profile page", "Publication Writing", "Projects", "All work"]) {
+        for (const name of [
+          "Example profile page",
+          "Publication Writing",
+          "Projects",
+          "All work",
+        ]) {
           await page.keyboard.press("Tab");
           assert.equal(
             await page

@@ -75,3 +75,19 @@ test("reserves derived heading IDs against other directory sections", () => {
     linkGroupProps({ id: "follow-title", title: "Links", links: [{ label: "Home", href: "/" }] }),
   ).toThrow("reserved -title");
 });
+
+test("supports a headingless group with an explicit accessible name", () => {
+  const props = {
+    id: "follow",
+    title: "Social profiles",
+    links: [{ label: "Profile", href: "/" }],
+  };
+  expect(linkGroupProps(props).showHeading).toBe(true);
+  expect(linkGroupProps({ ...props, showHeading: false })).toMatchObject({
+    title: "Social profiles",
+    showHeading: false,
+  });
+  expect(() =>
+    linkGroupProps({ ...props, showHeading: "false" } as unknown as LinkGroupProps),
+  ).toThrow("showHeading");
+});

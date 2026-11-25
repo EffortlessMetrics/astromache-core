@@ -170,11 +170,15 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
         await page.goto(`${origin}/directory/`);
         assert.equal(await page.getByRole("heading", { level: 1 }).textContent(), "Example author");
         assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
-          "Follow Me",
           "Websites",
           "Work",
         ]);
         assert.equal(await page.locator(".profile-portrait").count(), 0);
+        assert.equal(
+          await page.getByRole("region", { name: "Social profiles", exact: true }).count(),
+          1,
+        );
+        assert.equal(await page.locator("#follow h2").count(), 0);
         assert.equal(await page.locator("html").getAttribute("data-theme"), colorScheme);
         const follow = await page.locator("#follow").boundingBox();
         const websites = await page.locator("#websites").boundingBox();
@@ -265,12 +269,14 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
     assert.equal(await page.locator(".profile-portrait").count(), 0);
     await page.goto(`${origin}/directory/`);
     assert.deepEqual(await page.getByRole("heading", { level: 2 }).allTextContents(), [
-      "Follow Me",
       "Websites",
       "Work",
     ]);
     assert.equal(await page.getByRole("link", { name: "Example project" }).isVisible(), true);
-    assert.equal(await page.getByRole("link", { name: "Example profile" }).isVisible(), true);
+    assert.equal(
+      await page.getByRole("link", { name: "Example profile", exact: true }).isVisible(),
+      true,
+    );
     await context.close();
     const receipt = {
       browserVersion: browser.version(),

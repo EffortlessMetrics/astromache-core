@@ -20,6 +20,8 @@ export interface DirectoryLink extends ProfileLink {
 export interface LinkGroupProps extends SectionProps {
   links: ReadonlyArray<DirectoryLink>;
   layout?: "inline" | "stack";
+  /** Omit the visible heading while retaining a programmatically named region. */
+  showHeading?: boolean;
 }
 
 export function directoryTitle(title: string): string {
@@ -40,6 +42,10 @@ export function sectionProps(input: SectionProps): SectionProps {
 
 export function linkGroupProps(input: LinkGroupProps) {
   const { id, title } = sectionProps(input);
+  const showHeading = input.showHeading === undefined ? true : input.showHeading;
+  if (typeof showHeading !== "boolean") {
+    throw new TypeError("Directory link group showHeading must be a boolean");
+  }
   const layout = input.layout ?? "inline";
   if (layout !== "inline" && layout !== "stack") {
     throw new TypeError("Directory link group layout must be inline or stack");
@@ -63,5 +69,5 @@ export function linkGroupProps(input: LinkGroupProps) {
     }
     return { ...link, description, iconSrc, external };
   });
-  return { id, title, layout, links };
+  return { id, title, layout, links, showHeading };
 }

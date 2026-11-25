@@ -1,0 +1,7 @@
+# Static article sharing cards
+
+The `astromache/article-card` export lays out a 1200 × 630 SVG and returns a rasterized PNG plus a geometry receipt. It accepts two complete, local font faces exposing the OpenType path/metrics interface, local PNG/JPEG logo bytes, brand colors, a domain, explicit pixel layout and a synchronous SVG-to-PNG adapter. It has no browser, network, system-font or native-package dependency of its own.
+
+The domain ink begins at the logo's top edge. The title's last line ends at a configured gap above that anchor. The renderer wraps at word boundaries, then reduces the title size as necessary. It refuses missing glyphs, impossible fits and incorrect raster dimensions rather than emitting clipped or generic artwork. Complex-script shaping and font coverage are the caller's responsibility. For editorial exceptions, use a separately qualified explicit image rather than silently truncating the title.
+
+Consumers should use the same published-article inventory for HTML and images, validate the complete local raster outputs and metadata, exclude crawler-only artwork from reader offline precache, and revalidate stable image URLs. Full-font and rasterizer dependencies must be pinned in the consumer; a change to font bytes, brand tokens, template, or logo requires a rebuild. Keep the generator free of private publication content and identity.

@@ -1,0 +1,14 @@
+{
+  "version": "0.4.0-directory.1",
+  "sourceCommit": "69be801e26e16cef65c545f3afff8288796ebee9",
+  "archive": "astromache-0.4.0-directory.1.tgz",
+  "sha256": "4e39b6cb271c7b37aa277f5602416eb7701ff6b344b363ede9f43e8c41284e7f",
+  "integrity": "sha512-0A5XNwTwdgPe9I3lOF3K+D3sWgLUvjRvzl1h53PCJKW7dZhwQk3zeG02fQaZqTn1XfSRGkfdrgkunZ1NBfnXnA==",
+  "bytes": 171303,
+  "gitBlob": "08eab34dfedf7b17de12345b428d15f0e6dde998",
+  "qualificationRun": 45508015799,
+  "artifactId": 14974178071,
+  "artifactZipSha256": "a0f0715b3e8a78cc3e0af1aac9604a3d698dd64dd19453851fc48a50ad3d89cd",
+  "transferRun": 45529274846,
+  "published": false
+}

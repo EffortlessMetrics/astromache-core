@@ -1,0 +1,28 @@
+name: Verified directory.2 archive transfer
+on:
+  push:
+    branches: [delivery/directory2-artifact-transfer]
+permissions:
+  actions: read
+  contents: read
+jobs:
+  transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Transfer the exact qualified public archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api repos/EffortlessMetrics/astromache-core/actions/artifacts/14984984266/zip > delivery.zip
+          echo '033812588974983071b483c5481c3c33ee5dfddd9cc35da2611439d4d881efdf  delivery.zip' | sha256sum -c -
+          unzip -q delivery.zip
+          echo 'dd5902c678cd1d216b9075ca6058b2f858271b35e4bdfa44f45126e98d4d5035  astromache-0.4.0-directory.2.tgz' | sha256sum -c -
+          cat receipt.json
+          echo "ARCHIVE_BYTES:$(wc -c < astromache-0.4.0-directory.2.tgz)"
+          echo "ARCHIVE_INTEGRITY:sha512-$(openssl dgst -sha512 -binary astromache-0.4.0-directory.2.tgz | base64 -w0)"
+          echo "ARCHIVE_GIT_BLOB:$(git hash-object astromache-0.4.0-directory.2.tgz)"
+          echo "ASTROMACHE_DELIVERY_BEGIN"
+          base64 -w 512 astromache-0.4.0-directory.2.tgz | sed 's/^/ARCHIVE_B64:/'
+          echo "ASTROMACHE_DELIVERY_END"

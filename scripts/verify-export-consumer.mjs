@@ -42,6 +42,11 @@ await cp(archive, join(consumer, "vendor/astromache.tgz"));
 await cp(join(producer, "scripts/fixtures/export-consumer"), join(consumer, "src/pages"), {
   recursive: true,
 });
+await mkdir(join(consumer, "public"), { recursive: true });
+await cp(
+  join(producer, "consumers/neutral/public/portfolio-placeholder.svg"),
+  join(consumer, "public/portfolio-placeholder.svg"),
+);
 await writeFile(
   join(consumer, "package.json"),
   JSON.stringify({
@@ -156,6 +161,7 @@ assert.match(searchIntegration, /\/search-index\/[a-f0-9]{64}\/search-index\.jso
 const directory = await readFile(join(consumer, "dist/directory/index.html"), "utf8");
 assert.equal((directory.match(/class="directory-icon-only[^"]*"/g) ?? []).length, 2);
 assert.match(directory, /aria-label="Example profile"/);
+assert.ok((await readFile(join(consumer, "dist/portfolio-placeholder.svg"))).length);
 assert.match(directory, /class="directory-home/);
 assert.match(directory, /id="follow"[^>]*aria-label="Social profiles"/);
 assert.doesNotMatch(directory, /id="follow-title"/);

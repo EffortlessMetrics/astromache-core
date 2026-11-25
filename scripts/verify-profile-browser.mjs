@@ -191,6 +191,7 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
         assert.equal(await profileLink.getAttribute("aria-label"), "Example profile");
         assert.equal(await profileLink.locator(".directory-link-copy").count(), 0);
         assert.equal(await profileLink.locator(".directory-icon").count(), 1);
+        assert.equal((await page.request.get(`${origin}/portfolio-placeholder.svg`)).status(), 200);
         const hit = await profileLink.boundingBox();
         assert.ok(hit && hit.width >= 44 && hit.height >= 44);
         await profileLink.focus();

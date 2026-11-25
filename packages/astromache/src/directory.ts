@@ -74,7 +74,9 @@ export function linkGroupProps(input: LinkGroupProps) {
       throw new TypeError("Directory external indicator must be a boolean");
     }
     if (iconOnly && (!iconSrc || description !== undefined || external === true)) {
-      throw new TypeError("Icon-only links require an icon and no description or external indicator");
+      throw new TypeError(
+        "Icon-only links require an icon and no description or external indicator",
+      );
     }
     return { ...link, description, iconSrc, external };
   });

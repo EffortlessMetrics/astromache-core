@@ -100,9 +100,9 @@ test("icon-only groups require named local icons without visible copy", () => {
   };
   expect(linkGroupProps(props).iconOnly).toBe(false);
   expect(linkGroupProps({ ...props, iconOnly: true }).iconOnly).toBe(true);
-  expect(() =>
-    linkGroupProps({ ...props, iconOnly: "true" } as unknown as LinkGroupProps),
-  ).toThrow("iconOnly");
+  expect(() => linkGroupProps({ ...props, iconOnly: "true" } as unknown as LinkGroupProps)).toThrow(
+    "iconOnly",
+  );
   for (const link of [
     { label: "Profile", href: "/" },
     { ...props.links[0], description: "Profile" },

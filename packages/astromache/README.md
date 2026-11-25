@@ -1,4 +1,4 @@
-# astromache 0.4.0-directory.2 — unpublished candidate
+# astromache 0.4.0-og.3 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
@@ -12,6 +12,8 @@ The original npm 0.1.0 release and earlier unpublished archives remain immutable
 The foundation supplies real publication typography, responsive navigation, article presentation, cards, taxonomy lists, theme initialization/toggle, reading progress, focus mode, copy-link feedback, and gallery mechanics. The complete neutral starter and optional search/offline recipe consume these same exports. Content collection schemas, routes, dates, related-content selection, metadata policy, branding, font assets, privacy/share behavior, and search ranking remain consumer-owned.
 
 ## Added exports
+
+- `astromache/article-card`: static sharing-card geometry and rendering with consumer-owned fonts and artwork. See [the guide](ARTICLE-SHARING-CARDS.md).
 
 - `astromache/directory`: compact identity heading and responsive grid of consumer-owned link groups; required title and default slot. No biography, portrait or JavaScript.
 - `astromache/link-group`: required id, title and links[{label,href,rel?,description?,iconSrc?,external?}]; inline or stack layout. Optional `showHeading={false}` omits the visible heading and uses the supplied title as the region’s accessible name. IDs are consumer-owned and unique; the `-title` suffix is reserved for generated heading IDs. Do not use these generated IDs elsewhere in the page. Optional `iconOnly` displays local icons instead of visible text; every link must supply `iconSrc` and a meaningful label, without descriptions or external indicators. Icon links retain their accessible names and 44px minimum targets. Icons are decorative local assets; links never open a new tab automatically.

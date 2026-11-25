@@ -1,6 +1,6 @@
 {
   "name": "astromache",
-  "version": "0.4.0-directory.2",
+  "version": "0.4.0-og.3",
   "private": false,
   "description": "Astro publication components, metadata validation and bounded native navigation helpers",
   "homepage": "https://github.com/EffortlessMetrics/astromache-core#readme",
@@ -56,7 +56,8 @@
     "src/search/SearchTrigger.astro",
     "src/search/SearchPage.astro",
     "src/search/SearchRecovery.astro",
-    "src/search/surface.ts"
+    "src/search/surface.ts",
+    "ARTICLE-SHARING-CARDS.md"
   ],
   "type": "module",
   "exports": {
@@ -101,7 +102,11 @@
     "./search-trigger": "./src/search/SearchTrigger.astro",
     "./search-page": "./src/search/SearchPage.astro",
     "./search-recovery": "./src/search/SearchRecovery.astro",
-    "./search-surface": "./src/search/surface.ts"
+    "./search-surface": "./src/search/surface.ts",
+    "./article-card": {
+      "types": "./src/publishing/article-card.d.mts",
+      "import": "./src/publishing/article-card.mjs"
+    }
   },
   "publishConfig": {
     "access": "public",

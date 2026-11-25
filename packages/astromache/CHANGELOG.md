@@ -1,3 +1,8 @@
+## 0.4.0-og.3 — unpublished candidate
+
+- Add static article sharing cards with balanced titles, caller-owned fonts, artwork and rasterization.
+- Preserve directory composition and isolate geometry receipts; qualify incorrect PNG dimensions.
+
 ## 0.4.0-directory.2 — unpublished candidate
 
 - Support headingless and icon-only directory link groups with programmatic accessible names and touch targets.

@@ -104,6 +104,7 @@ const subpaths = [
   "publication-head",
   "static-publication",
   "markdown-negotiation",
+  "article-card",
 ];
 assert.deepEqual(
   Object.keys(manifest.exports).sort(),
@@ -118,6 +119,8 @@ const resolutions = JSON.parse(
       "-e",
       `
       import assert from 'node:assert/strict';
+      const { createArticleCardRenderer } = await import('astromache/article-card');
+      assert.equal(typeof createArticleCardRenderer, 'function');
       assert.throws(() => import.meta.resolve('@effortlessmetrics/astro-offline/integration'),
         {code:'ERR_MODULE_NOT_FOUND'});
       console.log(JSON.stringify(${JSON.stringify(subpaths)}.map(name =>

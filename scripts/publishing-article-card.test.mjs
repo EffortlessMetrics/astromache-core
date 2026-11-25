@@ -11,21 +11,37 @@ png.write("IHDR", 12);
 png.writeUInt32BE(1200, 16);
 png.writeUInt32BE(630, 20);
 const font = {
-  charToGlyphIndex: (text) => text === "☃" ? 0 : 1,
+  charToGlyphIndex: (text) => (text === "☃" ? 0 : 1),
   getAdvanceWidth: (text, size) => text.length * size * 0.6,
   getPath: (text, _x, _y, size) => ({
-    getBoundingBox: () => ({ x1: -1, y1: -size * 0.75, x2: text.length * size * 0.6, y2: size * 0.2 }),
+    getBoundingBox: () => ({
+      x1: -1,
+      y1: -size * 0.75,
+      x2: text.length * size * 0.6,
+      y2: size * 0.2,
+    }),
     toPathData: () => "M0 0L10 0L10 -10Z",
   }),
 };
 const fixture = () => ({
   brand: {
-    background: "#ffffff", heading: "#223344", foreground: "#111111", domain: "example.org",
+    background: "#ffffff",
+    heading: "#223344",
+    foreground: "#111111",
+    domain: "example.org",
     logo: { mime: "image/png", bytes: signature },
   },
   layout: {
-    left: 80, right: 60, top: 60, bottom: 60, logoSize: 130, titleGap: 40,
-    maxTitleSize: 80, minTitleSize: 38, lineHeight: 1.2, domainSize: 40,
+    left: 80,
+    right: 60,
+    top: 60,
+    bottom: 60,
+    logoSize: 130,
+    titleGap: 40,
+    maxTitleSize: 80,
+    minTitleSize: 38,
+    lineHeight: 1.2,
+    domainSize: 40,
   },
   titleFont: font,
   domainFont: font,
@@ -68,7 +84,10 @@ test("renderer uses embedded artwork and paths, not raw title markup or web font
   let svg;
   const render = createArticleCardRenderer({
     ...fixture(),
-    rasterize: (input) => { svg = input; return png; },
+    rasterize: (input) => {
+      svg = input;
+      return png;
+    },
   });
   render("Title <tag> & café");
   assert.match(svg, /data:image\/png;base64,/);

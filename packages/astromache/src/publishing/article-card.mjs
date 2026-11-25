@@ -18,7 +18,9 @@ const normalize = (text) => {
 function assertGlyphs(font, text) {
   for (const character of text) {
     if (!font.charToGlyphIndex(character)) {
-      throw new Error(`Missing sharing-card glyph U+${character.codePointAt(0).toString(16).toUpperCase()}`);
+      throw new Error(
+        `Missing sharing-card glyph U+${character.codePointAt(0).toString(16).toUpperCase()}`,
+      );
     }
   }
 }
@@ -75,17 +77,46 @@ export function createArticleCardRenderer({ brand, layout, titleFont, domainFont
   const mime = brand.logo.mime;
   if (
     !logo.length ||
-    !((mime === "image/png" && logo.subarray(0, 8).equals(PNG_SIGNATURE)) ||
-      (mime === "image/jpeg" && logo[0] === 255 && logo[1] === 216))
+    !(
+      (mime === "image/png" && logo.subarray(0, 8).equals(PNG_SIGNATURE)) ||
+      (mime === "image/jpeg" && logo[0] === 255 && logo[1] === 216)
+    )
   ) {
     throw new Error("Sharing card logo must be a local PNG or JPEG");
   }
-  const { left, right, top, bottom, logoSize, titleGap, maxTitleSize, minTitleSize, lineHeight, domainSize } = layout;
-  const sizes = [left, right, top, bottom, logoSize, titleGap, maxTitleSize, minTitleSize, domainSize];
-  if (!sizes.every((value) => Number.isSafeInteger(value) && value > 0) ||
-      !finite(lineHeight) || lineHeight < 1 || lineHeight > 2 ||
-      maxTitleSize < minTitleSize || maxTitleSize > 200 ||
-      left + right + logoSize >= WIDTH || top + bottom + logoSize + titleGap >= HEIGHT) {
+  const {
+    left,
+    right,
+    top,
+    bottom,
+    logoSize,
+    titleGap,
+    maxTitleSize,
+    minTitleSize,
+    lineHeight,
+    domainSize,
+  } = layout;
+  const sizes = [
+    left,
+    right,
+    top,
+    bottom,
+    logoSize,
+    titleGap,
+    maxTitleSize,
+    minTitleSize,
+    domainSize,
+  ];
+  if (
+    !sizes.every((value) => Number.isSafeInteger(value) && value > 0) ||
+    !finite(lineHeight) ||
+    lineHeight < 1 ||
+    lineHeight > 2 ||
+    maxTitleSize < minTitleSize ||
+    maxTitleSize > 200 ||
+    left + right + logoSize >= WIDTH ||
+    top + bottom + logoSize + titleGap >= HEIGHT
+  ) {
     throw new Error("Invalid sharing-card layout");
   }
   const anchor = HEIGHT - bottom - logoSize;
@@ -95,8 +126,10 @@ export function createArticleCardRenderer({ brand, layout, titleFont, domainFont
   assertGlyphs(domainFont, domain);
   const domainLine = measure(domainFont, domain, domainSize);
   const domainPlacement = placement(domainLine, left, anchor - domainLine.y1);
-  if (domainPlacement.bounds.right > logoLeft - titleGap ||
-      domainPlacement.bounds.bottom > HEIGHT - bottom) {
+  if (
+    domainPlacement.bounds.right > logoLeft - titleGap ||
+    domainPlacement.bounds.bottom > HEIGHT - bottom
+  ) {
     throw new Error("Sharing-card domain overlaps the logo or safe area");
   }
   const logoUri = `data:${mime};base64,${logo.toString("base64")}`;
@@ -114,17 +147,27 @@ export function createArticleCardRenderer({ brand, layout, titleFont, domainFont
       const placed = lines.map((line, index) =>
         placement(line, left, lastBaseline - (lines.length - 1 - index) * step),
       );
-      if (placed.some(({ bounds }, index) =>
-        bounds.top < top || bounds.bottom > titleBottom ||
-        bounds.left < left || bounds.right > WIDTH - right ||
-        (index > 0 && bounds.top < placed[index - 1].bounds.bottom)
-      )) continue;
+      if (
+        placed.some(
+          ({ bounds }, index) =>
+            bounds.top < top ||
+            bounds.bottom > titleBottom ||
+            bounds.left < left ||
+            bounds.right > WIDTH - right ||
+            (index > 0 && bounds.top < placed[index - 1].bounds.bottom),
+        )
+      )
+        continue;
 
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}"><rect width="${WIDTH}" height="${HEIGHT}" fill="${background}"/>${placed.map((line) => svgPath(line, heading)).join("")}${svgPath(domainPlacement, foreground)}<image x="${logoLeft}" y="${anchor}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid meet" xlink:href="${logoUri}"/></svg>`;
       const png = Buffer.from(rasterize(svg));
-      if (png.length < 24 || !png.subarray(0, 8).equals(PNG_SIGNATURE) ||
-          png.toString("ascii", 12, 16) !== "IHDR" ||
-          png.readUInt32BE(16) !== WIDTH || png.readUInt32BE(20) !== HEIGHT) {
+      if (
+        png.length < 24 ||
+        !png.subarray(0, 8).equals(PNG_SIGNATURE) ||
+        png.toString("ascii", 12, 16) !== "IHDR" ||
+        png.readUInt32BE(16) !== WIDTH ||
+        png.readUInt32BE(20) !== HEIGHT
+      ) {
         throw new Error("Sharing-card rasterizer must return a 1200x630 PNG");
       }
       const receipt = {

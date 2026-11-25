@@ -154,6 +154,8 @@ const searchIntegration = await readFile(
 assert.match(searchIntegration, /aria-label="Search example content"/);
 assert.match(searchIntegration, /\/search-index\/[a-f0-9]{64}\/search-index\.json/);
 const directory = await readFile(join(consumer, "dist/directory/index.html"), "utf8");
+assert.equal((directory.match(/class="directory-icon-only[^"]*"/g) ?? []).length, 2);
+assert.match(directory, /aria-label="Example profile"/);
 assert.match(directory, /class="directory-home/);
 assert.match(directory, /id="follow"[^>]*aria-label="Social profiles"/);
 assert.doesNotMatch(directory, /id="follow-title"/);

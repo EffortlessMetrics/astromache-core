@@ -188,6 +188,11 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
         const profileLink = page.getByRole("link", { name: "Example profile", exact: true });
         assert.equal(await profileLink.getAttribute("rel"), "me");
         assert.equal(await profileLink.getAttribute("target"), null);
+        assert.equal(await profileLink.getAttribute("aria-label"), "Example profile");
+        assert.equal(await profileLink.locator(".directory-link-copy").count(), 0);
+        assert.equal(await profileLink.locator(".directory-icon").count(), 1);
+        const hit = await profileLink.boundingBox();
+        assert.ok(hit && hit.width >= 44 && hit.height >= 44);
         await profileLink.focus();
         for (const name of [
           "Example profile page",
@@ -277,6 +282,9 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
       await page.getByRole("link", { name: "Example profile", exact: true }).isVisible(),
       true,
     );
+    const internalProfile = page.getByRole("link", { name: "Example profile page", exact: true });
+    assert.equal(await internalProfile.getAttribute("href"), "/profile/");
+    assert.equal(await internalProfile.isVisible(), true);
     await context.close();
     const receipt = {
       browserVersion: browser.version(),

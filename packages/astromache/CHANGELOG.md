@@ -1,6 +1,6 @@
 ## 0.4.0-directory.2 — unpublished candidate
 
-- Support headingless directory link groups with programmatic accessible names.
+- Support headingless and icon-only directory link groups with programmatic accessible names and touch targets.
 - Preserve explicit link-list semantics when CSS removes list markers.
 - Reserve derived heading IDs against other directory sections.
 - Qualify real local navigation in the neutral directory fixtures.

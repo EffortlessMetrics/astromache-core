@@ -91,3 +91,23 @@ test("supports a headingless group with an explicit accessible name", () => {
     linkGroupProps({ ...props, showHeading: "false" } as unknown as LinkGroupProps),
   ).toThrow("showHeading");
 });
+
+test("icon-only groups require named local icons without visible copy", () => {
+  const props = {
+    id: "follow",
+    title: "Social profiles",
+    links: [{ label: "Profile", href: "/", iconSrc: "/icons/profile.svg" }],
+  };
+  expect(linkGroupProps(props).iconOnly).toBe(false);
+  expect(linkGroupProps({ ...props, iconOnly: true }).iconOnly).toBe(true);
+  expect(() =>
+    linkGroupProps({ ...props, iconOnly: "true" } as unknown as LinkGroupProps),
+  ).toThrow("iconOnly");
+  for (const link of [
+    { label: "Profile", href: "/" },
+    { ...props.links[0], description: "Profile" },
+    { ...props.links[0], external: true },
+  ]) {
+    expect(() => linkGroupProps({ ...props, links: [link], iconOnly: true })).toThrow("Icon-only");
+  }
+});

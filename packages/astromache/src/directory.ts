@@ -22,6 +22,8 @@ export interface LinkGroupProps extends SectionProps {
   layout?: "inline" | "stack";
   /** Omit the visible heading while retaining a programmatically named region. */
   showHeading?: boolean;
+  /** Render only local icons, with each link named by its label. */
+  iconOnly?: boolean;
 }
 
 export function directoryTitle(title: string): string {
@@ -46,6 +48,10 @@ export function linkGroupProps(input: LinkGroupProps) {
   if (typeof showHeading !== "boolean") {
     throw new TypeError("Directory link group showHeading must be a boolean");
   }
+  const iconOnly = input.iconOnly === undefined ? false : input.iconOnly;
+  if (typeof iconOnly !== "boolean") {
+    throw new TypeError("Directory link group iconOnly must be a boolean");
+  }
   const layout = input.layout ?? "inline";
   if (layout !== "inline" && layout !== "stack") {
     throw new TypeError("Directory link group layout must be inline or stack");
@@ -67,7 +73,10 @@ export function linkGroupProps(input: LinkGroupProps) {
     if (external !== undefined && typeof external !== "boolean") {
       throw new TypeError("Directory external indicator must be a boolean");
     }
+    if (iconOnly && (!iconSrc || description !== undefined || external === true)) {
+      throw new TypeError("Icon-only links require an icon and no description or external indicator");
+    }
     return { ...link, description, iconSrc, external };
   });
-  return { id, title, layout, links, showHeading };
+  return { id, title, layout, links, showHeading, iconOnly };
 }

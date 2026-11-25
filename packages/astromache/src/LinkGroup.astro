@@ -2,19 +2,19 @@
 import { linkGroupProps, type LinkGroupProps } from "./directory";
 
 export type Props = LinkGroupProps;
-const { id, title, layout, links, showHeading } = linkGroupProps(Astro.props);
+const { id, title, layout, links, showHeading, iconOnly } = linkGroupProps(Astro.props);
 ---
 
 <section id={id} aria-labelledby={showHeading ? id + "-title" : undefined} aria-label={showHeading ? undefined : title} class="directory-link-group">
   {showHeading && <h2 id={id + "-title"}>{title}</h2>}
   <ul role="list" class:list={["directory-links", { "directory-links-stack": layout === "stack" }]}>
     {links.map(link => <li>
-      <a href={link.href} rel={link.rel}>
+      <a href={link.href} rel={link.rel} aria-label={iconOnly ? link.label : undefined} class:list={{ "directory-icon-only": iconOnly }}>
         {link.iconSrc && <span class="directory-icon" aria-hidden="true" style={`mask-image:url("${link.iconSrc}")`}></span>}
-        <span class="directory-link-copy">
+        {!iconOnly && <span class="directory-link-copy">
           <span class="directory-link-label">{link.label}</span>
           {link.description && <small>{link.description}</small>}
-        </span>
+        </span>}
         {link.external && <span class="directory-external" aria-hidden="true">↗</span>}
       </a>
     </li>)}
@@ -82,6 +82,16 @@ const { id, title, layout, links, showHeading } = linkGroupProps(Astro.props);
     mask-position: center;
     mask-repeat: no-repeat;
     mask-size: contain;
+  }
+  .directory-links a.directory-icon-only {
+    box-sizing: border-box;
+    justify-content: center;
+    inline-size: 2.75rem;
+    min-block-size: 2.75rem;
+  }
+  .directory-icon-only .directory-icon {
+    flex-basis: 1.5rem;
+    height: 1.5rem;
   }
   .directory-external {
     flex: none;

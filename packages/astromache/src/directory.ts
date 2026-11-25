@@ -30,6 +30,11 @@ export function sectionProps(input: SectionProps): SectionProps {
   if (typeof input.id !== "string" || !/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(input.id)) {
     throw new TypeError("Directory section id must be a nonempty HTML identifier");
   }
+  // The visible heading derives its ID from the section ID. Reserve that suffix
+  // so one valid directory section can never duplicate another section heading.
+  if (input.id.endsWith("-title")) {
+    throw new TypeError("Directory section id must not end in the reserved -title suffix");
+  }
   return { id: input.id, title: directoryTitle(input.title) };
 }
 

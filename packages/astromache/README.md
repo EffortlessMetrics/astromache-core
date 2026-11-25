@@ -1,4 +1,4 @@
-# astromache 0.4.0-directory.1 — unpublished candidate
+# astromache 0.4.0-directory.2 — unpublished candidate
 
 Reusable publication components and static publishing for Astro. Source: https://github.com/EffortlessMetrics/astromache-core. The small editable starter is https://github.com/EffortlessMetrics/astromache; real sites consume the libraries independently.
 
@@ -14,7 +14,7 @@ The foundation supplies real publication typography, responsive navigation, arti
 ## Added exports
 
 - `astromache/directory`: compact identity heading and responsive grid of consumer-owned link groups; required title and default slot. No biography, portrait or JavaScript.
-- `astromache/link-group`: required id, title and links[{label,href,rel?,description?,iconSrc?,external?}]; inline or stack layout. IDs are consumer-owned and unique. Icons are decorative local assets; links never open a new tab automatically.
+- `astromache/link-group`: required id, title and links[{label,href,rel?,description?,iconSrc?,external?}]; inline or stack layout. IDs are consumer-owned and unique; the `-title` suffix is reserved for generated heading IDs. Do not use these generated IDs elsewhere in the page. Icons are decorative local assets; links never open a new tab automatically.
 - `astromache/content-section`: generic content section with required id/title, optional actions slot and default content slot. Consumers own collections, ordering, card content and all links.
 
 Compose a directory before independent content sections, keep the existing Profile for About, and choose the homepage composition at build time by editing the starter's index route. No new runtime mode or content schema is required.

@@ -7,7 +7,7 @@ const { id, title, layout, links } = linkGroupProps(Astro.props);
 
 <section id={id} aria-labelledby={id + "-title"} class="directory-link-group">
   <h2 id={id + "-title"}>{title}</h2>
-  <ul class:list={["directory-links", { "directory-links-stack": layout === "stack" }]}>
+  <ul role="list" class:list={["directory-links", { "directory-links-stack": layout === "stack" }]}>
     {links.map(link => <li>
       <a href={link.href} rel={link.rel}>
         {link.iconSrc && <span class="directory-icon" aria-hidden="true" style={`mask-image:url("${link.iconSrc}")`}></span>}

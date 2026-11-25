@@ -67,3 +67,11 @@ test("rejects empty groups, unreadable titles and unknown layouts", () => {
     } as unknown as LinkGroupProps),
   ).toThrow();
 });
+
+test("reserves derived heading IDs against other directory sections", () => {
+  expect(sectionProps({ id: "work", title: "Work" }).id).toBe("work");
+  expect(() => sectionProps({ id: "work-title", title: "Other work" })).toThrow("reserved -title");
+  expect(() =>
+    linkGroupProps({ id: "follow-title", title: "Links", links: [{ label: "Home", href: "/" }] }),
+  ).toThrow("reserved -title");
+});

@@ -185,7 +185,7 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
         assert.equal(await profileLink.getAttribute("rel"), "me");
         assert.equal(await profileLink.getAttribute("target"), null);
         await profileLink.focus();
-        for (const name of ["Example contact", "Publication Writing", "Projects", "All work"]) {
+        for (const name of ["Example profile page", "Publication Writing", "Projects", "All work"]) {
           await page.keyboard.press("Tab");
           assert.equal(
             await page
@@ -211,6 +211,14 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
           true,
           "Enlarged directory text must not overflow horizontally",
         );
+        assert.equal(await page.locator(".directory-links[role=list]").count(), 2);
+        await page.getByRole("link", { name: "Example profile page", exact: true }).click();
+        assert.equal(new URL(page.url()).pathname, "/profile/");
+        assert.ok(await page.getByRole("heading", { level: 1 }).count());
+        await page.goto(`${origin}/directory/`);
+        await page.getByRole("link", { name: "Example project", exact: true }).click();
+        assert.equal(new URL(page.url()).pathname, "/portfolio/");
+        assert.ok(await page.getByRole("heading", { level: 1 }).count());
         assert.deepEqual(errors, []);
         checks.push({
           width,
@@ -256,7 +264,7 @@ export async function verifyProfileBrowser(directory, evidenceDirectory) {
       "Websites",
       "Work",
     ]);
-    assert.equal(await page.getByRole("link", { name: "Example recorded talk" }).isVisible(), true);
+    assert.equal(await page.getByRole("link", { name: "Example project" }).isVisible(), true);
     assert.equal(await page.getByRole("link", { name: "Example profile" }).isVisible(), true);
     await context.close();
     const receipt = {

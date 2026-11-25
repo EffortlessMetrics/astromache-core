@@ -161,6 +161,11 @@ assert.match(directory, /id="work"[^>]*aria-labelledby="work-title"/);
 assert.ok(directory.indexOf('id="follow"') < directory.indexOf('id="work"'));
 assert.match(directory, /href="https:\/\/profiles\.example\/person\/" rel="me"/);
 assert.doesNotMatch(directory, /class="profile-portrait"/);
+assert.equal((directory.match(/<ul[^>]*role="list"[^>]*>/g) ?? []).length, 2);
+for (const route of ["profile", "portfolio"]) {
+  assert.ok(directory.includes(`href="/${route}/"`));
+  assert.ok((await readFile(join(consumer, "dist", route, "index.html"))).length);
+}
 const stylesheets = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)];
 assert.ok(stylesheets.length, "Consumer must emit linked stylesheets");
 const css = (

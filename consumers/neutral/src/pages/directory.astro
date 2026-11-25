@@ -6,7 +6,7 @@ import ContentSection from "astromache/content-section";
 import "astromache/publication.css";
 const profiles = [
   { label: "Example profile", href: "https://profiles.example/person/", rel: "me" },
-  { label: "Example contact", href: "/about/" },
+  { label: "Example profile page", href: "/profile/" },
 ];
 const websites = [
   { label: "Publication", href: "https://notes.example/", description: "Writing", external: true },
@@ -21,6 +21,6 @@ const websites = [
   </Directory>
   <ContentSection id="work" title="Work">
     <a slot="actions" href="/portfolio/">All work</a>
-    <ul><li><h3><a href="/talk/">Example recorded talk</a></h3><p>Consumer-owned description.</p></li></ul>
+    <ul><li><h3><a href="/portfolio/">Example project</a></h3><p>Consumer-owned description.</p></li></ul>
   </ContentSection>
 </Publication>

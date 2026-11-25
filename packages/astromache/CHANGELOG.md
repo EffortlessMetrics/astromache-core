@@ -1,3 +1,9 @@
+## 0.4.0-directory.2 — unpublished candidate
+
+- Preserve explicit link-list semantics when CSS removes list markers.
+- Reserve derived heading IDs against other directory sections.
+- Qualify real local navigation in the neutral directory fixtures.
+
 ## 0.4.0-directory.1 — unpublished candidate
 
 - Add optional, static Directory, LinkGroup and ContentSection compositions using existing publication tokens.
